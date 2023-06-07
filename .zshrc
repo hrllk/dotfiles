@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/hr.k/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -80,10 +80,21 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 
+# 라인
+prompt_context() { 
+  # Custom (Random emoji) 
+  # emojis=("🐿" "🤍" "💛" "🐰" "🐥" "🦋" "🌈" "🍻" "🚀" "🍒" "🌙")
+  emojis=("🦋" "🌈" "🍻" "🚀" "🍒" "🌙")
+  RAND_EMOJI_N=$(( $RANDOM % ${#emojis[@]} + 1)) 
+  prompt_segment black default "hr_k ${emojis[$RAND_EMOJI_N]} " 
+}
+
+
+
 ## ENV Variables 
 export JKS_HOME=~/task/jks
-export ADB_HOME=/Users/hr.k/Library/Android/sdk
-export SPRING_HOME=/Users/hr.k/util/spring-2.3.8.RELEASE
+export ADB_HOME=$HOME/Library/Android/sdk
+export SPRING_HOME=$HOME/util/spring-2.3.8.RELEASE
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
 export HOMEBREW_RABBITMQ=/opt/homebrew/Cellar/rabbitmq/3.10.7
 # export RUBY_HOME=~/.gem/ruby/3.0.0
@@ -94,9 +105,9 @@ export GEM_HOME=$HOME/.gem/ruby/2.6.0
 export RBENV_HOME=$HOME/.rbenv/versions/2.6.10
 export LDFLAGS="-L/opt/homebrew/opt/libiconv/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/libiconv/include"
-export FP_HOME="/Users/hr.k/util/fp"
+export FP_HOME="$HOME/util/fp"
 export MYVIMRC="$HOME/.config/nvim/init.vim"
-# export IDEA_HOME="/System/Volumes/Data/Users/hr.k/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/213.5744.223/IntelliJ IDEA.app/Contents/MacOS"
+# export IDEA_HOME="/System/Volumes/Data/$HOME/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/213.5744.223/IntelliJ IDEA.app/Contents/MacOS"
 export IDEA_HOME="/Applications/IntelliJ IDEA.app/Contents/MacOS"
 export AND_STUDIO_HOME="/Applications/IntelliJ IDEA.app/Contents/MacOS"
 export JDTLS_HOME=$HOME/.local/share/nvim/lsp/jdt-language-server
