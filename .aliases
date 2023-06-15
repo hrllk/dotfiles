@@ -17,10 +17,7 @@ alias tk='tail -F $KAFKA_HOME/logs/server.log'
 alias tz='tail -F $KAFKA_HOME/logs/zookeeper.out'
 
 #전체목록, 그룹X, 시간순, 깃상태, 디렉토리우선리스
-# should install a specific font to fix broken icon of colorls 
-#https://github.com/ryanoasis/nerd-fonts/blob/master/readme.md#patched-fonts
 alias ll='colorls -lGt --gs --sd'
-alias ll='colorls -alGt --gs'
 alias ls='colorls'
 
 alias cdsource='cd $HOME/sources'
