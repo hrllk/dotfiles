@@ -81,13 +81,13 @@ source $ZSH/oh-my-zsh.sh
 
 
 # 라인
-prompt_context() { 
-  # Custom (Random emoji) 
-  # emojis=("🐿" "🤍" "💛" "🐰" "🐥" "🦋" "🌈" "🍻" "🚀" "🍒" "🌙")
-  emojis=("🦋" "🌈" "🍻" "🚀" "🍒" "🌙")
-  RAND_EMOJI_N=$(( $RANDOM % ${#emojis[@]} + 1)) 
-  prompt_segment black default "hr_k ${emojis[$RAND_EMOJI_N]} " 
-}
+ prompt_context() { 
+   # Custom (Random emoji) 
+   # emojis=("🐿" "🤍" "💛" "🐰" "🐥" "🦋" "🌈" "🍻" "🚀" "🍒" "🌙")
+   emojis=("🌈" "🌙")
+   RAND_EMOJI_N=$(( $RANDOM % ${#emojis[@]} + 1)) 
+   prompt_segment black default "$USER ${emojis[$RAND_EMOJI_N]} " 
+ }
 
 export LANG='en_US.UTF-8' 
 export LC_ALL=en_US.UTF-8
@@ -98,6 +98,10 @@ if [ -f $HOME/.aliases ];
 	then source $HOME/.aliases;
 fi
 
+if [ -f $HOME/.path ];
+	then source $HOME/.path;
+fi
+
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; 
 if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; 
 	then . "${___MY_VMOPTIONS_SHELL_FILE}"; 
@@ -106,4 +110,5 @@ fi
 
 
 set -o vi
+
 

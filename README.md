@@ -1,4 +1,19 @@
-## .zshrc 
+## install .zsh plugin 
+
+### 0. change sh from bash to zsh optional
+
+install zsh (using pkg manager (apt... )
+```
+sudo apt install zsh
+```
+
+isntall oh zsh (using wget)
+
+it changed to default shell automatically 
+```
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+```
+
 
 ### install plugins 
 
