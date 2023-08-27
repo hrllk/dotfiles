@@ -27,3 +27,33 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 ```
 
+
+
+### install colorls (using homebrew)
+
+##### pr-requires 
+gem (ruby) 
+
+please udpate ruby version using rbenv 
+``` bash 
+brew insatll rbev
+```
+
+
+
+
+
+#### install font (for colorls icon)
+##### 1. tap
+``` bash
+brew tap homebrew/cask-fonts 
+```
+##### 2. install 
+
+``` bash
+brew install font-hack-nerd-font
+```
+
+
+
+

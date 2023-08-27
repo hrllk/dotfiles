@@ -20,7 +20,7 @@ alias tz='tail -F $KAFKA_HOME/logs/zookeeper.out'
 alias ll='colorls -lGt --gs --sd'
 alias ls='colorls'
 
-alias cdsource='cd $HOME/sources'
+alias cdsource='cd $HOME/task/sources'
 alias cdtask='cd "$HOME/Library/Mobile Documents/com~apple~CloudDocs/task"'
 
 
