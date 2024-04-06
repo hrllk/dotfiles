@@ -3,6 +3,9 @@ export PATH=/opt/homebrew/bin:$PATH
 # export PATH=/opt/homebrew/opt/ruby@3.1/bin:$PATH
   
   
-export PATH=/Users/alzar/.rbenv/versions/3.1.4/bin:$PATH
+export PATH=$HOME/.rbenv/versions/3.1.4/bin:$PATH
 export PATH=/opt/homebrew/opt/openjdk@17/bin:$PATH
 export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
+export PATH=$HOME/.local/bin:$PATH
+
+export OPENAI_API_KEY=$(cat /Users/alzar/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
