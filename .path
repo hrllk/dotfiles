@@ -8,4 +8,4 @@ export PATH=/opt/homebrew/opt/openjdk@17/bin:$PATH
 export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
 export PATH=$HOME/.local/bin:$PATH
 
-export OPENAI_API_KEY=$(cat /Users/alzar/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
+export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
