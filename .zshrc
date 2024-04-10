@@ -99,8 +99,11 @@ if [ -f $HOME/.aliases ];
 	then source $HOME/.aliases;
 fi
 
-if [ -f $HOME/.path ];
-	then source $HOME/.path;
+if [ -f $HOME/.paths ];
+	then source $HOME/.paths;
+fi
+if [ -f $HOME/.variables ];
+	then source $HOME/.variables;
 fi
 
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; 
