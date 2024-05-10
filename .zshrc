@@ -93,17 +93,18 @@ source $ZSH/oh-my-zsh.sh
 export LANG='en_US.UTF-8' 
 export LC_ALL=en_US.UTF-8
 
+export DOT_PATH="$HOME/dotfiles"
 
 ## shortcut 
-if [ -f $HOME/.aliases ];
-	then source $HOME/.aliases;
+if [ -f $DOT_PATH/.aliases ];
+	then source $DOT_PATH/.aliases;
 fi
 
-if [ -f $HOME/.paths ];
-	then source $HOME/.paths;
+if [ -f $DOT_PATH/.paths ];
+	then source $DOT_PATH/.paths;
 fi
-if [ -f $HOME/.variables ];
-	then source $HOME/.variables;
+if [ -f $DOT_PATH/.variables ];
+	then source $DOT_PATH/.variables;
 fi
 
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; 
