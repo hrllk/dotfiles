@@ -1,29 +1,9 @@
-username=hwiryungkim
-
-# alias pedevbas='ssh -i $JKS_HOME/gruvoice-dev.pem ec2-user@13.124.91.253' 
-# alias peprodbas='ssh -i $JKS_HOME/gru-voice-prod-key.pem ec2-user@13.124.181.189'
-
-
-alias pedevbas='ssh -i $JKS_HOME/gru-voice-dev-new.pem ec2-user@13.124.91.253' 
-alias peprodbas='ssh -i $JKS_HOME/gru-voice-prod-new.pem ec2-user@13.124.181.189'
-
-alias startz='$KAFKA_HOME/bin/zookeeper-server-start.sh -daemon $KAFKA_HOME/config/zookeeper.properties'
-alias stopz='$KAFKA_HOME/bin/zookeeper-server-stop.sh'
-alias startk='$KAFKA_HOME/bin/kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties'
-alias stopk='$KAFKA_HOME/bin/kafka-server-stop.sh'
-alias sz='ps -ef | grep zookeeper.properties'
-alias sk='ps -ef | grep server.properties'
-alias tk='tail -F $KAFKA_HOME/logs/server.log'
-alias tz='tail -F $KAFKA_HOME/logs/zookeeper.out'
-
 #전체목록, 그룹X, 시간순, 깃상태, 디렉토리우선리스
 alias ll='colorls -lGt --gs --sd'
 alias ls='colorls'
 
 alias cdsource='cd $HOME/task/sources'
 alias cdtask='cd "$HOME/Library/Mobile Documents/com~apple~CloudDocs/task"'
-
-
 
 # should access after connect vpn 
 alias okestrovpn='ssh root@100.0.0.176'
