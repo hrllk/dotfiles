@@ -19,6 +19,10 @@ username=hwiryungkim
 #전체목록, 그룹X, 시간순, 깃상태, 디렉토리우선리스
 alias ll='colorls -lGt --gs --sd'
 alias ls='colorls'
+function tree() {
+  [[ -n "$1" ]] && depth=$1 || depth=1
+  colorls ${dir} -l --tree=${depth} --sd --sf
+}
 
 alias cdsource='cd $HOME/task/sources'
 alias cdtask='cd "$HOME/Library/Mobile Documents/com~apple~CloudDocs/task"'
