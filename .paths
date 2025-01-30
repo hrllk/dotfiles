@@ -1,9 +1,17 @@
 export PATH=/opt/homebrew/bin:$PATH
-  
-  
+
+export GRADLE_HOME=/Users/alzar/task/tmp/gradle-8.10.2
+export MAVEN_HOME=/opt/homebrew/Cellar/maven/3.9.9/libexec
+export IMAGEMAGICK_HOME=/opt/homebrew/var/homebrew/linked/imagemagick
+export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/var/homebrew/linked/imagemagick/lib
+
+
+
 export PATH=$HOME/.rbenv/versions/3.1.4/bin:$PATH
 export PATH=/opt/homebrew/opt/openjdk@17/bin:$PATH
 export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
+export PATH=$IMAGEMAGICK_HOME/bin:$PATH
+
 export NVM_DIR="$HOME/.nvm"
 
 export PATH=$HOME/.local/bin:$PATH
