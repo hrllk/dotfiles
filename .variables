@@ -1,1 +1,2 @@
-export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
+# export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
+export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/deepseek)

@@ -40,12 +40,12 @@ alias gotpsprd="sshpass -p 'cloud1234' ssh root@10.0.30.11"
 
 
 alias gotpsdevjenkins1="sshpass -p 'cloud1234' ssh root@172.10.40.221"
-
 alias hgrep='history | grep'
-#alias jarvis='cd ~/task/chat && nvim +"ChatGPT"'
-#alias jarvis='cd ~/task/chat && nvim --cmd "ChatGPT"'
-#alias jarvis='cd ~/task/chat && nvim +ChatGPT'
-alias jarvis='(cd ~/task/chat && nvim +"ChatGPT")'
+
 
 alias gotrbdev="sshpass -p 'cloud1234' ssh root@172.10.60.87"
 alias gotrbmirae="sshpass -p 'cloud1234' ssh root@10.0.30.180"
+alias vi='nvim'
+
+alias todo='cd $HOME/task/sources/personal/secretary && nvim'
+alias jarvis='cd $HOME/task/chat && nvim'
