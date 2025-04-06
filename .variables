@@ -1,2 +1,6 @@
 # export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
-export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/deepseek)
+export DEEPSEEK_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/deepseek)
+export OPENAI_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/gpt)
+export CLAUDE_API_KEY=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/claude)
+export OLLAMA_HOST=0.0.0.0
+
