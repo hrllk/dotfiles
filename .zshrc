@@ -127,8 +127,19 @@ export SDKMAN_DIR="$HOME/.sdkman"
 prompt_context() {}
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/hwiryungkim/.rd/bin:$PATH"
+# export PATH="/Users/hwiryungkim/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
 # Added by LM Studio CLI (lms)
-# export PATH="$PATH:/Users/hwiryungkim/.lmstudio/bin"
+
+alias vim='nvim --listen /tmp/nvim-server.pipe'
+
+
+# # Default Editor
+# if [ -n "$NVIM_LISTEN_ADDRESS" ]; then
+#     export VISUAL="nvr -cc split --remote-wait +'set bufhidden=wipe'"
+# else
+#     export VISUAL="nvim"
+# fi
+#
+# export EDITOR="$VISUAL"

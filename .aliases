@@ -50,5 +50,6 @@ alias vi='nvim'
 alias todo='cd $HOME/task/sources/personal/secretary && nvim'
 alias jarvis='cd $HOME/task/chat && nvim'
 
+alias tm='task-master'
 
 alias cl='clear'
