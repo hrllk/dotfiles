@@ -103,8 +103,8 @@ fi
 if [ -f $DOT_PATH/.paths ];
 	then source $DOT_PATH/.paths;
 fi
-if [ -f $DOT_PATH/.variables ];
-	then source $DOT_PATH/.variables;
+if [ -f $DOT_PATH/.env_vars ];
+	then source $DOT_PATH/.env_vars;
 fi
 
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; 
