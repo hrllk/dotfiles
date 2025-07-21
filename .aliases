@@ -1,22 +1,10 @@
 username=hwiryungkim
 
-# alias pedevbas='ssh -i $JKS_HOME/gruvoice-dev.pem ec2-user@13.124.91.253' 
-# alias peprodbas='ssh -i $JKS_HOME/gru-voice-prod-key.pem ec2-user@13.124.181.189'
+alias todo='cd $HOME/task/sources/personal/secretary && nvim'
+alias tm='task-master'
+alias vi='nvim'
+alias k='kubectl'
 
-
-# alias pedevbas='ssh -i $JKS_HOME/gru-voice-dev-new.pem ec2-user@13.124.91.253' 
-# alias peprodbas='ssh -i $JKS_HOME/gru-voice-prod-new.pem ec2-user@13.124.181.189'
-#
-# alias startz='$KAFKA_HOME/bin/zookeeper-server-start.sh -daemon $KAFKA_HOME/config/zookeeper.properties'
-# alias stopz='$KAFKA_HOME/bin/zookeeper-server-stop.sh'
-# alias startk='$KAFKA_HOME/bin/kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties'
-# alias stopk='$KAFKA_HOME/bin/kafka-server-stop.sh'
-# alias sz='ps -ef | grep zookeeper.properties'
-# alias sk='ps -ef | grep server.properties'
-# alias tk='tail -F $KAFKA_HOME/logs/server.log'
-# alias tz='tail -F $KAFKA_HOME/logs/zookeeper.out'
-
-#전체목록, 그룹X, 시간순, 깃상태, 디렉토리우선리스
 alias ll='colorls -lGt --gs --sd'
 alias ls='colorls'
 function tree() {
@@ -24,32 +12,8 @@ function tree() {
   colorls ${dir} -l --tree=${depth} --sd --sf
 }
 
+alias hgrep='history | grep'
+alias cl='clear'
+
 alias cdsource='cd $HOME/task/sources'
 alias cdtask='cd "$HOME/Library/Mobile Documents/com~apple~CloudDocs/task"'
-
-alias k='kubectl'
-
-
-# should access after connect vpn 
-alias okestrovpn='ssh root@100.0.0.176'
-# alias gotpsdev="sshpass -p 'cloud1234' ssh root@172.10.40.10"
-# alias gotpsstg1="sshpass -p 'cloud1234' ssh root@172.10.40.217"
-# alias gotpsstg2="sshpass -p 'cloud1234' ssh root@172.10.40.206"
-# alias gotpsstg3="sshpass -p 'cloud1234' ssh root@172.10.40.31"
-alias gotpsprd="sshpass -p 'cloud1234' ssh root@10.0.30.11"
-
-
-alias gotpsdevjenkins1="sshpass -p 'cloud1234' ssh root@172.10.40.221"
-alias hgrep='history | grep'
-
-
-alias gotrbdev="sshpass -p 'cloud1234' ssh root@172.10.60.87"
-alias gotrbmirae="sshpass -p 'cloud1234' ssh root@10.0.30.180"
-alias vi='nvim'
-
-alias todo='cd $HOME/task/sources/personal/secretary && nvim'
-alias jarvis='cd $HOME/task/chat && nvim'
-
-alias tm='task-master'
-
-alias cl='clear'
