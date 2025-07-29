@@ -45,7 +45,8 @@ alias hgrep='history | grep'
 
 alias gotrbdev="sshpass -p 'cloud1234' ssh root@172.10.60.87"
 alias gotrbmirae="sshpass -p 'cloud1234' ssh root@10.0.30.180"
-alias vi='nvim'
+alias vi='nvim --listen /tmp/nvim-server.pipe'
+# alias vi='nvim'
 
 alias todo='cd $HOME/task/sources/personal/secretary && nvim'
 alias jarvis='cd $HOME/task/chat && nvim'
