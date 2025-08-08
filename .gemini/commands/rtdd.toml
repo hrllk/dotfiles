@@ -1,0 +1,9 @@
+# In: ~/.gemini/commands/rtdd.toml
+# Invoked via: /rtdd "pasted failing test code"
+# or by piping the test file: cat path/to/test.spec.js | /tdd
+
+description = "Generates test code based on a current class (Reverse Test-Driven Development)."
+prompt = """
+please, create a test case within current code
+and you can also separate it when the implementation is complex or include many functionality 
+"""

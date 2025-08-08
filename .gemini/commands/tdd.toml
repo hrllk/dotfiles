@@ -1,0 +1,16 @@
+# In: ~/.gemini/commands/tdd.toml
+# Invoked via: /tdd "pasted failing test code"
+# or by piping the test file: cat path/to/test.spec.js | /tdd
+
+description = "Generates implementation code based on a failing test (Test-Driven Development)."
+prompt = """
+You are an expert in Test-Driven Development (TDD).
+The user has provided a failing test case. Your task is to write the simplest, cleanest production code possible to make this test pass.
+Do not write new tests, only the implementation code.
+
+Here is the failing test:
+---
+{{args}}
+---
+Please provide only the implementation code that satisfies this test.
+"""

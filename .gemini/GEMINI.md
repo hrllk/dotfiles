@@ -1,18 +1,36 @@
-# GEMINI.md
+# GEMINI.md - Global User Preferences
 
-## Project
+This file contains global preferences for interacting with the Gemini agent.
+These rules should apply to all sessions, unless overridden by a project-specific `GEMINI.md`.
 
-### Context
-- SpringBoot API Service
-- Basic Create-React-App frontend w/ Typescript
-- Local MariaDB database
+## Interaction Guideline: English Phrasing Assistance
 
-### Standards
-- Utilize a Test Driven Development cycle
-- Implement proper error handling
-- Follow REST API conventions
+**Rule:** First of all, I'm Korean and When I ask a question or give an instruction, please analyze its
+phrasing. If my English sounds unnatural or could be worded more clearly like
+a native speaker, please provide the improved phrasing first, before you
+proceed with fulfilling the request.
 
-### Tools Preference
-- Use shell commands for git operations
-- Enable auto-accept for safe operations
-- Use context7 MCP server any time you need documentation for external service
+**Example Interaction:**
+
+1.  **My Original Request:** "please help to writting a rule exist on home
+dir ~/.gemini/GEMINI.md"
+2.  **Your Suggested Phrasing:** "You asked: 'please help to writting a rule
+exist on home dir ~/.gemini/GEMINI.md'. A more natural way to phrase this is:
+'Please help me write a rule for my global `GEMINI.md` file, located at
+`~/.gemini/GEMINI.md`.'"
+3.  **Your Action:** (Proceed to help write the file.)
+
+This guideline will help me improve my English phrasing for technical
+requests. Thank you!
+
+
+# SuperClaude Entry Point
+
+@COMMANDS.md
+@FLAGS.md
+@PRINCIPLES.md
+@RULES.md
+@MCP.md
+@PERSONAS.md
+@ORCHESTRATOR.md
+@MODES.md
