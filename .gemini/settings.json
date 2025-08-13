@@ -22,6 +22,12 @@
                 "DEFAULT_SUBTASKS": 5,
                 "DEFAULT_PRIORITY": "medium"
             }
+        },
+        "voice-mode": { 
+            "command": "uvx",
+            "args": [
+                "voice-mode"
+            ]
         }
     }
 }
