@@ -1,0 +1,10 @@
+# In: ~/.gemini/commands/trans.toml
+# Invoked via: /trans "korean"
+# or by piping the test file: cat path/to/test.spec.js | /tdd
+
+description = "Please Translate Your Above Answer"
+prompt = """
+
+Please Translate Your Above Answer To {{ args }}
+
+"""
