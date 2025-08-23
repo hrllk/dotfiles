@@ -3,6 +3,7 @@
   "theme": "ANSI",
   "vimMode": true,
   "preferredEditor": "neovim",
+  "model": "gemini-2.5-flash",
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -27,12 +28,6 @@
         "DEFAULT_PRIORITY": "medium"
       }
     },
-    "voice-mode": {
-      "command": "uvx",
-      "args": [
-          "voice-mode"
-      ]
-    },
     "playwright": {
       "command": "npx",
       "args": [
@@ -43,5 +38,6 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     }
+
   }
 }
