@@ -8,8 +8,16 @@ alias k='kubectl'
 alias ll='colorls -lGt --gs --sd'
 alias ls='colorls'
 function tree() {
-  [[ -n "$1" ]] && depth=$1 || depth=1
-  colorls ${dir} -l --tree=${depth} --sd --sf
+  local depth=1
+  local mode="all"   # 기본값: 전체
+  [[ -n "$1" ]] && depth=$1
+  [[ -n "$2" ]] && mode=$2
+
+  if [[ "$mode" == "dirs" ]]; then
+    colorls ${dir:-.} -l --tree=${depth} --dirs
+  else
+    colorls ${dir:-.} -l --tree=${depth} --sd --sf
+  fi
 }
 
 alias hgrep='history | grep'
