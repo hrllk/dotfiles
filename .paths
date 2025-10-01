@@ -16,6 +16,8 @@ export PATH=$HOME/.rd/bin:$PATH
 export PATH=/usr/local/texlive/2025/bin/universal-darwin:$PATH
 export PATH="$HOME/.local/bin:$PATH"
 
+export PATH="/usr/local/bin:$PATH"
+
 
 export NVM_DIR="$HOME/.nvm"
 
