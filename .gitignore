@@ -3,3 +3,9 @@
 .yarn*
 *.log
 .gemini/tmp/*
+
+.codex/log
+.codex/log/*
+
+.codex/sessions
+.codex/sessions/*
