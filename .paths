@@ -1,6 +1,8 @@
 export MAVEN_HOME=/opt/homebrew/Cellar/maven/3.9.9/libexec
 export GRADLE_HOME=$HOME/task/tmp/gradle-8.10.2
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21
+# export JAVA_HOME=/opt/homebrew/opt/openjdk@21
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+# export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home
 export IMAGEMAGICK_HOME=/opt/homebrew/var/homebrew/linked/imagemagick
 export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/var/homebrew/linked/imagemagick/lib
 
