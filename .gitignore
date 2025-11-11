@@ -2,7 +2,10 @@
 .nvimlog
 .yarn*
 *.log
+.DS_Store
 .gemini/tmp/*
+.gemini/.DS_Store
+.gemini/settings.json.orig
 
 .codex/log
 .codex/log/*
