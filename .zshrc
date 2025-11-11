@@ -107,6 +107,12 @@ if [ -f $DOT_PATH/.env_vars ];
 	then source $DOT_PATH/.env_vars;
 fi
 
+if [ -f $DOT_PATH/.oke_vars ];
+	then source $DOT_PATH/.oke_vars;
+fi
+if [ -f $DOT_PATH/.aliases_work ];
+	then source $DOT_PATH/.aliases_work;
+fi
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; 
 if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; 
 	then . "${___MY_VMOPTIONS_SHELL_FILE}"; 
