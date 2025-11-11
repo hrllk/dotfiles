@@ -1,0 +1,3 @@
+
+alias godcprd='sshpass -f "$DC_TRB_PRD" ssh root@10.255.37.211'
+
