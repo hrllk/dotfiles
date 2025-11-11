@@ -1,9 +1,4 @@
 {
-  "selectedAuthType": "gemini-api-key",
-  "theme": "ANSI",
-  "vimMode": true,
-  "preferredEditor": "neovim",
-  "model": "gemini-2.5-flash",
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -36,8 +31,25 @@
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     }
-
+  },
+  "model": {
+    "name": "gemini-2.5-flash"
+  },
+  "general": {
+    "preferredEditor": "neovim",
+    "vimMode": true
+  },
+  "security": {
+    "auth": {
+      "selectedType": "gemini-api-key"
+    }
+  },
+  "ui": {
+    "theme": "ANSI"
   }
 }
