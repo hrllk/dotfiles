@@ -1,0 +1,5 @@
+export DC_TRB_PRD=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/work/dc_trb_prd)
+export DC_TRB_STG=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/work/dc_trb_stg)
+export DC_TRB_DEV=$(cat $HOME/Library/Mobile\ Documents/com~apple~CloudDocs/task/keys/work/dc_trb_dev)
+
+
