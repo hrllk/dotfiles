@@ -1,3 +1,4 @@
-
-alias godcprd='sshpass -f "$DC_TRB_PRD" ssh root@10.255.37.211'
+alias godcprd='sshpass -p $DC_TRB_PRD ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no root@10.255.37.211'
+alias godcstg='sshpass -p $DC_TRB_STG ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no root@10.255.12.119'
+alias godcdev='sshpass -p $DC_TRB_DEV ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no root@10.255.17.235'
 

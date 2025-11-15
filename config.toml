@@ -1,0 +1,9 @@
+model = "gpt-5"
+model_reasoning_effort = "medium"
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp"]
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
