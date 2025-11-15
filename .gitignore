@@ -12,3 +12,5 @@
 
 .codex/sessions
 .codex/sessions/*
+
+auth.json
