@@ -56,3 +56,11 @@ alias gclean='GIT_TRACE=1 git clean -fd'
 # logs
 alias glgc='GIT_TRACE=1 git log --oneline --graph --decorate'
 alias glga='git log --graph --decorate --all --format="%C(auto)%h %Cgreen(%cr)%Creset %C(bold blue)<%an>%Creset %C(auto)%d %s"'
+
+#############################
+# task master 
+#############################
+alias tm='task-master'
+alias taskmaster='task-master'
+alias hamster='task-master'
+alias ham='task-master'
