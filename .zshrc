@@ -5,6 +5,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -131,6 +132,13 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 prompt_context() {}
+
+## lazy-load nvm (load only when needed)
+export NVM_DIR="$HOME/.nvm"
+nvm() { unset -f nvm; [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"; nvm "$@"; }
+node() { unset -f node; nvm >/dev/null 2>&1; node "$@"; }
+npm() { unset -f npm; nvm >/dev/null 2>&1; npm "$@"; }
+npx() { unset -f npx; nvm >/dev/null 2>&1; npx "$@"; }
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 # export PATH="/Users/hwiryungkim/.rd/bin:$PATH"
