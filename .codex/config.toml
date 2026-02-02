@@ -1,4 +1,4 @@
-model = "gpt-5"
+model = "gpt-5.2-codex"
 model_reasoning_effort = "medium"
 [mcp_servers.context7]
 command = "npx"
@@ -6,4 +6,96 @@ args = ["-y", "@upstash/context7-mcp"]
 
 [mcp_servers.playwright]
 command = "npx"
-args = ["@playwright/mcp@latest"]
+# args = ["@playwright/mcp@latest"]
+args = ["@playwright/mcp@latest", "--user-data-dir=$HOME/Library/Application Support/Google/Chrome"]
+
+[mcp_servers.taskmaster-ai]
+command = "npx"
+args = ["task-master-ai"]
+
+# FIGMA 
+[mcp_servers.figma]
+command = "npx"
+args = ["-y", "mcp-remote", "http://127.0.0.1:3845/mcp", "--transport", "http"]
+enabled = true
+
+[mcp_servers.figma.environment]
+FIGMA_TOKEN = "${FIGMA_TOKEN}"
+# /FIGMA
+
+sandbox_mode = "workspace-write"
+
+[projects."/Users/hwiryungkim/task/work/sources/okestro/trombone-standalone/pipeline-api"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/.codex"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/.codex/log"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/jgitkins"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/personal/251205_hrllk"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/work/sources/okestro/trombone-standalone/auth-api"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/work/sources/okestro/trombone-standalone/react-app"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/jgitkins/jgitkins-server"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/jgitkins/jgitkins-runner"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/work/sources/okestro/archive/tps"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/work/sources/okestro/trombone-standalone/common-api"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/work/sources/okestro/tps2"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/trombone-standalone/react-app"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/trombone-standalone/pipeline-api"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/trombone-standalone/workflow-api"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/archive2/tps"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/personal/secretary"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/trombone-standalone/core-lib"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/trombone-standalone/pipeline-api/core-lib"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/task/sources/jgitkins/jgitkins-web"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/Downloads"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/go/bin"]
+trust_level = "untrusted"
+
+[projects."/Users/hwiryungkim/Library/CloudStorage/OneDrive-SharedLibraries-오케스트로/TPS - Documents/파트/TF/주간보고"]
+trust_level = "untrusted"
+
+[notice]
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+
+[notice.model_migrations]
+"gpt-5.1-codex-mini" = "gpt-5.2-codex"
