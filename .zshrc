@@ -139,6 +139,7 @@ nvm() { unset -f nvm; [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew
 node() { unset -f node; nvm >/dev/null 2>&1; node "$@"; }
 npm() { unset -f npm; nvm >/dev/null 2>&1; npm "$@"; }
 npx() { unset -f npx; nvm >/dev/null 2>&1; npx "$@"; }
+codex() { unset -f codex; nvm >/dev/null 2>&1; command codex "$@"; }
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 # export PATH="/Users/hwiryungkim/.rd/bin:$PATH"
