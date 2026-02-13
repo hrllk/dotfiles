@@ -133,14 +133,6 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 prompt_context() {}
 
-## lazy-load nvm (load only when needed)
-export NVM_DIR="$HOME/.nvm"
-nvm() { unset -f nvm; [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"; nvm "$@"; }
-node() { unset -f node; nvm >/dev/null 2>&1; node "$@"; }
-npm() { unset -f npm; nvm >/dev/null 2>&1; npm "$@"; }
-npx() { unset -f npx; nvm >/dev/null 2>&1; npx "$@"; }
-codex() { unset -f codex; nvm >/dev/null 2>&1; command codex "$@"; }
-
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 # export PATH="/Users/hwiryungkim/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)

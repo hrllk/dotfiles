@@ -26,3 +26,45 @@ export NVM_DIR="$HOME/.nvm"
 export PATH=$HOME/.local/bin:$PATH
 
 export EDITOR="nvim"
+
+__load_nvm() {
+  if [ -n "${__NVM_LOADED:-}" ]; then
+    return 0
+  fi
+
+  local nvm_script=""
+  if [ -s "$NVM_DIR/nvm.sh" ]; then
+    nvm_script="$NVM_DIR/nvm.sh"
+  elif [ -s "/opt/homebrew/opt/nvm/nvm.sh" ]; then
+    nvm_script="/opt/homebrew/opt/nvm/nvm.sh"
+  fi
+
+  if [ -z "$nvm_script" ]; then
+    return 1
+  fi
+
+  . "$nvm_script"
+  export __NVM_LOADED=1
+}
+
+__run_with_nvm() {
+  local cmd="$1"
+  shift
+  __load_nvm >/dev/null 2>&1 || true
+  command "$cmd" "$@"
+}
+
+nvm() {
+  unset -f nvm
+  if ! __load_nvm; then
+    echo "nvm loader not found: $NVM_DIR/nvm.sh or /opt/homebrew/opt/nvm/nvm.sh" >&2
+    return 127
+  fi
+  nvm "$@"
+}
+
+node() { unset -f node; __run_with_nvm node "$@"; }
+npm() { unset -f npm; __run_with_nvm npm "$@"; }
+npx() { unset -f npx; __run_with_nvm npx "$@"; }
+codex() { unset -f codex; __run_with_nvm codex "$@"; }
+function task-master { __run_with_nvm task-master "$@"; }
