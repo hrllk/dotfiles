@@ -8,7 +8,7 @@ export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/var/homebrew/linked/imagemagick/
 
 
 export PATH=/opt/homebrew/bin:$PATH
-# export PATH=$HOME/.rbenv/versions/3.4.0/bin:$PATH
+export PATH="/opt/homebrew/lib/ruby/gems/3.4.0/bin:$PATH"
 export PATH=$JAVA_HOME/bin:$PATH
 export PATH=/opt/homebrew/bin:$PATH
 export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
@@ -17,6 +17,7 @@ export PATH=/opt/homebrew/opt/kafka/bin:$PATH
 export PATH=$HOME/.rd/bin:$PATH
 export PATH=/usr/local/texlive/2025/bin/universal-darwin:$PATH
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.bun/bin:$PATH"
 
 export PATH="/usr/local/bin:$PATH"
 
