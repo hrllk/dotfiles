@@ -11,6 +11,12 @@ export PATH=/opt/homebrew/bin:$PATH
 # export PATH=$HOME/.rbenv/versions/3.4.0/bin:$PATH
 export PATH=$JAVA_HOME/bin:$PATH
 export PATH=/opt/homebrew/bin:$PATH
+
+# Homebrew Ruby gems install executables here.
+if [ -x /opt/homebrew/bin/gem ]; then
+  export PATH="$(/opt/homebrew/bin/gem env gemdir 2>/dev/null)/bin:$PATH"
+fi
+
 export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
 export PATH=$IMAGEMAGICK_HOME/bin:$PATH
 export PATH=/opt/homebrew/opt/kafka/bin:$PATH
@@ -18,7 +24,7 @@ export PATH=$HOME/.rd/bin:$PATH
 export PATH=/usr/local/texlive/2025/bin/universal-darwin:$PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-export PATH="/usr/local/bin:$PATH"
+export PATH="$PATH:/usr/local/bin"
 
 # Added by Antigravity
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"

@@ -5,8 +5,13 @@ alias tm='task-master'
 alias vi='nvim'
 alias k='kubectl'
 
-alias ll='colorls -lGt --gs --sd'
-alias ls='colorls'
+if command -v colorls >/dev/null 2>&1; then
+  alias ll='colorls -lGt --gs --sd'
+  alias ls='colorls'
+else
+  alias ll='ls -lG'
+fi
+
 function tree() {
   local depth=1
   local mode="all"   # 기본값: 전체
