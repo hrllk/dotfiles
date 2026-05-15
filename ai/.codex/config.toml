@@ -14,13 +14,13 @@ command = "npx"
 args = ["task-master-ai"]
 
 # FIGMA 
-[mcp_servers.figma]
-command = "npx"
-args = ["-y", "mcp-remote", "http://127.0.0.1:3845/mcp", "--transport", "http"]
-enabled = true
+# [mcp_servers.figma]
+# command = "npx"
+# args = ["-y", "mcp-remote", "http://127.0.0.1:3845/mcp", "--transport", "http"]
+# enabled = true
 
-[mcp_servers.figma.environment]
-FIGMA_TOKEN = "${FIGMA_TOKEN}"
+# [mcp_servers.figma.environment]
+# FIGMA_TOKEN = "${FIGMA_TOKEN}"
 # /FIGMA
 
 sandbox_mode = "workspace-write"
