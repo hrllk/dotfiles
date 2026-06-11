@@ -40,6 +40,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Uncomment the following line to change how often to auto-update (in days).
 # zstyle ':omz:update' frequency 13
+zstyle ':omz:update' mode disabled
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -127,7 +128,25 @@ set -o vi
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+__load_sdkman() {
+  if [[ "$__SDKMAN_LOADED" == "1" ]]; then
+    return 0
+  fi
+
+  if [[ ! -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]; then
+    echo "sdkman loader not found: $SDKMAN_DIR/bin/sdkman-init.sh" >&2
+    return 127
+  fi
+
+  source "$SDKMAN_DIR/bin/sdkman-init.sh"
+  export __SDKMAN_LOADED=1
+}
+
+sdk() {
+  unset -f sdk
+  __load_sdkman || return $?
+  sdk "$@"
+}
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
