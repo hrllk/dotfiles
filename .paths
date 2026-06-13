@@ -13,9 +13,8 @@ export PATH=$JAVA_HOME/bin:$PATH
 export PATH=/opt/homebrew/bin:$PATH
 
 # Homebrew Ruby gems install executables here.
-if [ -x /opt/homebrew/bin/gem ]; then
-  export PATH="$(/opt/homebrew/bin/gem env gemdir 2>/dev/null)/bin:$PATH"
-fi
+# Keep this static to avoid running `gem env gemdir` during shell startup.
+export PATH="/opt/homebrew/lib/ruby/gems/3.4.0/bin:$PATH"
 
 export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
 export PATH=$IMAGEMAGICK_HOME/bin:$PATH
@@ -37,7 +36,7 @@ export PATH=$HOME/.local/bin:$PATH
 export EDITOR="nvim"
 
 __load_nvm() {
-  if typeset -f nvm >/dev/null 2>&1; then
+  if [[ "$__NVM_LOADED" == "1" ]]; then
     export __NVM_LOADED=1
     return 0
   fi
