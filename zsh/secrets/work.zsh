@@ -5,4 +5,3 @@ load_oke_vars() {
   __export_secret DC_TRB_STG "$key_dir/dc_trb_stg"
   __export_secret DC_TRB_DEV "$key_dir/dc_trb_dev"
 }
-
