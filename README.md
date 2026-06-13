@@ -25,6 +25,7 @@ util/
   kitty/
     kitty.conf
   tmux/
+    .gitmux.conf
     .tmux.conf
     .tmux/
 ```
@@ -64,6 +65,7 @@ git clone https://github.com/hrllk/dotfiles.git ~/dotfiles
 ```zsh
 ln -s ~/dotfiles/zsh/.zshrc ~/.zshrc
 ln -s ~/dotfiles/util/tmux/.tmux.conf ~/.tmux.conf
+ln -s ~/dotfiles/util/tmux/.gitmux.conf ~/.gitmux.conf
 ln -s ~/dotfiles/util/tmux/.tmux ~/.tmux
 ln -s ~/dotfiles/util/kitty/kitty.conf ~/.config/kitty/kitty.conf
 ```
