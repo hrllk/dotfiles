@@ -18,6 +18,7 @@ zsh/
   lazy-node-commands.zsh
   lazy-sdkman.zsh
   local-integrations.zsh
+  keybindings.zsh
   paths.zsh
   aliases/
     personal.zsh
