@@ -2,7 +2,9 @@
 ```text
 zsh/
   .zshrc
-  completion.zsh
+  options/
+    completion.zsh
+    keybindings.zsh
   plugins/
     index.zsh
     custom/
@@ -10,13 +12,12 @@ zsh/
     omz/
       autosuggestions.zsh
       fzf-tab.zsh
+      prompt.zsh
       syntax-highlighting.zsh
-  prompt.zsh
   lazy-nvm.zsh
   lazy-node-commands.zsh
   lazy-sdkman.zsh
   local-integrations.zsh
-  keybindings.zsh
   paths.zsh
   aliases/
     personal.zsh
@@ -51,6 +52,8 @@ If you still have an older link to `~/dotfiles/.zshrc`, rerun bootstrap to refre
 ```zsh
 time zsh -i -c exit
 ```
+
+> zsh -i -c exit  0.05s user 0.04s system 61% cpu 0.149 total
 
 The shell setup is structured to keep interactive startup light:
 - `~/.zshrc` stays thin and simply resolves into the repository-managed config

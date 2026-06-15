@@ -13,7 +13,7 @@ source_if_exists() {
 }
 
 source_if_exists "$ZSH_DOTFILES_PATH/local-integrations.zsh"
-source_if_exists "$ZSH_DOTFILES_PATH/completion.zsh"
+source_if_exists "$ZSH_DOTFILES_PATH/options/completion.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/paths.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/lazy-nvm.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/lazy-node-commands.zsh"
@@ -22,6 +22,6 @@ source_if_exists "$ZSH_DOTFILES_PATH/secrets/work.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/aliases/personal.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/aliases/work.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/lazy-sdkman.zsh"
-source_if_exists "$ZSH_DOTFILES_PATH/prompt.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/plugins/index.zsh"
-source_if_exists "$ZSH_DOTFILES_PATH/keybindings.zsh"
+source_if_exists "$ZSH_DOTFILES_PATH/options/keybindings.zsh"
+source_if_exists "$ZSH_DOTFILES_PATH/plugins/omz/prompt.zsh"
