@@ -14,7 +14,7 @@ zstyle ':completion:*' list-dirs-first true
 
 zcompdump="${ZDOTDIR:-$HOME}/.zcompdump-${HOST:-unknown}-${ZSH_VERSION}"
 
-if [[ ! -s "$zcompdump" || "$zcompdump" -ot "$HOME/.zshrc" ]]; then
+if [[ ! -s "$zcompdump" || "$zcompdump" -ot "$HOME/.zshrc" || "$zcompdump" -ot "$ZSH_DOTFILES_PATH/options/completion.zsh" ]]; then
   compinit -d "$zcompdump"
 else
   compinit -C -d "$zcompdump"

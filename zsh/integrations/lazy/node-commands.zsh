@@ -1,10 +1,15 @@
 __run_with_nvm() {
   local cmd="$1"
   shift
-  __load_nvm >/dev/null 2>&1 || true
-  if ! command -v "$cmd" >/dev/null 2>&1; then
-    nvm use --silent default >/dev/null 2>&1 || nvm use --silent node >/dev/null 2>&1 || true
+
+  if ! __load_nvm >/dev/null 2>&1; then
+    return 127
   fi
+
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    nvm use --silent default >/dev/null 2>&1 || nvm use --silent node >/dev/null 2>&1 || return 127
+  fi
+
   command "$cmd" "$@"
 }
 

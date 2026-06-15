@@ -22,7 +22,9 @@ tree() {
     else
       colorls "${dir:-.}" -l --tree="${depth}" --sd --sf
     fi
-  else
+  elif command -v tree >/dev/null 2>&1; then
     command tree -L "$depth" "${dir:-.}"
+  else
+    command ls -la "${dir:-.}"
   fi
 }
