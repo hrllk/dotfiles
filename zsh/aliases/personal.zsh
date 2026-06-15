@@ -35,6 +35,7 @@ alias cdtask='cd "$HOME/Library/Mobile Documents/com~apple~CloudDocs/task"'
 # git 
 #############################
 alias gs='GIT_TRACE=1 git status -sb'
+alias gst='GIT_TRACE=1 git status'
 alias ga='GIT_TRACE=1 git add'
 alias gaa='GIT_TRACE=1 git add .'
 alias gb='GIT_TRACE=1 git branch'
