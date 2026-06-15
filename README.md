@@ -1,8 +1,3 @@
-### pre-requires
-- zsh
-- fzf
-- zsh plugins(powerlevel10k, fzf-tab, autosuggestions, syntax-highlighting)
-
 ### structure
 ```text
 zsh/
@@ -10,9 +5,12 @@ zsh/
   completion.zsh
   plugins/
     index.zsh
-    autosuggestions.zsh
-    fzf-tab.zsh
-    syntax-highlighting.zsh
+    custom/
+      safe-paste.zsh
+    omz/
+      autosuggestions.zsh
+      fzf-tab.zsh
+      syntax-highlighting.zsh
   prompt.zsh
   lazy-nvm.zsh
   lazy-node-commands.zsh
@@ -48,3 +46,13 @@ The bootstrap script handles:
 
 `~/.zshrc` should ultimately resolve to `~/dotfiles/zsh/.zshrc`.
 If you still have an older link to `~/dotfiles/.zshrc`, rerun bootstrap to refresh it.
+
+### shell startup
+```zsh
+time zsh -i -c exit
+```
+
+The shell setup is structured to keep interactive startup light:
+- `~/.zshrc` stays thin and simply resolves into the repository-managed config
+- optional integrations are sourced conditionally
+- plugin loading is split between local Zsh config and external oh-my-zsh plugins
