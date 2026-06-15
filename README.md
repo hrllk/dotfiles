@@ -26,7 +26,7 @@ zsh/
     omz/
       autosuggestions.zsh
       fzf-tab.zsh
-      prompt.zsh
+      theme.zsh
       syntax-highlighting.zsh
   secrets/
     index.zsh
