@@ -1,6 +1,7 @@
 export ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 plugin_configs=(
+  "$ZSH_DOTFILES_PATH/plugins/safe-paste.zsh"
   "$ZSH_DOTFILES_PATH/plugins/autosuggestions.zsh"
   "$ZSH_DOTFILES_PATH/plugins/fzf-tab.zsh"
   "$ZSH_DOTFILES_PATH/plugins/syntax-highlighting.zsh"

@@ -23,16 +23,6 @@ backup_with_timestamp() {
   mv "$path" "$backup_path"
 }
 
-backup_path() {
-  local path="$1"
-  local name="${2:-$(basename "$path")}"
-
-  if [[ -e "$path" || -L "$path" ]]; then
-    mkdir -p "$BACKUP_ROOT"
-    mv "$path" "$BACKUP_ROOT/$name"
-  fi
-}
-
 link_path() {
   local source_path="$1"
   local target_path="$2"
@@ -41,30 +31,13 @@ link_path() {
     if [[ "$(readlink "$target_path")" == "$source_path" ]]; then
       return 0
     fi
-    backup_path "$target_path" "$(basename "$target_path")"
+    backup_with_timestamp "$target_path" "$(basename "$target_path")"
   elif [[ -e "$target_path" ]]; then
-    backup_path "$target_path" "$(basename "$target_path")"
+    backup_with_timestamp "$target_path" "$(basename "$target_path")"
   fi
 
   mkdir -p "$(dirname "$target_path")"
   ln -s "$source_path" "$target_path"
-}
-
-write_zshrc_entrypoint() {
-  local target_path="$HOME/.zshrc"
-  local target_content='source ~/dotfiles/zsh/.zshrc'
-
-  if [[ -L "$target_path" || -e "$target_path" ]]; then
-    if [[ -L "$target_path" ]] && [[ "$(readlink "$target_path")" == "./dotfiles/.zshrc" ]]; then
-      backup_with_timestamp "$target_path" ".zshrc"
-    elif [[ -f "$target_path" ]] && [[ "$(cat "$target_path")" == "$target_content" ]]; then
-      return 0
-    else
-      backup_with_timestamp "$target_path" ".zshrc"
-    fi
-  fi
-
-  printf '%s\n' "$target_content" > "$target_path"
 }
 
 clone_if_missing() {
@@ -89,7 +62,7 @@ clone_if_missing https://github.com/Aloxaf/fzf-tab "$ZSH_CUSTOM_DIR/plugins/fzf-
 clone_if_missing https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
 clone_if_missing https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting"
 
-write_zshrc_entrypoint
+link_path "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
 link_path "$DOTFILES_DIR/util/tmux/.tmux.conf" "$HOME/.tmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.gitmux.conf" "$HOME/.gitmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux"
