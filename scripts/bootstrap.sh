@@ -63,6 +63,7 @@ clone_if_missing https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_D
 clone_if_missing https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting"
 
 link_path "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+link_path "$DOTFILES_DIR/util/intellij/.ideavimrc" "$HOME/.ideavimrc"
 link_path "$DOTFILES_DIR/util/tmux/.tmux.conf" "$HOME/.tmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.gitmux.conf" "$HOME/.gitmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux"
