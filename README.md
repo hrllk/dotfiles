@@ -29,7 +29,10 @@ zsh/
       prompt.zsh
       syntax-highlighting.zsh
   secrets/
-    personal.zsh
+    index.zsh
+    _shared.zsh
+    ai.zsh
+    dns.zsh
     work.zsh
 util/
   jetbrains/
@@ -68,3 +71,4 @@ The shell setup is structured to keep interactive startup light:
 - `~/.zshrc` stays thin and simply resolves into the repository-managed config
 - optional integrations are sourced conditionally
 - plugin loading is split between local Zsh config and external oh-my-zsh plugins
+- secrets are grouped by domain with a shared loader and an index file
