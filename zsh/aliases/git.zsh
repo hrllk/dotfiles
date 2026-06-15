@@ -1,39 +1,3 @@
-username=hwiryungkim
-
-alias todo='cd $HOME/task/sources/personal/secretary && nvim'
-alias tm='task-master'
-alias vi='nvim'
-alias k='kubectl'
-
-if command -v colorls >/dev/null 2>&1; then
-  alias ll='colorls -lGt --gs --sd'
-  alias ls='colorls'
-else
-  alias ll='ls -lG'
-fi
-
-function tree() {
-  local depth=1
-  local mode="all"   # 기본값: 전체
-  [[ -n "$1" ]] && depth=$1
-  [[ -n "$2" ]] && mode=$2
-
-  if [[ "$mode" == "dirs" ]]; then
-    colorls ${dir:-.} -l --tree=${depth} --dirs
-  else
-    colorls ${dir:-.} -l --tree=${depth} --sd --sf
-  fi
-}
-
-alias hgrep='history | grep'
-alias cl='clear'
-
-alias cdsource='cd $HOME/task/sources'
-alias cdtask='cd "$HOME/Library/Mobile Documents/com~apple~CloudDocs/task"'
-
-#############################
-# git 
-#############################
 alias gs='GIT_TRACE=1 git status -sb'
 alias gst='GIT_TRACE=1 git status'
 alias ga='GIT_TRACE=1 git add'
@@ -58,15 +22,5 @@ alias gstash='GIT_TRACE=1 git stash'
 alias gsta='GIT_TRACE=1 git stash apply'
 alias gpop='GIT_TRACE=1 git stash pop'
 alias gclean='GIT_TRACE=1 git clean -fd'
-
-# logs
 alias glgc='GIT_TRACE=1 git log --oneline --graph --decorate'
 alias glga='git log --graph --decorate --all --format="%C(auto)%h %Cgreen(%cr)%Creset %C(bold blue)<%an>%Creset %C(auto)%d %s"'
-
-#############################
-# task master 
-#############################
-alias tm='task-master'
-alias taskmaster='task-master'
-alias hamster='task-master'
-alias ham='task-master'

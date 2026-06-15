@@ -11,6 +11,14 @@ zsh/
       nvm.zsh
       node-commands.zsh
       sdkman.zsh
+  aliases/
+    index.zsh
+    navigation.zsh
+    git.zsh
+    taskmaster.zsh
+    tools.zsh
+    others.zsh
+    work.zsh
   plugins/
     index.zsh
     custom/
@@ -20,10 +28,6 @@ zsh/
       fzf-tab.zsh
       prompt.zsh
       syntax-highlighting.zsh
-  local-integrations.zsh
-  aliases/
-    personal.zsh
-    work.zsh
   secrets/
     personal.zsh
     work.zsh

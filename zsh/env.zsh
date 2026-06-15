@@ -1,22 +1,28 @@
 export MAVEN_HOME=/opt/homebrew/Cellar/maven/3.9.9/libexec
 export GRADLE_HOME=$HOME/task/tmp/gradle-8.10.2
-# export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17
-# export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home
 export IMAGEMAGICK_HOME=/opt/homebrew/var/homebrew/linked/imagemagick
 export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/var/homebrew/linked/imagemagick/lib
+export LANG='en_US.UTF-8'
+export LC_ALL=en_US.UTF-8
 
-export PATH=/opt/homebrew/bin:$PATH
-export PATH="/opt/homebrew/lib/ruby/gems/3.4.0/bin:$PATH"
-export PATH=$JAVA_HOME/bin:$PATH
-export PATH=/Applications/IntelliJ\ IDEA.app/Contents/MacOS:$PATH
-export PATH=$IMAGEMAGICK_HOME/bin:$PATH
-export PATH=/opt/homebrew/opt/kafka/bin:$PATH
-export PATH=$HOME/.rd/bin:$PATH
-export PATH=/usr/local/texlive/2025/bin/universal-darwin:$PATH
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.bun/bin:$PATH"
-export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
-export PATH="$PATH:/usr/local/bin"
+typeset -U path
+path=(
+  /opt/homebrew/bin
+  /opt/homebrew/lib/ruby/gems/3.4.0/bin
+  $JAVA_HOME/bin
+  /Applications/IntelliJ\ IDEA.app/Contents/MacOS
+  $IMAGEMAGICK_HOME/bin
+  /opt/homebrew/opt/kafka/bin
+  $HOME/.rd/bin
+  /usr/local/texlive/2025/bin/universal-darwin
+  $HOME/.local/bin
+  $HOME/.bun/bin
+  $HOME/.antigravity/antigravity/bin
+  /usr/local/bin
+  $path
+)
+
+export PATH
 
 export EDITOR="nvim"
