@@ -4,6 +4,7 @@ set -euo pipefail
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
 ZSH_CUSTOM_DIR="${ZSH_CUSTOM_DIR:-$HOME/.oh-my-zsh/custom}"
 BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)}"
+TMUX_TPM_DIR="$HOME/.local/share/tmux/plugins/tpm"
 
 mkdir -p "$BACKUP_ROOT"
 
@@ -49,6 +50,10 @@ clone_if_missing() {
     return 0
   fi
 
+  if [[ -e "$target" ]]; then
+    backup_with_timestamp "$target" "$(basename "$target")"
+  fi
+
   mkdir -p "$(dirname "$target")"
   if [[ -n "$depth" ]]; then
     git clone --depth "$depth" "$repo" "$target"
@@ -61,6 +66,7 @@ clone_if_missing https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM_DIR/t
 clone_if_missing https://github.com/Aloxaf/fzf-tab "$ZSH_CUSTOM_DIR/plugins/fzf-tab"
 clone_if_missing https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
 clone_if_missing https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM_DIR/plugins/zsh-syntax-highlighting"
+clone_if_missing https://github.com/tmux-plugins/tpm "$TMUX_TPM_DIR"
 
 link_path "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
 link_path "$DOTFILES_DIR/util/jetbrains/.ideavimrc" "$HOME/.ideavimrc"

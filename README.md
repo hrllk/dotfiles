@@ -84,7 +84,6 @@ Required:
 - `neovim`
 - `tmux`
 - `fzf`
-- `tmux plugin manager (TPM)`
 
 Optional:
 - `colorls` or `eza`
@@ -101,6 +100,7 @@ bash ~/dotfiles/scripts/bootstrap.sh
 
 The bootstrap script:
 - clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting`
+- clones `tmux plugin manager (TPM)`
 - backs up existing shell and terminal config files with timestamps
 - creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, and `kitty`
 
@@ -109,6 +109,8 @@ Targets after bootstrap:
 - `~/.ideavimrc` -> `~/dotfiles/util/jetbrains/.ideavimrc`
 - `~/.tmux.conf` -> `~/dotfiles/util/tmux/.tmux.conf`
 - `~/.config/kitty/kitty.conf` -> `~/dotfiles/util/kitty/kitty.conf`
+- tmux plugins are installed under `~/.local/share/tmux/plugins/` and are not tracked in this repo
+- use tmux `prefix + I` to install plugins after startup
 
 ### Post-bootstrap
 - `~/.zshrc` is only an entrypoint; real shell config lives under `~/dotfiles/zsh`
