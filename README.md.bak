@@ -1,0 +1,78 @@
+### structure
+```text
+zsh/
+  .zshrc
+  env.zsh
+  options/
+    completion.zsh
+    keybindings.zsh
+  integrations/
+    lazy/
+      nvm.zsh
+      node-commands.zsh
+      sdkman.zsh
+  aliases/
+    index.zsh
+    navigation.zsh
+    git.zsh
+    taskmaster.zsh
+    tools.zsh
+    others.zsh
+    work.zsh
+  plugins/
+    index.zsh
+    custom/
+      safe-paste.zsh
+    omz/
+      autosuggestions.zsh
+      fzf-tab.zsh
+      theme.zsh
+      syntax-highlighting.zsh
+  secrets/
+    index.zsh
+    _shared.zsh
+    ai.zsh
+    dns.zsh
+    work.zsh
+util/
+  jetbrains/
+    .ideavimrc
+  kitty/
+    kitty.conf
+  tmux/
+    .gitmux.conf
+    .tmux.conf
+    .tmux/
+```
+
+### bootstrap
+```zsh
+git clone https://github.com/hrllk/dotfiles.git ~/dotfiles
+bash ~/dotfiles/scripts/bootstrap.sh
+```
+
+The bootstrap script handles:
+- cloning `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, `zsh-syntax-highlighting`
+- backing up existing shell and terminal config files
+- creating symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, and `kitty`
+
+`~/.zshrc` should ultimately resolve to `~/dotfiles/zsh/.zshrc`.
+If you still have an older link to `~/dotfiles/.zshrc`, rerun bootstrap to refresh it.
+`~/.ideavimrc` should resolve to `~/dotfiles/util/jetbrains/.ideavimrc`.
+
+### shell startup
+```zsh
+time zsh -i -c exit
+```
+
+Measured on this machine:
+- current setup: `real 0.14s`, `user 0.04s`, `sys 0.03s`
+- full oh-my-zsh load: `real 0.54s`, `user 0.22s`, `sys 0.22s`
+
+The comparison is directional, but it shows the cost of loading the full OMZ stack.
+
+The shell setup is structured to keep interactive startup light:
+- `~/.zshrc` stays thin and simply resolves into the repository-managed config
+- optional integrations are sourced conditionally
+- plugin loading is split between local Zsh config and external oh-my-zsh plugins
+- secrets are grouped by domain with a shared loader and an index file

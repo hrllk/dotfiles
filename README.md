@@ -1,4 +1,29 @@
-### structure
+# Dotfiles
+
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Structure](#structure)
+- [Quickstart](#quickstart)
+- [Performance](#performance)
+- [Conventions](#conventions)
+- [Notes](#notes)
+
+## Overview
+This repository contains a personal dotfiles setup for shell, editor, and terminal tooling.
+
+The layout is optimized for:
+- fast interactive shell startup
+- clear ownership boundaries
+- safe bootstrapping with backups
+- local overrides without polluting the main configuration
+
+## Features
+- `zsh`: thin entrypoint, modular options, lazy tool integrations, aliases, secrets, and plugin loading
+- `ai`: secret loading for AI and API tooling
+- `util`: editor and terminal-related configs, including tmux, Kitty, and JetBrains-related files
+
+## Structure
 ```text
 zsh/
   .zshrc
@@ -26,8 +51,8 @@ zsh/
     omz/
       autosuggestions.zsh
       fzf-tab.zsh
-      theme.zsh
       syntax-highlighting.zsh
+      theme.zsh
   secrets/
     index.zsh
     _shared.zsh
@@ -43,32 +68,77 @@ util/
     .gitmux.conf
     .tmux.conf
     .tmux/
+archive/
+  util/
+    iterm/
+      itermconf.itermexport
 ```
 
-### bootstrap
+## Quickstart
+### Prerequisites
+Required:
+- `git`
+- `bash`
+- `zsh`
+- `oh-my-zsh`
+- `neovim`
+- `tmux`
+- `fzf`
+- `tmux plugin manager (TPM)`
+
+Optional:
+- `colorls` or `eza`
+- `kubectl`
+- `sshpass`
+- `nvm`
+- `sdkman`
+
+### Bootstrap
 ```zsh
 git clone https://github.com/hrllk/dotfiles.git ~/dotfiles
 bash ~/dotfiles/scripts/bootstrap.sh
 ```
 
-The bootstrap script handles:
-- cloning `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, `zsh-syntax-highlighting`
-- backing up existing shell and terminal config files
-- creating symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, and `kitty`
+The bootstrap script:
+- clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting`
+- backs up existing shell and terminal config files with timestamps
+- creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, and `kitty`
 
-`~/.zshrc` should ultimately resolve to `~/dotfiles/zsh/.zshrc`.
-If you still have an older link to `~/dotfiles/.zshrc`, rerun bootstrap to refresh it.
-`~/.ideavimrc` should resolve to `~/dotfiles/util/jetbrains/.ideavimrc`.
+Targets after bootstrap:
+- `~/.zshrc` -> `~/dotfiles/zsh/.zshrc`
+- `~/.ideavimrc` -> `~/dotfiles/util/jetbrains/.ideavimrc`
+- `~/.tmux.conf` -> `~/dotfiles/util/tmux/.tmux.conf`
+- `~/.config/kitty/kitty.conf` -> `~/dotfiles/util/kitty/kitty.conf`
 
-### shell startup
+### Post-bootstrap
+- `~/.zshrc` is only an entrypoint; real shell config lives under `~/dotfiles/zsh`
+- `index.zsh` files act as orchestration layers
+- `source_if_exists` is used for optional local or machine-specific files
+- `secrets/` is split by domain with a shared helper and a single index entrypoint
+- `integrations/lazy/` contains runtime loaders that are only initialized when needed
+
+### Verification
 ```zsh
 time zsh -i -c exit
 ```
 
-> zsh -i -c exit  0.05s user 0.04s system 61% cpu 0.149 total
+Measured on this machine:
+- current setup: `real 0.14s`, `user 0.04s`, `sys 0.03s`
+- full oh-my-zsh load: `real 0.54s`, `user 0.22s`, `sys 0.22s`
 
-The shell setup is structured to keep interactive startup light:
-- `~/.zshrc` stays thin and simply resolves into the repository-managed config
-- optional integrations are sourced conditionally
-- plugin loading is split between local Zsh config and external oh-my-zsh plugins
-- secrets are grouped by domain with a shared loader and an index file
+The comparison is directional, but it shows the cost of loading the full OMZ stack.
+
+## Conventions
+- `~/.zshrc` is only an entrypoint; real shell config lives under `~/dotfiles/zsh`
+- `index.zsh` files act as orchestration layers
+- `source_if_exists` is used for optional local or machine-specific files
+- `secrets/` is split by domain with a shared helper and a single index entrypoint
+- `integrations/lazy/` contains runtime loaders that are only initialized when needed
+
+## Notes
+- `zsh` initialization is intentionally modular to keep interactive startup lightweight
+- `ll` uses `colorls` when available, and falls back to standard directory listings if it is not
+- `archive/util/iterm/` keeps historical iTerm export data out of the active config set
+- `env.zsh` is currently optimized for this macOS + Homebrew + local directory layout
+- If you move to another machine, split machine-specific overrides into `env.local.zsh`
+- The current layout is optimized for this machine, not for full portability
