@@ -28,7 +28,7 @@ zsh/
     personal.zsh
     work.zsh
 util/
-  intellij/
+  jetbrains/
     .ideavimrc
   kitty/
     kitty.conf
@@ -51,7 +51,7 @@ The bootstrap script handles:
 
 `~/.zshrc` should ultimately resolve to `~/dotfiles/zsh/.zshrc`.
 If you still have an older link to `~/dotfiles/.zshrc`, rerun bootstrap to refresh it.
-`~/.ideavimrc` should resolve to `~/dotfiles/util/intellij/.ideavimrc`.
+`~/.ideavimrc` should resolve to `~/dotfiles/util/jetbrains/.ideavimrc`.
 
 ### shell startup
 ```zsh
