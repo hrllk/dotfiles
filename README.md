@@ -45,3 +45,6 @@ The bootstrap script handles:
 - cloning `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, `zsh-syntax-highlighting`
 - backing up existing shell and terminal config files
 - creating symlinks for `zsh`, `tmux`, `gitmux`, and `kitty`
+
+`~/.zshrc` should ultimately resolve to `~/dotfiles/zsh/.zshrc`.
+If you still have an older link to `~/dotfiles/.zshrc`, rerun bootstrap to refresh it.
