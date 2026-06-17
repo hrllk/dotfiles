@@ -6,7 +6,7 @@ export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/var/homebrew/linked/imagemagick/
 export LANG='en_US.UTF-8'
 export LC_ALL=en_US.UTF-8
 
-typeset -U path
+typeset -gU path
 path=(
   /opt/homebrew/bin
   /opt/homebrew/lib/ruby/gems/3.4.0/bin
