@@ -1,4 +1,5 @@
 setopt GLOB_DOTS
+setopt autocd
 
 zmodload -i zsh/complist
 
