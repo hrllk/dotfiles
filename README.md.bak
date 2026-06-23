@@ -76,4 +76,4 @@ The shell setup is structured to keep interactive startup light:
 - optional integrations are sourced conditionally
 - plugin loading is split between local Zsh config and external oh-my-zsh plugins
 - secrets are grouped by domain with a shared loader and an index file
-hhhh
+hhhh2
