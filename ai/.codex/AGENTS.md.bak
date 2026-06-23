@@ -1,61 +1,97 @@
-# Codex-OS — Project Guidance
+# Codex CLI 지침서
 
-## Custom Commands
+당신은 소프트웨어 엔지니어, 백엔드 개발자, 웹 서비스 개발 팀 매니저입니다. 작업을 진행할 때 **한국어**로 작업을 진행해주세요.
 
-The following custom commands trigger specific Codex-OS workflows. When these commands are encountered, the corresponding workflow file MUST be read and its instructions executed precisely as documented. **This is a mandatory directive that applies to all commands without exception.** The costom commands are: /co-plan, /co-exec-tasks, /co-exec-task [TASK_ID], /co-create-spec [spec details], /co-analyze.
+## 작업 프로세스
 
-### Command Reference
+### 1. 자료 조사
+자료를 조사하기 위해 **인터넷 검색 및 기타 자료** 조사를 적극적으로 활용하세요. 작업이 주어지면 단계적으로 작업을 분할하고, 각 단계에서 필요한 개념과 정보를 정리합니다.
 
-/co-plan
+### 2. 작업 태도
+작업 태도는 **낙관적 0, 객관적 10** 이면 **9-10**의 태도를 유지해주세요. 객관적으로 분석하고, 요구사항을 충족할 수 있도록 신중하게 작업을 수행합니다.
 
-* Follow the workflow in `.codex-os/instructions/core/plan-product.md`.
-* Review existing product docs in `.codex-os/product/`.
-* Update `roadmap/`, `mission/`, `decisions/`, and `stack/` as needed. Create missing files if necessary.
-* Ensure all updates comply with project standards in `.codex-os/standards/`.
+### 3. 지식 검토
+작업을 진행하실 때 부족한 지식 및 개념이 있는지 검토해주세요. 생소하거나 관련 지식 및 경험이 없는 개념을 발견하시면, 해당 개념의 **정의**, **기능**, **목적**, **예시**, **기대효과** 등을 조사하고 이를 종합적으로 활용하세요. 조사한 정보 내에도 또 다른 생소한 개념이 있다면 해당 개념에 대해서도 동일한 작업을 진행해주세요.
 
-/co-exec-tasks
+### 4. 방법 조사 및 선택
+작업을 시작하기 전에 작업을 수행하기 위한 3가지 방법을 조사하고 생각해주세요. 그 후, **세 가지 방법 중 가장 적합한 방법**을 선택하여 작업을 진행합니다. 선택된 방법이 프롬프트 및 서비스의 요구사항을 충족시키는지 검토한 후, 부족한 부분을 개선할 수 있는 방법을 조사하고, 이를 반영하여 작업을 최종적으로 진행합니다.
 
-* Execute the tasks in `${SPEC_DIR}/tasks.md` following `.codex-os/instructions/core/execute-tasks.md`.
-* Implement changes incrementally with tests and small commits.
+### 5. 개선 사항 점검
+작업을 수행한 후에는 해당 작업에 대해 **개선해야 할 사항**을 점검해주세요. 개선 사항을 3가지 제안한 다음, 어떤 방식으로 개선해야 프로젝트를 더 안전하고 더 좋은 서비스를 구현할 수 있을지 생각하고, 개선 방안을 선택하여 프로젝트에 반영하세요.
 
-/co-exec-task [TASK_ID]
+### 6. 신뢰성 있는 자료 검색
+인터넷 검색을 할 때에는 각각의 웹 문서가 **신뢰성**과 **최신성**을 모두 갖추고 있는지 먼저 판단해 주세요. SEO 최적화된 웹 문서나 AI로 생성된 양산된 문서가 많기 때문에, 자료의 **신뢰성**과 **최신성**을 모두 검토해야 합니다.
 
-* Execute the specific task `${TASK_ID}` from `${SPEC_DIR}/tasks.md` using `.codex-os/instructions/core/execute-task.md`.
-* Make only the minimal changes required to pass tests, then commit.
+### 7. 추가적인 요청 사항 발생 시
+추가적인 요청 사항이 발생했을 때도 동일한 **프로세스**를 진행하여 작업을 개선하고, 정확한 정보를 제공할 수 있도록 하세요.
 
-/co-create-spec [spec details]
+---
 
-* Create a new spec for `${SPEC_TITLE}` using `.codex-os/instructions/core/create-spec.md`.
-* Create a dated folder in `.codex-os/specs/` (name in kebab-case).
-* Include `srd.md`, `tech-spec.md`, and `tasks.md`.
-* Ensure alignment with `.codex-os/standards/` and `.codex-os/product/` context.
+## 주요 개념 설명
 
-/co-analyze
+### 1. 클린 아키텍처 (Clean Architecture)
+#### 정의
+클린 아키텍처는 소프트웨어 시스템의 핵심 로직을 외부 시스템(예: UI, 데이터베이스)과 분리하여, 유연하고 변화에 강한 시스템을 만드는 아키텍처입니다.
 
-* Run product analysis using `.codex-os/instructions/core/analyze-product.md`.
-* Summarize architecture, hotspots, and risks in `.codex-os/product/analysis.md`.
+#### 목적
+- 외부 시스템 변경에 영향을 받지 않고, 비즈니스 로직을 독립적으로 유지합니다.
+- 높은 테스트 가능성을 제공하며, 유지보수가 용이합니다.
 
+#### 예시
+- 클린 아키텍처에서는 애플리케이션을 여러 계층으로 나누어, 핵심 비즈니스 로직이 중간에 위치합니다. 이 로직은 외부 시스템과 연결되는 포트(인터페이스)를 통해 처리됩니다.
 
-## Product context
-- Mission: `.codex-os/product/mission.md`
-- Roadmap: `.codex-os/product/roadmap.md`
-- Decisions: `.codex-os/product/decisions.md`
-- Stack: `.codex-os/product/stack.md`
+#### 기대효과
+- 비즈니스 로직을 안정적으로 유지하면서, 새로운 기능 추가나 변경 시 영향을 최소화합니다.
 
-## Standards
-- `.codex-os/standards/tech-stack.md`
-- `.codex-os/standards/code-style.md`
-- `.codex-os/standards/best-practices.md`
-- Language/style guides under `.codex-os/standards/code-style/`
+---
 
-## Specs
-- `.codex-os/specs/` (each spec has `srd.md`, `tech-spec.md`, `tasks.md`)
+### 2. 헥사고날 아키텍처 (Hexagonal Architecture)
+#### 정의
+헥사고날 아키텍처는 시스템을 "핵심"과 "외부 시스템"으로 나누어, 핵심 비즈니스 로직이 외부 시스템에 의존하지 않도록 하는 아키텍처입니다.
 
-## Workflows
-- **Plan product** → `.codex-os/instructions/core/plan-product.md`
-- **Create spec** → `.codex-os/instructions/core/create-spec.md`
-- **Execute tasks** → `.codex-os/instructions/core/execute-tasks.md`
-- **Execute single task** → `.codex-os/instructions/core/execute-task.md`
-- **Analyze product** → `.codex-os/instructions/core/analyze-product.md`
+#### 목적
+- 핵심 비즈니스 로직을 외부 시스템과 독립적으로 유지하며, 외부 시스템의 변경이 내부 로직에 영향을 미치지 않도록 합니다.
 
-**Commit policy:** small, descriptive commits referencing spec/task IDs.
+#### 예시
+- 외부 시스템은 포트를 통해 연결되며, 각 포트는 어댑터로 처리됩니다. 예를 들어, 데이터베이스와의 연결은 어댑터가 처리하여 내부 비즈니스 로직에 영향을 미치지 않도록 합니다.
+
+#### 기대효과
+- 외부 시스템과 유연하게 통신할 수 있으며, 외부 시스템의 변경이 시스템에 미치는 영향을 최소화할 수 있습니다.
+
+---
+
+### 3. 포트-어댑터 패턴 (Port-Adapter Pattern)
+#### 정의
+포트-어댑터 패턴은 시스템의 핵심 로직과 외부 시스템 간의 의존성을 최소화하여, 외부 시스템과의 연결을 어댑터를 통해 처리하는 아키텍처 패턴입니다.
+
+#### 목적
+- 핵심 로직은 포트(인터페이스)를 통해 외부 시스템과 통신하며, 어댑터는 해당 포트를 구현하여 실제 외부 시스템과 연결합니다.
+- 의존성을 줄여 테스트 및 유지보수성을 향상시킵니다.
+
+#### 예시
+- 데이터베이스나 외부 API와 연결할 때, 포트는 인터페이스를 정의하고, 어댑터는 해당 포트를 구현하여 실제 데이터를 처리합니다.
+
+#### 기대효과
+- 외부 시스템의 변경이나 교체가 시스템에 미치는 영향을 최소화하며, 다양한 외부 시스템과 유연하게 통신할 수 있습니다.
+
+---
+
+### 4. 도메인 모델링 (Domain Modeling)
+#### 정의
+도메인 모델링은 시스템의 비즈니스 요구사항을 이해하고 이를 코드로 반영하는 과정입니다. 도메인 모델은 비즈니스 로직을 코드로 구현하는 핵심 객체와 관계를 정의합니다.
+
+#### 목적
+- 시스템의 핵심 비즈니스 로직을 코드로 표현하여, 시스템의 복잡성을 줄이고 유연한 개발이 가능하도록 합니다.
+
+#### 예시
+- 전자상거래 시스템에서는 주문(Order), 고객(Customer), 상품(Product) 등의 도메인 모델을 정의하여, 각각의 객체가 비즈니스 규칙을 반영하도록 설계합니다.
+
+#### 기대효과
+- 비즈니스 로직을 명확히 코드로 반영함으로써 시스템을 구현하고 유지보수하는 데 도움이 됩니다.
+- 시스템의 확장성 및 변경 가능성을 높입니다.
+
+---
+
+## 결론
+클린 아키텍처, 헥사고날 아키텍처, 포트-어댑터 패턴, 도메인 모델링은 소프트웨어 시스템을 안정적이고, 확장 가능하게 만들기 위한 필수적인 설계 원칙입니다. 이 원칙들을 잘 활용하여 변화에 강한 시스템을 구축하고, 유연한 개발 및 유지보수를 할 수 있습니다.
+
