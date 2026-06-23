@@ -1,9 +1,16 @@
 setopt GLOB_DOTS
 setopt autocd
+setopt COMPLETE_IN_WORD
 
 zmodload -i zsh/complist
 
 autoload -Uz compinit
+
+# suffix 기반 cd completion을 위해 필요한 최소 설정
+zstyle ':completion:*' matcher-list \
+  'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' \
+  'r:|=*' \
+  'l:|=* r:|=*'
 
 zstyle ':completion:*' menu select=1
 zstyle ':completion:*' descriptions format '[%d]'
