@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_LINK="$HOME/.codex"
 TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 BACKUP_PATH="$HOME/.codex.bak.${TIMESTAMP}"
