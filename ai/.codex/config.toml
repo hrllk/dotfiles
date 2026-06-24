@@ -1,4 +1,3 @@
-model = "gpt-5.2-codex"
 model_reasoning_effort = "medium"
 [mcp_servers.context7]
 command = "npx"
@@ -94,8 +93,14 @@ trust_level = "untrusted"
 [projects."/Users/hwiryungkim/Library/CloudStorage/OneDrive-SharedLibraries-오케스트로/TPS - Documents/파트/TF/주간보고"]
 trust_level = "untrusted"
 
+[projects."/Users/hwiryungkim"]
+trust_level = "trusted"
+
 [notice]
 "hide_gpt-5.1-codex-max_migration_prompt" = true
 
 [notice.model_migrations]
 "gpt-5.1-codex-mini" = "gpt-5.2-codex"
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4
