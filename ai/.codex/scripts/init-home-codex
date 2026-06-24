@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TARGET_LINK="$HOME/.codex"
+TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+BACKUP_PATH="$HOME/.codex.bak.${TIMESTAMP}"
+
+backup_target() {
+  local source_path="$1"
+  local destination="$2"
+
+  if [[ -e "$destination" || -L "$destination" ]]; then
+    destination="${destination}.$$"
+  fi
+
+  mv "$source_path" "$destination"
+  printf '%s' "$destination"
+}
+
+if [[ -L "$TARGET_LINK" ]] && [[ "$(readlink "$TARGET_LINK")" == "$HARNESS_DIR" ]]; then
+  printf 'home Codex already linked: %s -> %s\n' "$TARGET_LINK" "$HARNESS_DIR"
+  exit 0
+fi
+
+if [[ -e "$TARGET_LINK" || -L "$TARGET_LINK" ]]; then
+  BACKUP_PATH="$(backup_target "$TARGET_LINK" "$BACKUP_PATH")"
+  printf 'backed up existing %s to %s\n' "$TARGET_LINK" "$BACKUP_PATH"
+fi
+
+ln -s "$HARNESS_DIR" "$TARGET_LINK"
+printf 'created symlink: %s -> %s\n' "$TARGET_LINK" "$HARNESS_DIR"
