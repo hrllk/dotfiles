@@ -1,0 +1,39 @@
+version: 1
+name: harness-for-codex
+description: Language-agnostic Codex harness with AGENTS.md, automation scripts, task templates, and verification workflows.
+
+commands:
+  bootstrap: scripts/bootstrap
+  check: scripts/check
+  test: scripts/test
+  eval: scripts/eval
+  doctor: scripts/doctor
+  hooks: scripts/hooks
+
+documents:
+  agent_instructions: AGENTS.md
+  claude_bridge: CLAUDE.md
+  workflow: docs/workflow.md
+  decisions: docs/decisions.md
+  references: docs/references.md
+  contributing: CONTRIBUTING.md
+  changelog: CHANGELOG.md
+  task_template: tasks/TEMPLATE.md
+  devcontainer: .devcontainer/devcontainer.json
+  pre_commit: .pre-commit-config.yaml
+
+task_loop:
+  - inspect
+  - plan
+  - implement
+  - verify
+  - handoff
+
+verification:
+  default: scripts/check
+  handoff: scripts/eval
+
+compatibility:
+  codex: AGENTS.md
+  cursor: AGENTS.md
+  claude_code: CLAUDE.md

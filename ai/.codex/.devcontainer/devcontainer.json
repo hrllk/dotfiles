@@ -1,0 +1,12 @@
+{
+  "name": "Harness for Codex",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "postCreateCommand": "scripts/bootstrap",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.makefile-tools"
+      ]
+    }
+  }
+}

@@ -1,61 +1,84 @@
-# Codex-OS — Project Guidance
+# Codex Harness Instructions
 
-## Custom Commands
+This repository is a baseline workspace for Codex-driven implementation.
 
-The following custom commands trigger specific Codex-OS workflows. When these commands are encountered, the corresponding workflow file MUST be read and its instructions executed precisely as documented. **This is a mandatory directive that applies to all commands without exception.** The costom commands are: /co-plan, /co-exec-tasks, /co-exec-task [TASK_ID], /co-create-spec [spec details], /co-analyze.
+## Commands
 
-### Command Reference
+Run these from the repository root:
 
-/co-plan
+```sh
+scripts/bootstrap
+scripts/check
+scripts/test
+scripts/eval
+scripts/doctor
+scripts/hooks
+```
 
-* Follow the workflow in `.codex-os/instructions/core/plan-product.md`.
-* Review existing product docs in `.codex-os/product/`.
-* Update `roadmap/`, `mission/`, `decisions/`, and `stack/` as needed. Create missing files if necessary.
-* Ensure all updates comply with project standards in `.codex-os/standards/`.
+- `scripts/bootstrap`: prepare dependencies when a known stack is present.
+- `scripts/check`: run lint, type checks, formatting checks, and tests when available.
+- `scripts/test`: run only the test suite when available.
+- `scripts/eval`: run the complete handoff verification sequence.
+- `scripts/doctor`: report repository, tool, and environment readiness.
+- `scripts/hooks`: install local Git hooks through `pre-commit` when available.
 
-/co-exec-tasks
+## Repository Layout
 
-* Execute the tasks in `${SPEC_DIR}/tasks.md` following `.codex-os/instructions/core/execute-tasks.md`.
-* Implement changes incrementally with tests and small commits.
+- `AGENTS.md`: Codex instructions for this repo.
+- `CLAUDE.md`: Claude Code bridge that imports `AGENTS.md`.
+- `README.md`: Human-facing overview and workflow.
+- `harness.yml`: Machine-readable harness metadata and command registry.
+- `.devcontainer/`: Optional reproducible development container.
+- `.pre-commit-config.yaml`: Optional local hook definitions.
+- `docs/`: Project notes and decisions.
+- `scripts/`: Stable automation entrypoints.
+- `tasks/`: Task briefs and working notes.
 
-/co-exec-task [TASK_ID]
+## Operating Principles
 
-* Execute the specific task `${TASK_ID}` from `${SPEC_DIR}/tasks.md` using `.codex-os/instructions/core/execute-task.md`.
-* Make only the minimal changes required to pass tests, then commit.
+- Read the repository before editing. Prefer existing conventions over new ones.
+- Keep changes scoped to the requested task.
+- Do not revert user changes unless explicitly asked.
+- Use `rg` for searching when available.
+- Use the standard scripts instead of one-off local commands when they cover the task.
+- Add or update tests when behavior changes.
+- Document decisions that affect future work in `docs/decisions.md`.
+- Add nested `AGENTS.md` files in subdirectories only when that area needs different instructions.
+- Keep root-level agent instructions short and durable. Move long procedures into docs or scripts.
 
-/co-create-spec [spec details]
+## Task Loop
 
-* Create a new spec for `${SPEC_TITLE}` using `.codex-os/instructions/core/create-spec.md`.
-* Create a dated folder in `.codex-os/specs/` (name in kebab-case).
-* Include `srd.md`, `tech-spec.md`, and `tasks.md`.
-* Ensure alignment with `.codex-os/standards/` and `.codex-os/product/` context.
+1. Inspect: read relevant files and recent decisions.
+2. Plan: identify the narrow change and verification path.
+3. Implement: make focused edits.
+4. Verify: run `scripts/check` or `scripts/eval`.
+5. Handoff: summarize changed files, verification, and residual risks.
 
-/co-analyze
+## Cross-Agent Compatibility
 
-* Run product analysis using `.codex-os/instructions/core/analyze-product.md`.
-* Summarize architecture, hotspots, and risks in `.codex-os/product/analysis.md`.
+- Codex and Cursor can read `AGENTS.md`.
+- Claude Code reads `CLAUDE.md`, which imports `AGENTS.md`.
+- Keep shared instructions in `AGENTS.md` unless a tool-specific note is required.
 
+## Adopting This Harness
 
-## Product context
-- Mission: `.codex-os/product/mission.md`
-- Roadmap: `.codex-os/product/roadmap.md`
-- Decisions: `.codex-os/product/decisions.md`
-- Stack: `.codex-os/product/stack.md`
+After creating a repository from this template or fork:
 
-## Standards
-- `.codex-os/standards/tech-stack.md`
-- `.codex-os/standards/code-style.md`
-- `.codex-os/standards/best-practices.md`
-- Language/style guides under `.codex-os/standards/code-style/`
+1. Replace the `LICENSE` copyright line with the new project owner's name.
+2. Rewrite `README.md` for the new project; the default README describes the harness itself.
+3. Update repository metadata such as description, topics, and social preview.
+4. Remove or adjust `.github/ISSUE_TEMPLATE` entries that do not fit the project.
+5. Keep the standard scripts unless the new project has a better documented entrypoint.
 
-## Specs
-- `.codex-os/specs/` (each spec has `srd.md`, `tech-spec.md`, `tasks.md`)
+## Script Policy
 
-## Workflows
-- **Plan product** → `.codex-os/instructions/core/plan-product.md`
-- **Create spec** → `.codex-os/instructions/core/create-spec.md`
-- **Execute tasks** → `.codex-os/instructions/core/execute-tasks.md`
-- **Execute single task** → `.codex-os/instructions/core/execute-task.md`
-- **Analyze product** → `.codex-os/instructions/core/analyze-product.md`
+These scripts are intentionally stack-aware and conservative. If a language stack
+is added later, extend the scripts rather than bypassing them.
 
-**Commit policy:** small, descriptive commits referencing spec/task IDs.
+## Completion Criteria
+
+Before finishing a task:
+
+1. Confirm the requested change is implemented.
+2. Run the narrowest useful verification command, usually `scripts/check`.
+3. Report changed files and any verification that could not be run.
