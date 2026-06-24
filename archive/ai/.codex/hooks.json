@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/dotfiles/ai/.codex/tmux-notify-hook.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
