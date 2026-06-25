@@ -30,8 +30,8 @@ _bracketed_paste_begin() {
 }
 
 _bracketed_paste_end() {
-  local content="${_bracketed_paste_content//$'\r'/ }"
-  content="${content//$'\n'/ }"
+  local content="${_bracketed_paste_content//$'\r\n'/$'\n'}"
+  content="${content//$'\r'/$'\n'}"
 
   if [ ${_bracketed_paste_restore_keymap[@]:0:1} = 'bindkey' ]; then
     $_bracketed_paste_restore_keymap
