@@ -1,4 +1,5 @@
 model_reasoning_effort = "medium"
+model = "gpt-5.4-mini"
 [mcp_servers.context7]
 command = "npx"
 args = ["-y", "@upstash/context7-mcp"]
@@ -94,6 +95,12 @@ trust_level = "untrusted"
 trust_level = "untrusted"
 
 [projects."/Users/hwiryungkim"]
+trust_level = "trusted"
+
+[projects."/Users/alzar/task/sources/opensources/graphkeeper"]
+trust_level = "trusted"
+
+[projects."/Users/alzar/dotfiles"]
 trust_level = "trusted"
 
 [notice]
