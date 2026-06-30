@@ -1,4 +1,5 @@
 model_reasoning_effort = "medium"
+model = "gpt-5.4-mini"
 [mcp_servers.context7]
 command = "npx"
 args = ["-y", "@upstash/context7-mcp"]
@@ -96,11 +97,30 @@ trust_level = "untrusted"
 [projects."/Users/hwiryungkim"]
 trust_level = "trusted"
 
+[projects."/Users/hwiryungkim/task/sources/opensources/graphkeeper"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/GS"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/Downloads/tmp"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/archive/tps-mirae"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/.config/nvim"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/sources/personal/blog"]
+trust_level = "trusted"
+
 [notice]
 "hide_gpt-5.1-codex-max_migration_prompt" = true
 
 [notice.model_migrations]
 "gpt-5.1-codex-mini" = "gpt-5.2-codex"
+"gpt-5.4" = "gpt-5.5"
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
