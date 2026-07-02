@@ -52,3 +52,7 @@ reload_zshrc() {
 
 add-zsh-hook -d precmd reload_zshrc 2>/dev/null
 add-zsh-hook precmd reload_zshrc
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/Users/hrk/.sdkman"
+[[ -s "/Users/hrk/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/hrk/.sdkman/bin/sdkman-init.sh"

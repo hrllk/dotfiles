@@ -148,6 +148,7 @@ The comparison is directional, but it shows the cost of loading the full OMZ sta
 - `zsh` initialization is intentionally modular to keep interactive startup lightweight
 - `ll` uses `colorls` when available, and falls back to standard directory listings if it is not
 - `archive/util/iterm/` keeps historical iTerm export data out of the active config set
-- `env.zsh` is currently optimized for this macOS + Homebrew + local directory layout
+- `env.zsh` prefers `~/.sdkman/candidates/java/current` for Java when SDKMAN is installed, and otherwise falls back to `java_home -v 17` when available
+- after `sdk default java <version>`, `which java` should resolve to `~/.sdkman/candidates/java/current/bin/java`
 - If you move to another machine, split machine-specific overrides into `env.local.zsh`
 - The current layout is optimized for this machine, not for full portability
