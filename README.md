@@ -21,7 +21,7 @@ The layout is optimized for:
 ## Features
 - `zsh`: thin entrypoint, modular options, lazy tool integrations, aliases, secrets, and plugin loading
 - `ai`: secret loading for AI and API tooling
-- `util`: editor and terminal-related configs, including tmux, Kitty, and JetBrains-related files
+- `util`: editor and terminal-related configs, including tmux, Kitty, wezterm, and JetBrains-related files
 
 ## Structure
 ```text
@@ -64,6 +64,8 @@ util/
     .ideavimrc
   kitty/
     kitty.conf
+  wezterm/
+    wezterm.lua
   tmux/
     .gitmux.conf
     .tmux.conf
@@ -102,7 +104,7 @@ The bootstrap script:
 - clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting`
 - clones `tmux plugin manager (TPM)`
 - backs up existing shell and terminal config files with timestamps
-- creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, and `kitty`
+- creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, `kitty`, and `wezterm`
 - loads `zsh/.p10k.zsh` when present, so Powerlevel10k config can live in the repo
 
 Targets after bootstrap:
@@ -110,6 +112,7 @@ Targets after bootstrap:
 - `~/.ideavimrc` -> `~/dotfiles/util/jetbrains/.ideavimrc`
 - `~/.tmux.conf` -> `~/dotfiles/util/tmux/.tmux.conf`
 - `~/.config/kitty/kitty.conf` -> `~/dotfiles/util/kitty/kitty.conf`
+- `~/.wezterm.lua` -> `~/dotfiles/util/wezterm/wezterm.lua`
 - tmux plugins are installed under `~/.local/share/tmux/plugins/` and are not tracked in this repo
 - use tmux `prefix + I` to install plugins after startup
 

@@ -74,5 +74,6 @@ link_path "$DOTFILES_DIR/util/tmux/.tmux.conf" "$HOME/.tmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.gitmux.conf" "$HOME/.gitmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux"
 link_path "$DOTFILES_DIR/util/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf"
+link_path "$DOTFILES_DIR/util/wezterm/wezterm.lua" "$HOME/.wezterm.lua"
 
 printf 'bootstrap completed. backups: %s\n' "$BACKUP_ROOT"
