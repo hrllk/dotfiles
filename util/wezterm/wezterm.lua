@@ -9,7 +9,7 @@ config.font = wezterm.font_with_fallback({
 })
 config.font_size = 12.0
 config.color_scheme = "Tokyo Night"
-config.line_height = 1.0
+config.line_height = 0.9
 config.adjust_window_size_when_changing_font_size = false
 config.window_background_image = home .. "/dotfiles/util/kitty/materials/jeremy-bishop-G9i_plbfDgk-unsplash.jpg"
 config.window_background_opacity = 1.0
