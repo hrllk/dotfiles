@@ -8,8 +8,9 @@ export LC_ALL=en_US.UTF-8
 
 typeset -gU path
 path=(
+  /opt/homebrew/opt/ruby/bin
+  /opt/homebrew/lib/ruby/gems/4.0.0/bin
   /opt/homebrew/bin
-  /opt/homebrew/lib/ruby/gems/3.4.0/bin
   $JAVA_HOME/bin
   /Applications/IntelliJ\ IDEA.app/Contents/MacOS
   $IMAGEMAGICK_HOME/bin

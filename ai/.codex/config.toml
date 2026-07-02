@@ -97,10 +97,22 @@ trust_level = "untrusted"
 [projects."/Users/hwiryungkim"]
 trust_level = "trusted"
 
-[projects."/Users/alzar/task/sources/opensources/graphkeeper"]
+[projects."/Users/hwiryungkim/task/sources/opensources/graphkeeper"]
 trust_level = "trusted"
 
-[projects."/Users/alzar/dotfiles"]
+[projects."/Users/hwiryungkim/task/sources/okestro/GS"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/Downloads/tmp"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/sources/okestro/archive/tps-mirae"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/.config/nvim"]
+trust_level = "trusted"
+
+[projects."/Users/hwiryungkim/task/sources/personal/blog"]
 trust_level = "trusted"
 
 [notice]
@@ -108,6 +120,7 @@ trust_level = "trusted"
 
 [notice.model_migrations]
 "gpt-5.1-codex-mini" = "gpt-5.2-codex"
+"gpt-5.4" = "gpt-5.5"
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4

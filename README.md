@@ -103,6 +103,7 @@ The bootstrap script:
 - clones `tmux plugin manager (TPM)`
 - backs up existing shell and terminal config files with timestamps
 - creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, and `kitty`
+- loads `zsh/.p10k.zsh` when present, so Powerlevel10k config can live in the repo
 
 Targets after bootstrap:
 - `~/.zshrc` -> `~/dotfiles/zsh/.zshrc`
