@@ -43,17 +43,20 @@ wezterm.on("window-config-reloaded", function(window)
 end)
 
 config.font = wezterm.font_with_fallback({
-  "JetBrains Mono",
+  { family = "JetBrains Mono", weight = "Medium" },
+  { family = "Apple SD Gothic Neo", weight = "DemiBold" },
   "Apple Color Emoji",
 })
-config.font_size = 12.0
+config.font_size = 12
 config.color_scheme = "Tokyo Night"
 config.line_height = 0.9
 config.adjust_window_size_when_changing_font_size = false
 config.background = {
   {
     source = {
-      File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
+      File = home .. "/dotfiles/util/assets/wallpapers/pexels-leyla21m-30744872.jpg",
+
     },
     hsb = {
       brightness = 0.75,
@@ -63,7 +66,7 @@ config.background = {
     source = {
       Color = "black",
     },
-    opacity = 0.22,
+    opacity = 0.82,
     width = "100%",
     height = "100%",
   },
