@@ -2,6 +2,45 @@ local wezterm = require "wezterm"
 local home = os.getenv("HOME") or "/Users/hrk"
 
 local config = wezterm.config_builder()
+local kitty_active_border = "#2DD4BF"
+local kitty_inactive_border = "#3b4261"
+
+local active_window_frame = {
+  border_left_width = "0.25cell",
+  border_right_width = "0.25cell",
+  border_top_height = "0.125cell",
+  border_bottom_height = "0.125cell",
+  border_left_color = kitty_active_border,
+  border_right_color = kitty_active_border,
+  border_top_color = kitty_active_border,
+  border_bottom_color = kitty_active_border,
+}
+
+local inactive_window_frame = {
+  border_left_width = "0.25cell",
+  border_right_width = "0.25cell",
+  border_top_height = "0.125cell",
+  border_bottom_height = "0.125cell",
+  border_left_color = kitty_inactive_border,
+  border_right_color = kitty_inactive_border,
+  border_top_color = kitty_inactive_border,
+  border_bottom_color = kitty_inactive_border,
+}
+
+local function apply_window_frame(window)
+  local frame = window:is_focused() and active_window_frame or inactive_window_frame
+  window:set_config_overrides({
+    window_frame = frame,
+  })
+end
+
+wezterm.on("window-focus-changed", function(window, pane)
+  apply_window_frame(window)
+end)
+
+wezterm.on("window-config-reloaded", function(window)
+  apply_window_frame(window)
+end)
 
 config.font = wezterm.font_with_fallback({
   "JetBrains Mono",
@@ -43,6 +82,7 @@ config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
 config.tab_bar_at_bottom = true
 config.window_decorations = "RESIZE"
+config.window_frame = active_window_frame
 
 config.audible_bell = "Disabled"
 config.warn_about_missing_glyphs = false
