@@ -11,7 +11,7 @@ config.font_size = 12.0
 config.color_scheme = "Tokyo Night"
 config.line_height = 0.9
 config.adjust_window_size_when_changing_font_size = false
-config.window_background_image = home .. "/dotfiles/util/kitty/materials/jeremy-bishop-G9i_plbfDgk-unsplash.jpg"
+config.window_background_image = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg"
 config.window_background_opacity = 1.0
 config.macos_window_background_blur = 0
 

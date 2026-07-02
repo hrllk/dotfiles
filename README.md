@@ -64,6 +64,9 @@ util/
     .ideavimrc
   kitty/
     kitty.conf
+  assets/
+    wallpapers/
+      ...
   wezterm/
     wezterm.lua
   tmux/
