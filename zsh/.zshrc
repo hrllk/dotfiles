@@ -29,16 +29,23 @@ autoload -Uz add-zsh-hook
 zmodload -i zsh/stat
 
 typeset -g _zshrc_mtime=''
+typeset -g _p10k_mtime=''
 typeset -A _zshrc_stat
 zstat -H _zshrc_stat -L -- "$ZSH_DOTFILES_PATH/.zshrc" 2>/dev/null && _zshrc_mtime="${_zshrc_stat[mtime]}"
+typeset -A _p10k_stat
+zstat -H _p10k_stat -L -- "$ZSH_DOTFILES_PATH/.p10k.zsh" 2>/dev/null && _p10k_mtime="${_p10k_stat[mtime]}"
 
 reload_zshrc() {
   local -A stat
+  local -A p10k_stat
 
   zstat -H stat -L -- "$ZSH_DOTFILES_PATH/.zshrc" 2>/dev/null || return 0
-  [[ "${stat[mtime]}" == "$_zshrc_mtime" ]] && return 0
+  zstat -H p10k_stat -L -- "$ZSH_DOTFILES_PATH/.p10k.zsh" 2>/dev/null
+
+  [[ "${stat[mtime]}" == "$_zshrc_mtime" && "${p10k_stat[mtime]:-}" == "$_p10k_mtime" ]] && return 0
 
   _zshrc_mtime="${stat[mtime]}"
+  _p10k_mtime="${p10k_stat[mtime]:-}"
   ZSH_RELOADING_RC=1 source "$ZSH_DOTFILES_PATH/.zshrc"
   unset ZSH_RELOADING_RC
 }
