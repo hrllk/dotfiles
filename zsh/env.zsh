@@ -16,6 +16,8 @@ fi
 
 typeset -gU path
 path=(
+  # /opt/homebrew/opt/git/bin
+  /opt/homebrew/bin
   /usr/bin
   /bin
   /usr/sbin
@@ -31,7 +33,6 @@ if [[ -n "${JAVA_HOME:-}" ]]; then
 fi
 
 path+=(
-  /opt/homebrew/bin
   /Applications/IntelliJ\ IDEA.app/Contents/MacOS
   $IMAGEMAGICK_HOME/bin
   /opt/homebrew/opt/kafka/bin
