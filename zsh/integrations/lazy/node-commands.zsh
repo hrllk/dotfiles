@@ -16,7 +16,6 @@ __run_with_nvm() {
 node() { unset -f node; __run_with_nvm node "$@"; }
 npm() { unset -f npm; __run_with_nvm npm "$@"; }
 npx() { unset -f npx; __run_with_nvm npx "$@"; }
-codex() { unset -f codex; __run_with_nvm codex "$@"; }
 gemini() { unset -f gemini; __run_with_nvm gemini "$@"; }
 task-master() { unset -f task-master; __run_with_nvm task-master "$@"; }
 openclaw() { unset -f openclaw; __run_with_nvm openclaw "$@"; }
