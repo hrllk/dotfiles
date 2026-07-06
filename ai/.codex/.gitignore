@@ -36,7 +36,9 @@ cache/
 .tmp/
 sessions/
 shell_snapshots/
-skills/
+skills/.system
+skills/gstack
+skills/gstack-*
 rules/
 logs/
 crash_reports/

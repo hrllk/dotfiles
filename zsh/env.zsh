@@ -4,6 +4,7 @@ export IMAGEMAGICK_HOME=/opt/homebrew/var/homebrew/linked/imagemagick
 export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/var/homebrew/linked/imagemagick/lib
 export LANG='en_US.UTF-8'
 export LC_ALL=en_US.UTF-8
+export BUN_INSTALL="$HOME/.bun"
 
 if [[ -x "$HOME/.sdkman/candidates/java/current/bin/java" ]]; then
   export JAVA_HOME="$HOME/.sdkman/candidates/java/current"
@@ -39,12 +40,16 @@ path+=(
   $HOME/.rd/bin
   /usr/local/texlive/2025/bin/universal-darwin
   $HOME/.local/bin
-  $HOME/.bun/bin
+  $BUN_INSTALL/bin
   $HOME/.antigravity/antigravity/bin
   /usr/local/bin
   $path
 )
 
 export PATH
+
+if [[ -s "$BUN_INSTALL/_bun" ]]; then
+  source "$BUN_INSTALL/_bun"
+fi
 
 export EDITOR="nvim"
