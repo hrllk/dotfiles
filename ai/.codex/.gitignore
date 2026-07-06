@@ -19,11 +19,13 @@ tmp/
 
 # Codex runtime state and machine-local data
 auth.json
+oauth*.json
 installation_id
 history.jsonl
 models_cache.json
 version.json
 *.sqlite
+*.sqlite-journal
 *.sqlite-wal
 *.sqlite-shm
 logs_*.sqlite*
@@ -36,7 +38,10 @@ sessions/
 shell_snapshots/
 skills/
 rules/
+logs/
+crash_reports/
 .personality_migration
 *.bak
+*.merge-backup-*
 AGENTS.md.bak
 CLAUDE.md.bak
