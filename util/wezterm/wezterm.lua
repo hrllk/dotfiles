@@ -54,8 +54,8 @@ config.adjust_window_size_when_changing_font_size = false
 config.background = {
   {
     source = {
-      -- File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
-      File = home .. "/dotfiles/util/assets/wallpapers/pexels-leyla21m-30744872.jpg",
+      File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-leyla21m-30744872.jpg",
 
     },
     hsb = {
@@ -66,7 +66,7 @@ config.background = {
     source = {
       Color = "black",
     },
-    opacity = 0.82,
+    opacity = 0.40,
     width = "100%",
     height = "100%",
   },
