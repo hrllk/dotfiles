@@ -24,8 +24,9 @@ path=(
   /usr/sbin
   /sbin
   /opt/homebrew/opt/ruby/bin
-  /opt/homebrew/lib/ruby/gems/4.0.0/bin
 )
+
+path+=(/opt/homebrew/lib/ruby/gems/*/bin(N))
 
 if [[ -n "${JAVA_HOME:-}" ]]; then
   path+=(
