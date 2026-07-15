@@ -13,8 +13,6 @@ __run_with_nvm() {
   command "$cmd" "$@"
 }
 
-node() { unset -f node; __run_with_nvm node "$@"; }
-npm() { unset -f npm; __run_with_nvm npm "$@"; }
 npx() { unset -f npx; __run_with_nvm npx "$@"; }
 gemini() { unset -f gemini; __run_with_nvm gemini "$@"; }
 task-master() { unset -f task-master; __run_with_nvm task-master "$@"; }
