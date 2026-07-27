@@ -14,6 +14,11 @@ source_if_exists() {
   [[ -r "$1" ]] && source "$1"
 }
 
+# Make the taskmaster shortcut available before slow completion and plugin
+# initialization. Powerlevel10k's instant prompt can accept input while the
+# rest of this file is still loading.
+source_if_exists "$ZSH_DOTFILES_PATH/aliases/taskmaster.zsh"
+
 source_if_exists "$ZSH_DOTFILES_PATH/options/completion.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/env.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/integrations/lazy/nvm.zsh"
