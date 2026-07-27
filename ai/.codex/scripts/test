@@ -12,3 +12,7 @@ elif [[ -d tests ]] && command -v pytest >/dev/null 2>&1; then
 else
   echo "No known test suite found."
 fi
+
+if [[ -x scripts/test-tmux-unread ]]; then
+  scripts/test-tmux-unread
+fi

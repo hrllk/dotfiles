@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HARNESS_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+TMUX_SOCKET="codex-unread-test-$$"
+TMUX_CONF="$(mktemp "${TMPDIR:-/tmp}/codex-unread-tmux.XXXXXX.conf")"
+TMUX_LOG="$(mktemp "${TMPDIR:-/tmp}/codex-unread-tmux.XXXXXX.log")"
+
+cleanup() {
+  tmux -L "$TMUX_SOCKET" kill-server >/dev/null 2>&1 || true
+  rm -f "$TMUX_CONF" "$TMUX_LOG"
+}
+trap cleanup EXIT
+
+cat >"$TMUX_CONF" <<'EOF'
+set -g status off
+set -g @codex_unread_color '#FBBF24'
+set -g window-status-current-format '#{?@codex_unread,#[fg=#FBBF24],} #I:#W #{?@codex_unread,#[fg=green],}'
+set -g window-status-format '#{?@codex_unread,#[fg=#FBBF24],} #I:#W #{?@codex_unread,#[fg=colour250],}'
+set-hook -g after-select-window[99] 'set-option -wq @codex_unread 0'
+set-hook -g client-focus-in[99] 'set-option -wq @codex_unread 0'
+EOF
+
+tmux -L "$TMUX_SOCKET" -f "$TMUX_CONF" new-session -d -s test -n codex-a
+tmux -L "$TMUX_SOCKET" new-window -d -t test:2 -n codex-b
+
+socket_path="$(tmux -L "$TMUX_SOCKET" display-message -p '#{socket_path}')"
+tmux_value="${socket_path},0,0"
+pane_a="$(tmux -L "$TMUX_SOCKET" display-message -p -t test:codex-a '#{pane_id}')"
+pane_b="$(tmux -L "$TMUX_SOCKET" display-message -p -t test:codex-b '#{pane_id}')"
+window_b="$(tmux -L "$TMUX_SOCKET" display-message -p -t test:codex-b '#{window_id}')"
+
+# Invoke the real hook against an inactive origin window.
+tmux -L "$TMUX_SOCKET" select-window -t test:codex-a
+TMUX="$tmux_value" TMUX_PANE="$pane_b" "$HARNESS_DIR/tmux-notify-hook.sh"
+state="$(tmux -L "$TMUX_SOCKET" show-options -wv -t "$window_b" @codex_unread)"
+[ "$state" = "1" ]
+
+# Invoke the real hook against the active origin window.
+TMUX="$tmux_value" TMUX_PANE="$pane_a" "$HARNESS_DIR/tmux-notify-hook.sh"
+window_a="$(tmux -L "$TMUX_SOCKET" display-message -p -t test:codex-a '#{window_id}')"
+state="$(tmux -L "$TMUX_SOCKET" show-options -wv -t "$window_a" @codex_unread 2>/dev/null || true)"
+[ "$state" = "0" ] || [ -z "$state" ]
+
+tmux -L "$TMUX_SOCKET" select-window -t test:codex-b
+state="$(tmux -L "$TMUX_SOCKET" show-options -wv -t "$window_b" @codex_unread 2>/dev/null || true)"
+[ "$state" = "0" ] || [ -z "$state" ]
+
+tmux -L "$TMUX_SOCKET" source-file "$TMUX_CONF"
+hook_count="$(tmux -L "$TMUX_SOCKET" show-options -gH | rg -c 'after-select-window\[99\]' || true)"
+[ "$hook_count" -eq 1 ]
+
+TMUX= TMUX_PANE= "$HARNESS_DIR/tmux-notify-hook.sh"
+
+echo "tmux unread smoke test passed"
