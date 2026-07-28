@@ -2,6 +2,13 @@ __run_with_nvm() {
   local cmd="$1"
   shift
 
+  # Prefer an already available executable. This keeps commands such as
+  # task-master usable on machines that install them outside nvm.
+  if command -v "$cmd" >/dev/null 2>&1; then
+    command "$cmd" "$@"
+    return $?
+  fi
+
   if ! __load_nvm >/dev/null 2>&1; then
     return 127
   fi
