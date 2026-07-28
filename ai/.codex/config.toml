@@ -1,5 +1,6 @@
-model = "gpt-5.4"
+model = "gpt-5.6-luna"
 model_reasoning_effort = "medium"
+approvals_reviewer = "user"
 [projects."/Users/hrk/dotfiles"]
 trust_level = "trusted"
 
@@ -21,8 +22,48 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/personal/secretary"]
 trust_level = "trusted"
 
+[projects."/Users/hrk/task/sources/okestro/3.0.5.2/react-app"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.1/pipeline-api"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.2/operator-api"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.2"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/personal/blog"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/personal/carf"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/personal/cv"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/ideas"]
+trust_level = "trusted"
+
 [tui]
 theme = "ansi"
 
+[tui.model_availability_nux]
+"gpt-5.5" = 2
+"gpt-5.6-sol" = 4
+
 [notice.model_migrations]
 "gpt-5.4" = "gpt-5.5"
+
+[hooks.state]
+
+[hooks.state."/Users/hrk/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:0ff2e207dbc95b6733f4e0e61e10bad1752e52b38980b2e739974b8f88919822"
+
+[mcp_servers.gbrain]
+command = "gbrain"
+args = ["serve"]
