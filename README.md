@@ -5,6 +5,7 @@
 - [Features](#features)
 - [Structure](#structure)
 - [Quickstart](#quickstart)
+- [Documentation](#documentation)
 - [Performance](#performance)
 - [Conventions](#conventions)
 - [Notes](#notes)
@@ -125,6 +126,15 @@ Targets after bootstrap:
 - `source_if_exists` is used for optional local or machine-specific files
 - `secrets/` is split by domain with a shared helper and a single index entrypoint
 - `integrations/lazy/` contains runtime loaders that are only initialized when needed
+
+## Documentation
+
+- [Documentation index](docs/index.md): choose a tutorial, how-to, reference, or explanation
+- [First setup tutorial](docs/tutorial-first-setup.md): install the environment on a new Mac
+- [Bootstrap how-to](docs/howto-bootstrap.md): rerun, verify, and troubleshoot installation
+- [Project structure reference](docs/project-structure.md): understand ownership and public shell commands
+- [Configuration architecture](docs/explanation-architecture.md): understand startup order and fallbacks
+- [Codex tmux unread design](docs/design-codex-tmux-unread.md): completion state in tmux windows
 
 ### Verification
 ```zsh
