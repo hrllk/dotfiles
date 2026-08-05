@@ -24,6 +24,7 @@ path=(
   /usr/sbin
   /sbin
   /opt/homebrew/opt/ruby/bin
+  /opt/homebrew/opt/mysql-client/bin
 )
 
 path+=(/opt/homebrew/lib/ruby/gems/*/bin(N))
