@@ -1,3 +1,0 @@
-#!/bin/zsh
-set -eu
-exec "$HOME/.hermes/scripts/gateway-restart" "$@"
