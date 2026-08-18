@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+KEY_DIR="${DOTFILES_KEY_DIR:-$HOME/Library/Mobile Documents/com~apple~CloudDocs/task/keys}"
+HERMES_BIN="${HERMES_BIN:-hermes}"
+SYNC_SCRIPT="$HERMES_HOME/scripts/sync-secrets"
+RESTART_SCRIPT="$HERMES_HOME/scripts/gateway-restart"
+
+usage() {
+  cat <<'EOF'
+Hermes profile gateway management tool
+
+Usage:
+  gateway-management-profile [--dry-run]
+
+Menu:
+  1. Create a profile and gateway
+  2. Delete a profile and gateway
+
+Create flow:
+  Select an existing profile to copy from, or select none for a fresh profile.
+  Enter the new agent name and Discord bot token.
+
+Delete flow:
+  Select an existing profile, confirm deletion, and optionally remove its secret.
+
+Options:
+  --dry-run  Show planned changes without modifying files or services.
+  -h, --help Show this help message.
+
+The Discord token is entered silently and is never displayed.
+EOF
+}
+
+dry_run=0
+while (( $# > 0 )); do
+  case "$1" in
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+[[ -t 0 ]] || {
+  printf '%s\n' 'This tool requires an interactive terminal.' >&2
+  exit 1
+}
+
+profiles=()
+load_profiles() {
+  profiles=()
+  gateway_list="$("$HERMES_BIN" gateway list)" || {
+    printf '%s\n' 'Unable to read the Hermes gateway list.' >&2
+    exit 1
+  }
+  while IFS= read -r profile_name; do
+    [[ -n "$profile_name" ]] && profiles+=("$profile_name")
+  done < <(printf '%s\n' "$gateway_list" | awk '$1 == "✓" || $1 == "✗" { print $2 }')
+}
+
+select_copy_source() {
+  load_profiles
+  printf '\nCopy from:\n'
+  printf '  0) none (create a fresh profile)\n'
+  for index in "${!profiles[@]}"; do
+    printf '  %d) %s\n' "$((index + 1))" "${profiles[$index]}"
+  done
+  printf 'Select copy source [0-%d]: ' "${#profiles[@]}"
+  IFS= read -r selection
+  [[ "$selection" =~ ^[0-9]+$ ]] || { printf '%s\n' 'Invalid selection.' >&2; exit 2; }
+  (( selection <= ${#profiles[@]} )) || { printf '%s\n' 'Selection is out of range.' >&2; exit 2; }
+  if (( selection == 0 )); then
+    clone_from=''
+  else
+    clone_from="${profiles[$((selection - 1))]}"
+  fi
+}
+
+select_delete_profile() {
+  load_profiles
+  (( ${#profiles[@]} > 0 )) || { printf '%s\n' 'No profiles are available to delete.' >&2; exit 1; }
+  printf '\nProfiles:\n'
+  for index in "${!profiles[@]}"; do
+    printf '  %d) %s\n' "$((index + 1))" "${profiles[$index]}"
+  done
+  printf 'Select profile to delete [1-%d]: ' "${#profiles[@]}"
+  IFS= read -r selection
+  [[ "$selection" =~ ^[0-9]+$ ]] || { printf '%s\n' 'Invalid selection.' >&2; exit 2; }
+  (( selection >= 1 && selection <= ${#profiles[@]} )) || { printf '%s\n' 'Selection is out of range.' >&2; exit 2; }
+  profile="${profiles[$((selection - 1))]}"
+}
+
+printf 'Hermes profile gateway management\n\n'
+printf '1) Create\n2) Delete\nSelect action [1-2]: '
+IFS= read -r action
+
+case "$action" in
+  1)
+    select_copy_source
+    printf '\nAgent name (lowercase letters, numbers, hyphens): '
+    IFS= read -r profile
+    printf 'Discord bot token: '
+    IFS= read -r -s token
+    printf '\n'
+
+    [[ -n "$profile" && -n "$token" ]] || {
+      printf '%s\n' 'Agent name and Discord token must not be empty.' >&2
+      exit 1
+    }
+    [[ "$profile" =~ ^[a-z0-9][a-z0-9-]*$ ]] || {
+      printf 'Invalid agent name: %s\n' "$profile" >&2
+      exit 2
+    }
+
+    profile_dir="$HERMES_HOME/profiles/$profile"
+    secret_dir="$KEY_DIR/personal/discord"
+    secret_file="$secret_dir/discord-bot-token-$profile"
+    suffix="$(printf '%s' "$profile" | tr '[:lower:]-' '[:upper:]_')"
+    token_variable="DISCORD_BOT_TOKEN_$suffix"
+
+    [[ ! -e "$profile_dir" ]] || {
+      printf 'Profile already exists: %s\n' "$profile" >&2
+      exit 1
+    }
+    if [[ -e "$secret_file" ]] && (( ! dry_run )); then
+      printf 'Secret file already exists. Replace it? [y/N] '
+      IFS= read -r replace_secret
+      [[ "$replace_secret" =~ ^[Yy]$ ]] || exit 0
+    fi
+
+    if (( dry_run )); then
+      printf '\nWould create secret: %s\n' "$secret_file"
+      printf 'Would create profile: %s\n' "$profile"
+      if [[ -n "$clone_from" ]]; then
+        printf 'Would copy from: %s\n' "$clone_from"
+      else
+        printf 'Would create from scratch\n'
+      fi
+      printf 'Would bind DISCORD_BOT_TOKEN to: ${%s}\n' "$token_variable"
+      printf 'Would install and start the profile LaunchAgent\n'
+      exit 0
+    fi
+
+    mkdir -p "$secret_dir"
+    umask 077
+    tmp_secret="$(mktemp "$secret_file.tmp.XXXXXX")"
+    trap 'rm -f "$tmp_secret"' EXIT
+    printf '%s\n' "$token" > "$tmp_secret"
+    mv -f "$tmp_secret" "$secret_file"
+    trap - EXIT
+    unset token
+
+    if [[ -n "$clone_from" ]]; then
+      "$HERMES_BIN" profile create "$profile" --clone-from "$clone_from"
+    else
+      "$HERMES_BIN" profile create "$profile"
+    fi
+
+    profile_env="$profile_dir/.env"
+    tmp_env="$(mktemp "$profile_env.tmp.XXXXXX")"
+    trap 'rm -f "$tmp_env"' EXIT
+    awk -v token_ref="${token_variable}" '
+      /^DISCORD_BOT_TOKEN=/ { print "DISCORD_BOT_TOKEN=${" token_ref "}"; token_seen=1; next }
+      /^DISCORD_ALLOWED_USERS=/ { print "DISCORD_ALLOWED_USERS=${DISCORD_USER_ID_ALZAR}"; users_seen=1; next }
+      { print }
+      END {
+        if (!token_seen) print "DISCORD_BOT_TOKEN=${" token_ref "}"
+        if (!users_seen) print "DISCORD_ALLOWED_USERS=${DISCORD_USER_ID_ALZAR}"
+      }
+    ' "$profile_env" > "$tmp_env"
+    chmod 600 "$tmp_env"
+    mv -f "$tmp_env" "$profile_env"
+    trap - EXIT
+
+    "$SYNC_SCRIPT"
+    "$HERMES_BIN" --profile "$profile" gateway install --force --no-start-now --start-on-login
+    "$RESTART_SCRIPT" --all
+    printf '✓ profile created and gateway connected: %s\n' "$profile"
+    ;;
+  2)
+    select_delete_profile
+    [[ "$profile" != default ]] || {
+      printf '%s\n' 'The default gateway cannot be deleted by this tool.' >&2
+      exit 1
+    }
+    profile_dir="$HERMES_HOME/profiles/$profile"
+    secret_file="$KEY_DIR/personal/discord/discord-bot-token-$profile"
+    printf '\nDelete profile "%s"? This removes its runtime state. [y/N] ' "$profile"
+    IFS= read -r confirm
+    [[ "$confirm" =~ ^[Yy]$ ]] || exit 0
+
+    if (( dry_run )); then
+      printf 'Would stop and delete profile: %s\n' "$profile"
+    else
+      "$HERMES_BIN" --profile "$profile" gateway stop || true
+      "$HERMES_BIN" --profile "$profile" gateway uninstall || true
+      "$HERMES_BIN" profile delete "$profile" --yes
+    fi
+
+    if [[ -e "$secret_file" ]]; then
+      printf 'Delete secret file too? [y/N] '
+      IFS= read -r delete_secret
+      if [[ "$delete_secret" =~ ^[Yy]$ ]]; then
+        if (( dry_run )); then
+          printf 'Would delete secret: %s\n' "$secret_file"
+        else
+          rm -f "$secret_file"
+          printf '✓ secret deleted: %s\n' "$secret_file"
+        fi
+      fi
+    fi
+    ;;
+  *)
+    printf '%s\n' 'Select 1 for create or 2 for delete.' >&2
+    exit 2
+    ;;
+esac

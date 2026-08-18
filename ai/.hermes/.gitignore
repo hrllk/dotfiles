@@ -9,6 +9,7 @@
 !scripts/
 !scripts/gateway-restart
 !scripts/sync-secrets
+!scripts/gateway-management-profile
 
 !bin/
 !bin/gateway-*
