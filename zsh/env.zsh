@@ -17,14 +17,20 @@ fi
 
 typeset -gU path
 path=(
-  # /opt/homebrew/opt/git/bin
+  # Keep paths inherited from the launcher/shell. macOS tools such as Codex's
+  # bundled rg can be provided there and must survive this PATH setup.
   /opt/homebrew/bin
+  /opt/homebrew/opt/ripgrep/bin
+  /usr/local/opt/ripgrep/bin
+  /opt/homebrew/Caskroom/codex/*/codex-path(N)
+  /opt/homebrew/opt/ruby/bin
+  /opt/homebrew/opt/mysql-client/bin
+  /opt/homebrew/opt/libpq/bin
   /usr/bin
   /bin
   /usr/sbin
   /sbin
-  /opt/homebrew/opt/ruby/bin
-  /opt/homebrew/opt/mysql-client/bin
+  $path
 )
 
 path+=(/opt/homebrew/lib/ruby/gems/*/bin(N))
@@ -45,10 +51,10 @@ path+=(
   $BUN_INSTALL/bin
   $HOME/.antigravity/antigravity/bin
   /usr/local/bin
-  $path
 )
 
 export PATH
+rehash 2>/dev/null || true
 
 if [[ -s "$BUN_INSTALL/_bun" ]]; then
   source "$BUN_INSTALL/_bun"
