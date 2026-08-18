@@ -1,0 +1,24 @@
+# Ignore Hermes runtime state by default. Only the entries below are tracked.
+*
+
+!.gitignore
+!.env
+!config.yaml
+!SOUL.md
+
+!scripts/
+!scripts/gateway-restart
+!scripts/sync-secrets
+
+!bin/
+!bin/gateway-*
+
+!profiles/
+!profiles/*/
+!profiles/*/.env
+!profiles/*/config.yaml
+!profiles/*/SOUL.md
+
+# Never commit the local launchd secret cache.
+.launchd.env
+.launchd.env.tmp.*

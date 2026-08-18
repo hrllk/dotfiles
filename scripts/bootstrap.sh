@@ -62,6 +62,8 @@ clone_if_missing() {
   fi
 }
 
+
+
 clone_if_missing https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM_DIR/themes/powerlevel10k" 1
 clone_if_missing https://github.com/Aloxaf/fzf-tab "$ZSH_CUSTOM_DIR/plugins/fzf-tab"
 clone_if_missing https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM_DIR/plugins/zsh-autosuggestions"
@@ -75,5 +77,8 @@ link_path "$DOTFILES_DIR/util/tmux/.gitmux.conf" "$HOME/.gitmux.conf"
 link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux"
 link_path "$DOTFILES_DIR/util/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf"
 link_path "$DOTFILES_DIR/util/wezterm/wezterm.lua" "$HOME/.wezterm.lua"
+link_path "$DOTFILES_DIR/ai/.hermes" "$HOME/.hermes"
+
+"$DOTFILES_DIR/ai/.hermes/scripts/sync-secrets"
 
 printf 'bootstrap completed. backups: %s\n' "$BACKUP_ROOT"

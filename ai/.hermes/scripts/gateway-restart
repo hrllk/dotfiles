@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
+SYNC_SCRIPT="$HERMES_HOME/scripts/sync-secrets"
+HERMES_BIN="${HERMES_BIN:-hermes}"
+
+usage() {
+  printf '사용법: %s --all | [profile ...]\n' "$0"
+}
+
+[[ -x "$SYNC_SCRIPT" ]] || {
+  printf 'secret sync script not found: %s\n' "$SYNC_SCRIPT" >&2
+  exit 1
+}
+
+profiles=()
+if [[ "${1:-}" == "--all" ]]; then
+  profiles+=(default)
+  if [[ -d "$HERMES_HOME/profiles" ]]; then
+    while IFS= read -r profile_dir; do
+      profiles+=("${profile_dir##*/}")
+    done < <(find "$HERMES_HOME/profiles" -mindepth 1 -maxdepth 1 -type d -print | sort)
+  fi
+  shift
+elif (( $# > 0 )); then
+  profiles=("$@")
+  shift $#
+else
+  usage >&2
+  exit 2
+fi
+
+(( $# == 0 )) || {
+  usage >&2
+  exit 2
+}
+
+"$SYNC_SCRIPT"
+
+failed=0
+for profile in "${profiles[@]}"; do
+  if [[ "$profile" == default ]]; then
+    printf '↻ restarting default Gateway\n'
+    "$HERMES_BIN" gateway restart || failed=1
+    log_file="$HERMES_HOME/logs/gateway.log"
+  else
+    printf '↻ restarting profile Gateway: %s\n' "$profile"
+    "$HERMES_BIN" --profile "$profile" gateway restart || failed=1
+    log_file="$HERMES_HOME/profiles/$profile/logs/gateway.log"
+  fi
+done
+
+sleep 8
+for profile in "${profiles[@]}"; do
+  if [[ "$profile" == default ]]; then
+    log_file="$HERMES_HOME/logs/gateway.log"
+  else
+    log_file="$HERMES_HOME/profiles/$profile/logs/gateway.log"
+  fi
+  if [[ -f "$log_file" ]] && tail -n 120 "$log_file" | rg -q 'Gateway running with 1 platform\(s\)'; then
+    printf '✓ %s connected\n' "$profile"
+  else
+    printf '✗ %s connection could not be verified\n' "$profile" >&2
+    printf '  log: %s\n' "$log_file" >&2
+    failed=1
+  fi
+done
+
+exit "$failed"
