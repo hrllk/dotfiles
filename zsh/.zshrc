@@ -21,6 +21,7 @@ source_if_exists "$ZSH_DOTFILES_PATH/aliases/taskmaster.zsh"
 
 source_if_exists "$ZSH_DOTFILES_PATH/options/completion.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/env.zsh"
+source_if_exists "$ZSH_DOTFILES_PATH/path.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/integrations/lazy/nvm.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/integrations/lazy/node-commands.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/secrets/index.zsh"
