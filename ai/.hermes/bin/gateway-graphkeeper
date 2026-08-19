@@ -1,0 +1,12 @@
+#!/bin/zsh
+set -eu
+
+LAUNCHD_ENV="$HOME/.hermes/.launchd.env"
+HERMES_PYTHON="$HOME/.hermes/hermes-agent/venv/bin/python"
+[[ -r "$LAUNCHD_ENV" ]]
+source "$LAUNCHD_ENV"
+export DISCORD_BOT_TOKEN="$DISCORD_BOT_TOKEN_GRAPHKEEPER"
+export DISCORD_ALLOWED_USERS="$DISCORD_USER_ID_ALZAR"
+[[ -n "$DISCORD_BOT_TOKEN" && -n "$DISCORD_ALLOWED_USERS" ]]
+
+exec "$HERMES_PYTHON" -m hermes_cli.main --profile graphkeeper gateway run --replace

@@ -27,6 +27,7 @@ Delete flow:
 
 Options:
   --dry-run  Show planned changes without modifying files or services.
+  --repair PROFILE...  Repair existing profile LaunchAgents without prompts.
   -h, --help Show this help message.
 
 The Discord token is entered silently and is never displayed.
@@ -34,11 +35,19 @@ EOF
 }
 
 dry_run=0
+repair_profiles=()
 while (( $# > 0 )); do
   case "$1" in
     --dry-run)
       dry_run=1
       shift
+      ;;
+    --repair)
+      shift
+      while (( $# > 0 )); do
+        repair_profiles+=("$1")
+        shift
+      done
       ;;
     -h|--help)
       usage
@@ -50,6 +59,67 @@ while (( $# > 0 )); do
       ;;
   esac
 done
+
+install_profile_gateway() {
+  profile="$1"
+  suffix="$(printf '%s' "$profile" | tr '[:lower:]-' '[:upper:]_')"
+  token_variable="DISCORD_BOT_TOKEN_$suffix"
+  wrapper="$HERMES_HOME/bin/gateway-$profile"
+  plist="$HOME/Library/LaunchAgents/ai.hermes.gateway-$profile.plist"
+  label="ai.hermes.gateway-$profile"
+  uid="$(id -u)"
+
+  if (( dry_run )); then
+    printf 'Would create wrapper: %s\n' "$wrapper"
+    printf 'Would point plist to wrapper: %s\n' "$plist"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$wrapper")"
+  umask 077
+  {
+    printf '%s\n' '#!/bin/zsh' 'set -eu' ''
+    printf '%s\n' 'LAUNCHD_ENV="$HOME/.hermes/.launchd.env"'
+    printf '%s\n' 'HERMES_PYTHON="$HOME/.hermes/hermes-agent/venv/bin/python"'
+    printf '%s\n' '[[ -r "$LAUNCHD_ENV" ]]'
+    printf '%s\n' 'source "$LAUNCHD_ENV"'
+    printf 'export DISCORD_BOT_TOKEN="$%s"\n' "$token_variable"
+    printf '%s\n' 'export DISCORD_ALLOWED_USERS="$DISCORD_USER_ID_ALZAR"'
+    printf '%s\n' '[[ -n "$DISCORD_BOT_TOKEN" && -n "$DISCORD_ALLOWED_USERS" ]]' ''
+    printf 'exec "$HERMES_PYTHON" -m hermes_cli.main --profile %s gateway run --replace\n' "$profile"
+  } > "$wrapper"
+  chmod 700 "$wrapper"
+
+  "$HERMES_BIN" --profile "$profile" gateway stop || true
+  "$HERMES_BIN" --profile "$profile" gateway install --force --no-start-now --start-on-login
+  "$HERMES_BIN" --profile "$profile" gateway stop || true
+  [[ -f "$plist" ]] || {
+    printf 'LaunchAgent plist was not created: %s\n' "$plist" >&2
+    return 1
+  }
+  plutil -replace ProgramArguments -json "[\"$wrapper\"]" "$plist"
+  launchctl bootout "gui/$uid/$label" 2>/dev/null || true
+  if ! launchctl bootstrap "gui/$uid" "$plist" 2>/dev/null; then
+    launchctl load -w "$plist"
+  fi
+  launchctl kickstart -k "gui/$uid/$label"
+}
+
+if (( ${#repair_profiles[@]} > 0 )); then
+  for profile in "${repair_profiles[@]}"; do
+    [[ "$profile" =~ ^[a-z0-9][a-z0-9-]*$ ]] || {
+      printf 'Invalid profile name: %s\n' "$profile" >&2
+      exit 2
+    }
+    [[ -d "$HERMES_HOME/profiles/$profile" ]] || {
+      printf 'Profile does not exist: %s\n' "$profile" >&2
+      exit 1
+    }
+    install_profile_gateway "$profile"
+  done
+  (( dry_run )) || "$RESTART_SCRIPT" "${repair_profiles[@]}"
+  exit 0
+fi
 
 [[ -t 0 ]] || {
   printf '%s\n' 'This tool requires an interactive terminal.' >&2
@@ -183,7 +253,7 @@ case "$action" in
     trap - EXIT
 
     "$SYNC_SCRIPT"
-    "$HERMES_BIN" --profile "$profile" gateway install --force --no-start-now --start-on-login
+    install_profile_gateway "$profile"
     "$RESTART_SCRIPT" --all
     printf '✓ profile created and gateway connected: %s\n' "$profile"
     ;;

@@ -10,15 +10,16 @@ browser:
 display:
   tool_progress: all
 command_allowlist:
-  - execute_code
-  - script execution via -e/-c flag
-  - script execution via heredoc
+  - recursive delete
   - shell command via -c/-lc flag
+  - execute_code
+  - script execution via heredoc
+  - script execution via -e/-c flag
 onboarding:
   seen:
     profile_build_offered: true
     busy_input_prompt: true
-_config_version: 33
+_config_version: 34
 session_reset:
   mode: none
 image_gen:
