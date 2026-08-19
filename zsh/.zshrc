@@ -63,3 +63,7 @@ add-zsh-hook precmd reload_zshrc
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/hrk/.sdkman"
 [[ -s "/Users/hrk/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/hrk/.sdkman/bin/sdkman-init.sh"
+
+# Task Master aliases added on 8/18/2026
+alias tm='task-master'
+alias taskmaster='task-master'

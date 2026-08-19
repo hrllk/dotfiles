@@ -2,6 +2,7 @@ for secret_file in \
   "$ZSH_DOTFILES_PATH/secrets/_shared.zsh" \
   "$ZSH_DOTFILES_PATH/secrets/ai.zsh" \
   "$ZSH_DOTFILES_PATH/secrets/dns.zsh" \
+  "$ZSH_DOTFILES_PATH/secrets/personal.zsh" \
   "$ZSH_DOTFILES_PATH/secrets/work.zsh"
 do
   [[ -r "$secret_file" ]] && source "$secret_file"
