@@ -4,8 +4,6 @@ approvals_reviewer = "user"
 [projects."/Users/hrk/dotfiles"]
 trust_level = "trusted"
 
-[projects."/Users/hrk"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/.config/nvim"]
 trust_level = "trusted"
@@ -13,11 +11,7 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/opensources/graphkeeper"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/.config"]
-trust_level = "trusted"
 
-[projects."/Users/hrk/task/sources/pipeline-api"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/task/sources/personal/secretary"]
 trust_level = "trusted"
@@ -28,14 +22,10 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/okestro/3.0.5.1/pipeline-api"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/task/sources/okestro"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/task/sources/okestro/3.0.5.2/operator-api"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/task/sources/okestro/3.0.5.2"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/task/sources/personal/blog"]
 trust_level = "trusted"
@@ -46,8 +36,6 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/personal/cv"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/task/sources/ideas"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/.gstack"]
 trust_level = "trusted"
@@ -55,14 +43,10 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/okestro/3.0.5.2/common-api"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/task/sources/okestro/3.0.5.1"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/task/sources/okestro/3.0.5.2/executor"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/Downloads"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/task/sources/personal/yangperation"]
 trust_level = "trusted"
@@ -73,8 +57,6 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/personal/readme"]
 trust_level = "trusted"
 
-[projects."/Users/hrk/task/sources/okestro/poc"]
-trust_level = "trusted"
 
 [projects."/Users/hrk/.hermes"]
 trust_level = "trusted"
