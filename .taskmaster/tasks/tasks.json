@@ -1,0 +1,26 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "[infrastructure] Zsh 히스토리 영속화 복구",
+      "description": "새 Zsh 세션에서도 실제 ~/.zsh_history를 로드하고 hgrep으로 이전 명령을 검색할 수 있도록 히스토리 설정을 복구한다.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "HISTFILE을 ${ZDOTDIR:-$HOME}/.zsh_history로 설정하고 INC_APPEND_HISTORY_TIME, 중복 제거, 민감 명령 보호 옵션을 적용했다. zsh/.zshrc에서 옵션 파일을 로드하며 임시 HOME/HISTFILE 세션 테스트와 실제 새 셸 hgrep 테스트를 통과했다. 커밋 3a7478c로 origin/main에 반영했다.",
+      "testStrategy": "zsh -n zsh/.zshrc zsh/options/history.zsh; 임시 HOME/HISTFILE 세션 간 저장·로드 테스트; 새 셸에서 hgrep clone 검증",
+      "subtasks": []
+    },
+    {
+      "id": "2",
+      "title": "[infrastructure] Hermes profile gateway 관리",
+      "description": "Hermes profile별 gateway wrapper와 profile 설정을 dotfiles에서 관리하고 gateway 관리 스크립트의 profile 복구 흐름을 제공한다.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "blog, config, graphkeeper, jgitkins profile 설정과 gateway wrapper를 추가하고 bot-graphkeeper profile을 blog로 정리했다. gateway-management-profile에 --repair 흐름을 추가했다. Zsh 문법 검사, Hermes YAML 파싱, staged diff 검사를 통과했고 커밋 d828960으로 origin/main에 반영했다.",
+      "testStrategy": "gateway 관련 스크립트 zsh -n; Hermes root/profile YAML 파싱; git diff --cached --check; origin/main 최신 커밋 확인",
+      "subtasks": []
+    }
+  ]
+}
