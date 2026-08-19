@@ -175,7 +175,7 @@
         "id": 16,
         "title": "[infrastructure] Codex whitelist 및 Git 제외 정책 정리",
         "description": "Codex trusted project 설정을 명시적 whitelist로 정리하고 Codex runtime 및 machine-local 파일을 Git 추적에서 제외한다.",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           "11"
