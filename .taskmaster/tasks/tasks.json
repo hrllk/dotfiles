@@ -126,7 +126,7 @@
         "id": 12,
         "title": "[infrastructure] Task Master alias 설정 반영 검증",
         "description": "tm과 taskmaster alias를 dotfiles의 표준 alias 구성에 반영하고 새 셸에서 정상 동작을 검증한다.",
-        "status": "pending",
+        "status": "done",
         "priority": "medium",
         "dependencies": [],
         "details": "현재 zsh/.zshrc 하단에 tm과 taskmaster alias 변경이 미커밋 상태다. aliases/taskmaster.zsh와 중복 여부를 확인하고 적절한 위치로 정리한 뒤 커밋한다.",
