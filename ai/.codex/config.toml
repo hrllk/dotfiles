@@ -49,6 +49,39 @@ trust_level = "trusted"
 [projects."/Users/hrk/task/sources/ideas"]
 trust_level = "trusted"
 
+[projects."/Users/hrk/.gstack"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.2/common-api"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.1"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.2/executor"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/Downloads"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/personal/yangperation"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/3.0.5.1/react-app"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/personal/readme"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/poc"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/.hermes"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/task/sources/okestro/uplus-poc/plus_poc_app"]
+trust_level = "trusted"
+
 [tui]
 theme = "ansi"
 
