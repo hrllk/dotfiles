@@ -1,26 +1,180 @@
 {
-  "tasks": [
-    {
-      "id": "1",
-      "title": "[infrastructure] Zsh 히스토리 영속화 복구",
-      "description": "새 Zsh 세션에서도 실제 ~/.zsh_history를 로드하고 hgrep으로 이전 명령을 검색할 수 있도록 히스토리 설정을 복구한다.",
-      "status": "done",
-      "dependencies": [],
-      "priority": "high",
-      "details": "HISTFILE을 ${ZDOTDIR:-$HOME}/.zsh_history로 설정하고 INC_APPEND_HISTORY_TIME, 중복 제거, 민감 명령 보호 옵션을 적용했다. zsh/.zshrc에서 옵션 파일을 로드하며 임시 HOME/HISTFILE 세션 테스트와 실제 새 셸 hgrep 테스트를 통과했다. 커밋 3a7478c로 origin/main에 반영했다.",
-      "testStrategy": "zsh -n zsh/.zshrc zsh/options/history.zsh; 임시 HOME/HISTFILE 세션 간 저장·로드 테스트; 새 셸에서 hgrep clone 검증",
-      "subtasks": []
-    },
-    {
-      "id": "2",
-      "title": "[infrastructure] Hermes profile gateway 관리",
-      "description": "Hermes profile별 gateway wrapper와 profile 설정을 dotfiles에서 관리하고 gateway 관리 스크립트의 profile 복구 흐름을 제공한다.",
-      "status": "done",
-      "dependencies": [],
-      "priority": "high",
-      "details": "blog, config, graphkeeper, jgitkins profile 설정과 gateway wrapper를 추가하고 bot-graphkeeper profile을 blog로 정리했다. gateway-management-profile에 --repair 흐름을 추가했다. Zsh 문법 검사, Hermes YAML 파싱, staged diff 검사를 통과했고 커밋 d828960으로 origin/main에 반영했다.",
-      "testStrategy": "gateway 관련 스크립트 zsh -n; Hermes root/profile YAML 파싱; git diff --cached --check; origin/main 최신 커밋 확인",
-      "subtasks": []
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "[infrastructure] Zsh 히스토리 영속화 복구",
+        "description": "새 Zsh 세션에서도 실제 ~/.zsh_history를 로드하고 hgrep으로 이전 명령을 검색할 수 있도록 히스토리 설정을 복구한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "HISTFILE을 ${ZDOTDIR:-$HOME}/.zsh_history로 설정하고 INC_APPEND_HISTORY_TIME, 중복 제거, 민감 명령 보호 옵션을 적용했다. zsh/.zshrc에서 옵션 파일을 로드하며 임시 HOME/HISTFILE 세션 테스트와 실제 새 셸 hgrep 테스트를 통과했다. 커밋 3a7478c로 origin/main에 반영했다.",
+        "testStrategy": "zsh -n zsh/.zshrc zsh/options/history.zsh; 임시 HOME/HISTFILE 세션 간 저장·로드 테스트; 새 셸에서 hgrep clone 검증",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "[infrastructure] Hermes profile gateway 관리",
+        "description": "Hermes profile별 gateway wrapper와 profile 설정을 dotfiles에서 관리하고 gateway 관리 스크립트의 profile 복구 흐름을 제공한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "blog, config, graphkeeper, jgitkins profile 설정과 gateway wrapper를 추가하고 bot-graphkeeper profile을 blog로 정리했다. gateway-management-profile에 --repair 흐름을 추가했다. 커밋 d828960으로 origin/main에 반영했다.",
+        "testStrategy": "gateway 관련 스크립트 zsh -n; Hermes root/profile YAML 파싱; staged diff 검사; origin/main 최신 커밋 확인",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "[infrastructure] Hermes gateway 운영 문서화",
+        "description": "Hermes gateway 설치, 운영, profile별 관리 절차를 dotfiles 문서로 정리한다.",
+        "status": "done",
+        "priority": "medium",
+        "dependencies": [],
+        "details": "Hermes gateway 운영 절차 문서를 추가하고 profile gateway 관리 흐름을 문서화했다. 커밋 2a62e19로 반영했다.",
+        "testStrategy": "문서 파일 존재 확인; 문서에 기록된 gateway 명령과 현재 scripts/bin 경로 대조",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "[infrastructure] Hermes profile interactive 관리",
+        "description": "Hermes profile 생성·삭제·gateway 연결을 대화형 관리 스크립트로 제공한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "interactive Hermes profile management 스크립트를 추가하고 profile gateway 설치 흐름을 구성했다. 커밋 4dc33f9로 반영했다.",
+        "testStrategy": "gateway-management-profile zsh 문법 검사; --help와 --dry-run 경로 확인",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "[infrastructure] 불필요한 Hermes gateway 설정 제거",
+        "description": "중복되거나 더 이상 사용하지 않는 Hermes gateway restart 설정을 제거한다.",
+        "status": "done",
+        "priority": "low",
+        "dependencies": [],
+        "details": "중복 Hermes gateway restart 설정을 제거해 gateway 관리 경로를 단순화했다. 커밋 b5c091e로 반영했다.",
+        "testStrategy": "삭제된 스크립트 참조 검색; 현재 gateway 관리 스크립트 경로 확인",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "[infrastructure] Hermes gateway dotfiles 관리 기반 추가",
+        "description": "Hermes root 설정, profile 설정, gateway wrapper, secret sync 흐름을 dotfiles에서 관리한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "Hermes 설정과 profile을 dotfiles로 이동하고 bootstrap 및 secret sync와 gateway restart 흐름을 연결했다. 커밋 4ca2b7b로 반영했다.",
+        "testStrategy": "bootstrap 경로 확인; gateway wrapper 및 sync script shell 문법 검사; Hermes 설정 파일 구조 확인",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "[infrastructure] Zsh 환경·PATH 설정 분리",
+        "description": "Zsh 환경변수와 PATH 구성을 별도 파일로 분리해 설정 책임을 명확히 한다.",
+        "status": "done",
+        "priority": "medium",
+        "dependencies": [],
+        "details": "zsh/env.zsh와 zsh/path.zsh의 책임을 분리하고 .zshrc 로딩 구조를 갱신했다. 커밋 d55d4be로 반영했다.",
+        "testStrategy": "zsh 문법 검사; 새 셸에서 PATH와 주요 환경변수 로딩 확인",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "[infrastructure] 상속된 PATH 보존",
+        "description": "Zsh 초기화 과정에서 부모 셸의 PATH 항목이 사라지지 않도록 보존한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "Zsh 환경 초기화 시 inherited PATH entries를 보존하도록 수정했다. 커밋 6f5c9e9로 반영했다.",
+        "testStrategy": "상속 PATH를 설정한 격리 셸에서 zsh 초기화 전후 항목 비교",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "[infrastructure] MySQL client PATH 추가",
+        "description": "Homebrew MySQL client 실행 파일을 Zsh PATH에 포함한다.",
+        "status": "done",
+        "priority": "low",
+        "dependencies": [],
+        "details": "MySQL client 경로를 Zsh PATH 구성에 추가했다. 커밋 757bb71로 반영했다.",
+        "testStrategy": "새 셸에서 PATH 출력 확인; mysql 실행 파일 탐색 확인",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "[infrastructure] tmux 알림 색상 호환성 수정",
+        "description": "tmux 알림 색상 설정을 다양한 터미널 환경에서 동작하도록 수정한다.",
+        "status": "done",
+        "priority": "low",
+        "dependencies": [],
+        "details": "tmux notification color 설정을 portable한 형태로 수정했다. 커밋 1ad6011로 반영했다.",
+        "testStrategy": "tmux 설정 파일 구문 검사; tmux 실행 환경에서 알림 설정 로딩 확인",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "[infrastructure] Codex trusted project 설정 검토 및 정리",
+        "description": "현재 추가된 Codex trusted project 경로가 필요한 범위인지 검토하고 불필요한 신뢰 경로를 제거한다.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [],
+        "details": "현재 ai/.codex/config.toml에 여러 로컬 프로젝트가 trusted로 추가되어 있다. 각 경로의 필요성, 범위, 보안 영향을 검토한 뒤 최소 권한 설정으로 정리한다.",
+        "testStrategy": "TOML 파싱; trusted project 목록 검토; Codex 실행 시 필요한 경로만 신뢰되는지 확인",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "[infrastructure] Task Master alias 설정 반영 검증",
+        "description": "tm과 taskmaster alias를 dotfiles의 표준 alias 구성에 반영하고 새 셸에서 정상 동작을 검증한다.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [],
+        "details": "현재 zsh/.zshrc 하단에 tm과 taskmaster alias 변경이 미커밋 상태다. aliases/taskmaster.zsh와 중복 여부를 확인하고 적절한 위치로 정리한 뒤 커밋한다.",
+        "testStrategy": "zsh -n; 새 셸에서 alias tm/taskmaster 확인; task-master --help 실행 확인",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "[infrastructure] personal secret 로딩 변경 검증",
+        "description": "personal.zsh를 secrets 로딩 목록에 추가한 변경을 검증하고 안전한 로딩 순서를 확정한다.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [],
+        "details": "현재 zsh/secrets/index.zsh에 personal.zsh 추가가 미커밋 상태다. 파일 존재 여부, 권한, 로딩 실패 시 동작, 기존 secret 파일과의 충돌을 확인한다.",
+        "testStrategy": "zsh -n; 격리 HOME에서 secret 로딩 테스트; 민감값이 출력되지 않는지 확인",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "[security] shell history 및 추적 env 자격증명 회전",
+        "description": "shell history와 Git 추적 profile env에 남아 있을 수 있는 자격증명을 점검하고 필요한 토큰·비밀번호를 회전한다.",
+        "status": "pending",
+        "priority": "high",
+        "dependencies": [],
+        "details": "기존 ~/.zsh_history와 Hermes profile env가 자격증명 노출 경로가 될 수 있다. 값을 출력하지 않는 방식으로 탐지하고, 영향받은 자격증명을 폐기·재발급하며 이후 secret 관리 방식을 정리한다.",
+        "testStrategy": "비밀값 비출력 탐지; provider별 토큰 회전 확인; history와 env 파일 권한 확인; Git history 노출 범위 검토",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "[infrastructure] dotfiles smoke test 자동화",
+        "description": "Zsh, tmux, Hermes 설정의 기본 문법과 핵심 로딩 경로를 한 번에 검증하는 smoke test를 추가한다.",
+        "status": "pending",
+        "priority": "medium",
+        "dependencies": [
+          "11",
+          "12",
+          "13"
+        ],
+        "details": "현재 검증 명령이 작업별로 흩어져 있다. Zsh 문법, YAML/TOML 파싱, alias, PATH, Hermes gateway wrapper를 자동 점검하는 재현 가능한 스크립트를 만든다.",
+        "testStrategy": "단일 smoke test 명령 실행; 격리 HOME 테스트; 실패 시 어떤 설정이 깨졌는지 파일별 오류 출력",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2026-08-19T07:41:21.216Z",
+      "updated": "2026-08-19T07:41:21.216Z",
+      "description": "Tasks for master context"
     }
-  ]
+  }
 }
