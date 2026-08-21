@@ -175,12 +175,12 @@
         "id": 16,
         "title": "[infrastructure] Codex whitelist 및 Git 제외 정책 정리",
         "description": "Codex trusted project 설정을 명시적 whitelist로 정리하고 Codex runtime 및 machine-local 파일을 Git 추적에서 제외한다.",
-        "status": "in-progress",
+        "status": "done",
         "priority": "high",
         "dependencies": [
           "11"
         ],
-        "details": "현재 ai/.codex/config.toml에 여러 경로가 trusted로 누적되어 있다. 실제 사용하는 프로젝트만 whitelist로 남기고 Downloads·상위 디렉터리처럼 범위가 넓은 경로를 재검토한다. .sandbox_migration, thread-writer-locks 및 기타 runtime state가 저장소에 나타나지 않도록 ai/.codex/.gitignore를 점검하고 Git 상태로 검증한다.",
+        "details": "공통 Codex 설정에서 project·hook·MCP machine-local 설정을 분리하고 local.config.toml overlay, local.config.toml.example, fail-closed Zsh wrapper, 권한 검증, codex-profile-check 및 runtime deny-by-default Git 경계를 추가했다. fake Codex argv·exit-code 테스트와 profile checker/TOML/Zsh 검증을 통과했으며 구현 커밋 0819ab3으로 origin/main에 반영했다.",
         "testStrategy": "TOML 파싱; whitelist 경로 목록과 실제 workspace 대조; runtime 파일 생성 후 git status에 나타나지 않는지 확인; 의도한 설정 파일만 추적되는지 검증",
         "subtasks": []
       }
