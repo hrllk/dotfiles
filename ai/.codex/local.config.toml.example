@@ -1,0 +1,13 @@
+# Copy this file to local.config.toml and replace the example workspace path.
+# Keep this file user-owned and mode 600. Do not store secrets here.
+
+[projects."/absolute/path/to/workspace"]
+trust_level = "trusted"
+
+# Machine-local hook and MCP settings belong below when needed.
+# [hooks.state."/absolute/path/to/hooks.json:stop:0:0"]
+# trusted_hash = "sha256:[REDACTED]"
+#
+# [mcp_servers.example]
+# command = "example-command"
+# args = ["serve"]

@@ -1,4 +1,9 @@
-.DS_Store
+*
+!.gitignore
+!config.toml
+!local.config.toml.example
+!codex-profile-check
+
 node_modules/
 dist/
 build/
@@ -43,6 +48,8 @@ rules/
 logs/
 crash_reports/
 .personality_migration
+.sandbox_migration
+thread-writer-locks/
 *.bak
 *.merge-backup-*
 AGENTS.md.bak

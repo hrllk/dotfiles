@@ -1,68 +1,6 @@
 model = "gpt-5.6-luna"
 model_reasoning_effort = "medium"
 approvals_reviewer = "user"
-[projects."/Users/hrk/dotfiles"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/.config/nvim"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/opensources/graphkeeper"]
-trust_level = "trusted"
-
-
-
-[projects."/Users/hrk/task/sources/personal/secretary"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/okestro/3.0.5.2/react-app"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/okestro/3.0.5.1/pipeline-api"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/task/sources/okestro/3.0.5.2/operator-api"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/task/sources/personal/blog"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/personal/carf"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/personal/cv"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/.gstack"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/okestro/3.0.5.2/common-api"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/task/sources/okestro/3.0.5.2/executor"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/task/sources/personal/yangperation"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/okestro/3.0.5.1/react-app"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/personal/readme"]
-trust_level = "trusted"
-
-
-[projects."/Users/hrk/.hermes"]
-trust_level = "trusted"
-
-[projects."/Users/hrk/task/sources/okestro/uplus-poc/plus_poc_app"]
-trust_level = "trusted"
 
 [tui]
 theme = "ansi"
@@ -73,12 +11,3 @@ theme = "ansi"
 
 [notice.model_migrations]
 "gpt-5.4" = "gpt-5.5"
-
-[hooks.state]
-
-[hooks.state."/Users/hrk/.codex/hooks.json:stop:0:0"]
-trusted_hash = "sha256:0ff2e207dbc95b6733f4e0e61e10bad1752e52b38980b2e739974b8f88919822"
-
-[mcp_servers.gbrain]
-command = "gbrain"
-args = ["serve"]

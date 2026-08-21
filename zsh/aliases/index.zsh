@@ -3,7 +3,8 @@ for alias_file in \
   "$ZSH_DOTFILES_PATH/aliases/git.zsh" \
   "$ZSH_DOTFILES_PATH/aliases/tools.zsh" \
   "$ZSH_DOTFILES_PATH/aliases/others.zsh" \
-  "$ZSH_DOTFILES_PATH/aliases/work.zsh"
+  "$ZSH_DOTFILES_PATH/aliases/work.zsh" \
+  "$ZSH_DOTFILES_PATH/aliases/codex.zsh"
 do
   [[ -r "$alias_file" ]] && source "$alias_file"
 done

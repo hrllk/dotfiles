@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROFILE="${1:-${CODEX_HOME:-$HOME/.codex}/local.config.toml}"
+
+if [[ ! -f "$PROFILE" ]]; then
+  printf 'Codex profile does not exist: %s\n' "$PROFILE" >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHON="${CODEX_PROFILE_CHECK_PYTHON:-}"
+if [[ -z "$PYTHON" ]]; then
+  for candidate in \
+    "$SCRIPT_DIR/../.hermes/hermes-agent/venv/bin/python3.11" \
+    "$(command -v python3.11 2>/dev/null || true)" \
+    "$(command -v python3 2>/dev/null || true)"; do
+    if [[ -n "$candidate" && -x "$candidate" ]]; then
+      PYTHON="$candidate"
+      break
+    fi
+  done
+fi
+[[ -n "$PYTHON" ]] || { printf 'Python 3.11 is required for TOML validation\n' >&2; exit 1; }
+
+"$PYTHON" - "$PROFILE" <<'PY'
+from pathlib import Path
+import sys
+import tomllib
+
+profile = Path(sys.argv[1])
+try:
+    with profile.open("rb") as handle:
+        data = tomllib.load(handle)
+except (OSError, tomllib.TOMLDecodeError) as exc:
+    print(f"Codex profile TOML is invalid: {exc}", file=sys.stderr)
+    raise SystemExit(1)
+
+projects = data.get("projects")
+if not isinstance(projects, dict) or not projects:
+    print("Codex profile must define at least one project", file=sys.stderr)
+    raise SystemExit(1)
+
+home = Path.home().resolve()
+broad_paths = {home, home / "Downloads", home / "Desktop", Path("/")}
+errors = []
+for raw_path, settings in projects.items():
+    path = Path(raw_path)
+    if not path.is_absolute():
+        errors.append(f"project path is not absolute: {raw_path}")
+        continue
+    if path in broad_paths:
+        errors.append(f"broad project path is not allowed: {raw_path}")
+    if not path.is_dir():
+        errors.append(f"project path does not exist: {raw_path}")
+    if not isinstance(settings, dict) or settings.get("trust_level") != "trusted":
+        errors.append(f"project is not trusted: {raw_path}")
+
+if errors:
+    for error in errors:
+        print(error, file=sys.stderr)
+    raise SystemExit(1)
+
+print(f"Codex profile OK: {len(projects)} explicit project(s)")
+PY
