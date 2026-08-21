@@ -1,0 +1,17 @@
+{
+  "theme": "dark",
+  "hooks": {
+    "Stop": [
+      {
+        "_gstack_source": "gstack-timeline-stop",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/hrk/.claude/skills/gstack/hosts/claude/hooks/timeline-stop-hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

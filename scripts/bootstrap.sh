@@ -79,6 +79,8 @@ link_path "$DOTFILES_DIR/util/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf"
 link_path "$DOTFILES_DIR/util/wezterm/wezterm.lua" "$HOME/.wezterm.lua"
 link_path "$DOTFILES_DIR/ai/.hermes" "$HOME/.hermes"
 
+DOTFILES_DIR="$DOTFILES_DIR" BACKUP_ROOT="$BACKUP_ROOT" "$DOTFILES_DIR/ai/.claude/scripts/link-claude-home" --yes
+
 "$DOTFILES_DIR/ai/.hermes/scripts/sync-secrets"
 
 printf 'bootstrap completed. backups: %s\n' "$BACKUP_ROOT"

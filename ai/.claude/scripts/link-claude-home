@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+SOURCE_DIR="$DOTFILES_DIR/ai/.claude"
+TARGET_PATH="${CLAUDE_HOME:-$HOME/.claude}"
+BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)}"
+
+DRY_RUN=0
+ASSUME_YES=0
+
+usage() {
+  cat <<'USAGE'
+usage: link-claude-home [--dry-run] [--yes]
+
+Links ~/.claude to the dotfiles-managed directory.
+
+  --dry-run  print the planned actions without changing anything
+  --yes, -y  skip the confirmation prompt before migrating a real directory
+
+Behavior:
+  already linked        no-op
+  wrong symlink         backed up, then relinked
+  real directory        contents merged into the repo (repo files win),
+                        original directory moved to the backup root, then linked
+USAGE
+}
+
+die() {
+  printf 'error: %s\n' "$*" >&2
+  exit 1
+}
+
+log() {
+  printf '%s\n' "$*"
+}
+
+run() {
+  if (( DRY_RUN )); then
+    printf 'dry-run: %s\n' "$*"
+    return 0
+  fi
+  "$@"
+}
+
+confirm() {
+  local prompt="$1"
+
+  if (( ASSUME_YES )) || (( DRY_RUN )); then
+    return 0
+  fi
+
+  local reply
+  read -r -p "$prompt [y/N] " reply
+  [[ "$reply" == [yY] || "$reply" == [yY][eE][sS] ]]
+}
+
+claude_is_running() {
+  pgrep -x claude >/dev/null 2>&1
+}
+
+backup_path_for() {
+  local base_name="$1"
+  local stamp
+  stamp="$(date +%Y%m%d-%H%M%S)"
+  printf '%s/%s.bak.%s\n' "$BACKUP_ROOT" "$base_name" "$stamp"
+}
+
+move_to_backup() {
+  local path="$1"
+  local backup_path
+  backup_path="$(backup_path_for "$(basename "$path")")"
+
+  run mkdir -p "$BACKUP_ROOT"
+  run mv "$path" "$backup_path"
+  log "backed up $path -> $backup_path"
+}
+
+merge_into_source() {
+  local path="$1"
+
+  command -v rsync >/dev/null 2>&1 || die 'rsync is required to migrate an existing ~/.claude'
+
+  # --ignore-existing keeps the versioned config in the repo authoritative.
+  run rsync -a --ignore-existing "$path"/ "$SOURCE_DIR"/
+  log "merged runtime state from $path into $SOURCE_DIR"
+}
+
+link_source() {
+  run mkdir -p "$(dirname "$TARGET_PATH")"
+  run ln -s "$SOURCE_DIR" "$TARGET_PATH"
+  log "linked $TARGET_PATH -> $SOURCE_DIR"
+}
+
+while (( $# )); do
+  case "$1" in
+    --dry-run) DRY_RUN=1 ;;
+    --yes|-y) ASSUME_YES=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) usage >&2; die "unknown option: $1" ;;
+  esac
+  shift
+done
+
+[[ -d "$SOURCE_DIR" ]] || die "missing managed directory: $SOURCE_DIR"
+
+if [[ -L "$TARGET_PATH" ]]; then
+  current_target="$(readlink "$TARGET_PATH")"
+
+  if [[ "$current_target" == "$SOURCE_DIR" ]]; then
+    log "already linked: $TARGET_PATH -> $SOURCE_DIR"
+    exit 0
+  fi
+
+  log "replacing existing symlink: $TARGET_PATH -> $current_target"
+  move_to_backup "$TARGET_PATH"
+  link_source
+  exit 0
+fi
+
+if [[ -e "$TARGET_PATH" ]]; then
+  [[ -d "$TARGET_PATH" ]] || die "$TARGET_PATH exists and is not a directory"
+
+  if claude_is_running; then
+    log 'warning: a claude process is running; quit Claude Code before migrating.'
+    confirm 'continue anyway?' || die 'aborted'
+  fi
+
+  log "migrating existing directory: $TARGET_PATH"
+  confirm "merge $TARGET_PATH into $SOURCE_DIR and replace it with a symlink?" || die 'aborted'
+
+  merge_into_source "$TARGET_PATH"
+  move_to_backup "$TARGET_PATH"
+fi
+
+link_source
+
+if (( DRY_RUN )); then
+  exit 0
+fi
+
+log 'review what the whitelist now exposes:'
+log "  git -C $DOTFILES_DIR status --short ai/.claude"
