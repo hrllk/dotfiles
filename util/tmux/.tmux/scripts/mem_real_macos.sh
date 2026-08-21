@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
 
-PAGE_SIZE=$(vm_stat | awk '/page size of/ {print $8}')
+stats=$(vm_stat) || exit 0
+page_size=$(awk '/page size of/ {print $8; exit}' <<< "$stats")
+active=$(awk '/Pages active:/ {gsub("\\.", "", $NF); print $NF; exit}' <<< "$stats")
+wired=$(awk '/Pages wired down:/ {gsub("\\.", "", $NF); print $NF; exit}' <<< "$stats")
+total=$(sysctl -n hw.memsize 2>/dev/null || true)
 
-vm_stat | awk -v ps=$PAGE_SIZE '
-/Pages active/ {a=$NF}
-/Pages wired down/ {w=$NF}
-/Pages occupied by compressor/ {c=$NF}
-END {
-  gsub("\\.", "", a)
-  gsub("\\.", "", w)
-  gsub("\\.", "", c)
+if [[ -z "$page_size" || -z "$active" || -z "$wired" || -z "$total" ]]; then
+  exit 0
+fi
 
-  used=(a+w+c)*ps
-  total='"$(sysctl -n hw.memsize)"'
+used=$(( (active + wired) * page_size ))
+percentage=$(awk -v used="$used" -v total="$total" 'BEGIN { printf "%.0f", 100 * used / total }')
 
-  printf "%d%%\n", (used/total)*100
-}'
+if (( percentage >= 80 )); then
+  color="#[fg=#FF0000]"
+  icon="󰁹"
+elif (( percentage >= 50 )); then
+  color="#[fg=#FFA500]"
+  icon="󰁾"
+else
+  color="#[fg=WHITE]"
+  icon="󰁺"
+fi
+
+printf '%s%s %s%%#[fg=default]\n' "$color" "$icon" "$percentage"
