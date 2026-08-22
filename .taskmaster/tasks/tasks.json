@@ -148,10 +148,10 @@
         "id": 14,
         "title": "[security] shell history 및 추적 env 자격증명 회전",
         "description": "shell history와 Git 추적 profile env에 남아 있을 수 있는 자격증명을 점검하고 필요한 토큰·비밀번호를 회전한다.",
-        "status": "pending",
+        "status": "cancelled",
         "priority": "high",
         "dependencies": [],
-        "details": "기존 ~/.zsh_history와 Hermes profile env가 자격증명 노출 경로가 될 수 있다. 값을 출력하지 않는 방식으로 탐지하고, 영향받은 자격증명을 폐기·재발급하며 이후 secret 관리 방식을 정리한다.",
+        "details": "읽기 전용 감사 결과 현재 및 전체 Git history의 .env·history 후보에서 실제 credential literal은 확인되지 않았고 환경변수 참조만 존재했다. 따라서 token 회전과 Git history rewrite가 불필요해 본 보안 수습 task는 취소한다. .env 추적 방지 정책은 별도 infrastructure 작업으로 필요 시 다룬다.",
         "testStrategy": "비밀값 비출력 탐지; provider별 토큰 회전 확인; history와 env 파일 권한 확인; Git history 노출 범위 검토",
         "subtasks": []
       },
