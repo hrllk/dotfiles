@@ -13,6 +13,11 @@ EOF
 chmod 755 "$TMP_HOME/bin/codex"
 export HOME="$TMP_HOME" CODEX_HOME="$TMP_HOME/.codex" PATH="$TMP_HOME/bin:$PATH"
 
+# Simulate an interactive shell where stat/id are aliases; wrapper must use
+# command lookup so these aliases cannot break profile validation.
+alias stat='false'
+alias id='false'
+
 source "$ROOT/aliases/codex.zsh"
 
 # Explicit profile bypasses local profile preconditions and preserves argv.

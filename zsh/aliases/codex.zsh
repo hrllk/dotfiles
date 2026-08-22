@@ -14,16 +14,16 @@ _codex_require_local_profile() {
     return 1
   fi
 
-  owner="$(stat -f %Su -- "$profile_path" 2>/dev/null)" || {
+  owner="$(command stat -f %Su -- "$profile_path" 2>/dev/null)" || {
     print -u2 "Unable to inspect Codex local profile permissions"
     return 1
   }
-  if [[ "$owner" != "$(id -un)" ]]; then
+  if [[ "$owner" != "$(command id -un)" ]]; then
     print -u2 "Codex local profile must be owned by the current user"
     return 1
   fi
 
-  mode="$(stat -f %Lp -- "$profile_path" 2>/dev/null)" || {
+  mode="$(command stat -f %Lp -- "$profile_path" 2>/dev/null)" || {
     print -u2 "Unable to inspect Codex local profile permissions"
     return 1
   }
