@@ -11,3 +11,17 @@ theme = "ansi"
 
 [notice.model_migrations]
 "gpt-5.4" = "gpt-5.5"
+
+[projects."/Users/hrk/task/sources/opensource/jgitkins"]
+trust_level = "trusted"
+
+[projects."/Users/hrk/gstack-open"]
+trust_level = "trusted"
+
+[projects."/Users/hrk"]
+trust_level = "trusted"
+
+[hooks.state]
+
+[hooks.state."/Users/hrk/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:0ff2e207dbc95b6733f4e0e61e10bad1752e52b38980b2e739974b8f88919822"
