@@ -135,13 +135,13 @@
       },
       {
         "id": 13,
-        "title": "[infrastructure] personal secret 로딩 변경 검증",
-        "description": "personal.zsh를 secrets 로딩 목록에 추가한 변경을 검증하고 안전한 로딩 순서를 확정한다.",
-        "status": "pending",
+        "title": "[refactor] shell secret loader와 Hermes sync 책임 분리",
+        "description": "shell startup의 deterministic secret loading과 Hermes runtime secret synchronization을 분리해 startup side effect와 중복 동기화를 제거한다.",
+        "status": "done",
         "priority": "high",
-        "dependencies": [],
-        "details": "현재 zsh/secrets/index.zsh에 personal.zsh 추가가 미커밋 상태다. 파일 존재 여부, 권한, 로딩 실패 시 동작, 기존 secret 파일과의 충돌을 확인한다.",
-        "testStrategy": "zsh -n; 격리 HOME에서 secret 로딩 테스트; 민감값이 출력되지 않는지 확인",
+        "dependencies": ["22"],
+        "details": "Task #13은 Hermes runtime sync의 input/output/exit-code/idempotency/security contract와 검증 fixture만 소유한다. startup에서 sync 호출을 제거하는 구현은 Task #18, 실제 `--sync-secrets` invocation은 Task #23이 소유한다. secret 값은 출력하지 않으며 load_all_keys/domain loader의 shell 구현 정책은 이 task 범위에서 다루지 않는다.",
+        "testStrategy": "contract fixture에서 정상·누락·권한 오류·sync 실패 code를 secret 값 없이 검증; input/output shape과 idempotency assertion; startup source 변경은 Task #18에서 검증",
         "subtasks": []
       },
       {
@@ -156,19 +156,47 @@
         "subtasks": []
       },
       {
+        "id": 24,
+        "title": "[docs] 설정 책임 계약 outline 고정",
+        "description": "구현 전에 PATH, Zsh startup, secret/runtime sync, bootstrap mode의 최소 사용자 계약과 영향 문서 범위를 고정한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": [],
+        "details": "구현 전 contract artifact와 affected-doc manifest만 만든다. 최종 README/docs 편집과 `/generate-documents` 실행은 Task #21만 소유한다. Contract artifact에는 path.zsh/env.zsh ownership, PATH resolution snapshot 형식, `Approved resolution changes` 표(before/after, reason, task, approver/date), SDKMAN fixtures/assertions, startup observable criteria, canonical bootstrap matrix를 기록한다. 하나의 dispatcher가 16개 flag 조합을 선검증하며 valid rows는 #20 shell rows와 #23 AI rows가 각각 소유하고 invalid 8개 rows는 어느 단계도 실행하지 않고 exit 2로 종료한다. SDKMAN fixture는 미설치 startup 0/sdk 미정의/call stdout 빈 문자열/stderr 1줄/127, 설치 marker 0→1→1과 두 호출 exact stdout/stderr/exit 0, candidate 없음 loader 0/JAVA_HOME 보존/`command -v java` exit 1 빈 stdout을 고정한다. 영향 문서 manifest는 bootstrap how-to, PATH/startup/secret reference, 필요한 architecture explanation으로 제한하며 문서 내용을 최종 갱신하지 않는다.",
+        "testStrategy": "contract artifact와 tasks #13/#17/#18/#19/#20/#23 대조; mode matrix의 모든 valid/invalid 조합 행 존재; PATH approval 표 필수 열 검증; SDKMAN fixture/assertion 검증; affected-doc manifest 범위 검사; secret literal 없음",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "[test] dotfiles baseline smoke harness",
+        "description": "현재 동작을 고정하고 이후 설정 리팩토링의 선행 회귀 기준이 되는 side-effect-free baseline smoke harness를 만든다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": ["24"],
+        "details": "리팩토링 전 현재 Zsh syntax, fresh startup, PATH/alias/SDKMAN 관찰값, Codex/TOML/YAML, tmux static policy를 기록한다. 결과는 secret 값 없이 `~/.gstack/plans/dotfiles-refactoring-baseline.md`와 `~/.gstack/plans/dotfiles-path-baseline.md`에 저장한다. 실제 bootstrap은 실행하지 않고 fake dependency와 격리 HOME을 사용한다. baseline에서 발견한 startup stderr는 known baseline 목록으로 기록하며 이후 smoke test는 목록 밖 stderr를 실패로 처리한다. dirty snapshot은 계획문서에 기록하고 baseline artifact는 저장소에 commit하지 않는다.",
+        "testStrategy": "isolated HOME; fake git/link/sync command; network 차단; shell/Bash syntax; PATH snapshot; command resolution snapshot; secret presence metadata only; baseline artifact 존재·redaction·known stderr 목록 검증",
+        "subtasks": []
+      },
+      {
         "id": 15,
-        "title": "[infrastructure] dotfiles smoke test 자동화",
-        "description": "Zsh, tmux, Hermes 설정의 기본 문법과 핵심 로딩 경로를 한 번에 검증하는 smoke test를 추가한다.",
-        "status": "pending",
+        "title": "[test] dotfiles post-refactor smoke test 자동화",
+        "description": "설정 리팩토링 후 Zsh, tmux, Hermes, Codex의 핵심 계약을 한 번에 검증하는 post-refactor smoke test를 완성한다.",
+        "status": "done",
         "priority": "medium",
         "dependencies": [
           "11",
           "12",
           "13",
-          "16"
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "22",
+          "23"
         ],
-        "details": "현재 검증 명령이 작업별로 흩어져 있다. Zsh 문법, YAML/TOML 파싱, alias, PATH, Hermes gateway wrapper를 자동 점검하는 재현 가능한 스크립트를 만든다.",
-        "testStrategy": "단일 smoke test 명령 실행; 격리 HOME 테스트; 실패 시 어떤 설정이 깨졌는지 파일별 오류 출력",
+        "details": "Task #22 baseline harness를 확장해 PATH 단일 소유, SDKMAN 단일 진입점, startup no-write/no-sync, secret/Hermes 경계, bootstrap explicit modes, Codex profile, tmux, 문서 정책을 계약으로 검증한다. 외부 네트워크·launchctl·gateway restart·raw secret write는 수행하지 않는다.",
+        "testStrategy": "Task #22 baseline 비교; 격리 HOME; fake dependency; bootstrap mode별 side-effect assertion; Zsh/Bash syntax; TOML/YAML/JSON parse; secret no-disclosure; 변경된 command resolution의 승인 목록 검증",
         "subtasks": []
       },
       {
@@ -182,6 +210,72 @@
         ],
         "details": "공통 Codex 설정에서 project·hook·MCP machine-local 설정을 분리하고 local.config.toml overlay, local.config.toml.example, fail-closed Zsh wrapper, 권한 검증, codex-profile-check 및 runtime deny-by-default Git 경계를 추가했다. fake Codex argv·exit-code 테스트와 profile checker/TOML/Zsh 검증을 통과했으며 구현 커밋 0819ab3으로 origin/main에 반영했다.",
         "testStrategy": "TOML 파싱; whitelist 경로 목록과 실제 workspace 대조; runtime 파일 생성 후 git status에 나타나지 않는지 확인; 의도한 설정 파일만 추적되는지 검증",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "[refactor] PATH 소유권을 path.zsh 하나로 통합",
+        "description": "환경변수와 PATH 구성을 분리하되 PATH 선언·정규화·우선순위는 path.zsh 한 곳에서만 관리한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": ["22"],
+        "details": "env.zsh는 환경변수와 tool home만 담당하고 PATH/path 배열과 PATH에 필요한 경로 계산은 path.zsh가 담당한다. `rbenv init - zsh`는 `zsh/integrations/rbenv.zsh`로 이동해 tool integration 책임으로 분리하고, Bun loader source는 `zsh/integrations/bun.zsh`로 이동한다. `BUN_INSTALL/bin`, Java/bin, ImageMagick/bin 등 bin 등록은 path.zsh가 담당한다. PATH snapshot은 `~/.gstack/plans/dotfiles-path-baseline.md`에 저장하고 `command -v` 필수 목록과 승인된 변경만 비교한다.",
+        "testStrategy": "zsh 문법 검사; typeset -p path와 전후 PATH diff; 격리 shell inherited PATH 보존; command -v ruby/java/codex/rg/task-master/npm/bun 비교; env.zsh·integration의 direct/indirect PATH mutation 검색; baseline artifact와 승인 목록 검증",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "[refactor] Zsh startup orchestration 단순화",
+        "description": "zsh/.zshrc를 명시적인 startup 조합기만 남기고 중복 alias·자동 reload·runtime side effect를 별도 책임으로 분리한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": ["17", "19", "13", "22"],
+        "details": "Task #19의 SDKMAN 단일 진입점 계약과 Task #13의 no-sync contract를 전제로 source order를 정리하고 task-master alias 중복 정의를 제거한다. `personal.zsh`에서 sync 호출을 제거하는 구현과 `.zshrc` startup no-sync 검증을 소유한다. auto reload는 기본 비활성, 명시적 opt-in command로 분리한다. fresh startup은 known baseline stderr 외 stderr 0줄, 파일 mtime 변경 0건, sync sentinel 호출 0회, 재귀 source 0회여야 한다. PATH는 #17, bootstrap은 #20/#23이 소유한다.",
+        "testStrategy": "Task #22 baseline 비교; fresh HOME의 zsh -lic startup; stderr 오류 검증; alias 단일 정의 검사; prompt/plugin 로딩 회귀 검증; auto reload 기본 비활성 및 opt-in 경로 검증",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "[refactor] SDKMAN 중복 초기화 제거",
+        "description": "SDKMAN의 eager 초기화와 lazy wrapper 중 하나만 유지해 startup 순서 의존성과 하드코딩 경로를 제거한다.",
+        "status": "done",
+        "priority": "medium",
+        "dependencies": ["22"],
+        "details": "zsh/.zshrc 하단의 직접 sdkman-init.sh source와 integrations/lazy/sdkman.zsh의 중복을 제거하고 **lazy 단일 진입점**을 선택한다. SDKMAN_DIR은 $HOME 기반으로 통일한다. SDKMAN 미설치 환경에서는 startup이 성공하고 `sdk` 함수는 정의되지 않으며, 사용자가 `sdk`를 호출할 때만 stderr 1줄과 exit 127을 반환한다. 설치됐지만 Java candidate가 없으면 SDKMAN loader는 성공하되 JAVA_HOME은 기존 값 보존 또는 unset이며 Java resolution 실패를 숨기지 않는다. sdk default java와 첫 호출·이후 호출 동작을 보존한다.",
+        "testStrategy": "SDKMAN 설치·미설치 격리 fixture; type sdk와 첫 sdk 호출 검증; JAVA_HOME/command -v java 검증; zsh syntax 및 startup stderr 검사; Task #22 baseline 비교",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "[refactor] bootstrap shell/terminal 설치 및 backup 책임 분리",
+        "description": "bootstrap의 shell·terminal clone, backup, symlink 설치를 명시적이고 재실행 가능한 단계로 분리한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": ["17", "22"],
+        "details": "scripts/bootstrap.sh의 shell/terminal clone·backup·symlink 책임과 canonical `--shell-only`/`--dry-run --shell-only` mode만 소유한다. 공통 dispatcher가 모든 flag를 먼저 검증하며 #20은 valid shell rows만 실행한다. `--ai` 및 invalid 8개 조합은 #20이 위임·거부·실행하지 않는다. invalid rows는 dispatcher-only exit `2`다. 인자 없음은 `--shell-only`와 동일하다. dry-run은 network, mkdir, mv, ln, git clone, launchctl, sync write를 모두 금지한다. exit code는 0=성공, 2=인자/조합 오류, 10=사전조건 오류, 20=파일·link 단계 오류로 고정한다. 기존 backup semantics는 보존하고 자동 rollback은 하지 않으며 preflight와 backup 후 실패 단계부터 idempotent 재실행한다.",
+        "testStrategy": "bash syntax; fake git/link command와 isolated HOME; canonical mode matrix의 shell rows 검증; --dry-run에서 network/write/launchctl/sync write 부재; 잘못된 shell 조합 exit 2; prerequisite exit 10; file/link failure exit 20; existing file backup과 재실행 상태 검증",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "[refactor] bootstrap AI agent/profile/secret 단계 분리",
+        "description": "Claude·Codex·Hermes profile 연결과 runtime secret sync를 shell bootstrap과 분리된 명시적 단계로 제공한다.",
+        "status": "done",
+        "priority": "high",
+        "dependencies": ["13", "20"],
+        "details": "canonical mode matrix의 AI rows를 소유한다. 공통 dispatcher가 모든 flag를 먼저 검증하고 valid AI rows만 #23이 실행한다. `--ai`는 AI link/profile만 수행하고 AI link 오류는 `20`, prerequisite 오류는 `10`이다. `--ai --sync-secrets`는 Task #13 contract를 호출하며 sync 실패는 `30`이다. invalid 8개 조합은 dispatcher-only이며 #23은 거부·실행하지 않는다. `--dry-run --ai`와 `--dry-run --ai --sync-secrets`는 계획·관찰만 하며 sync를 호출하지 않는다. 인자 없음은 shell-only이며 AI/secret을 실행하지 않는다. Codex local profile은 자동 복사하지 않고 안내한다. 자동 rollback은 하지 않으며 완료 단계 상태를 보존하고 실패 단계부터 재실행한다.",
+        "testStrategy": "fake link/sync command; isolated HOME; canonical mode matrix의 AI rows; --ai/--ai --sync-secrets 선택 실행; invalid combinations exit 2; prerequisite exit 10; AI link exit 20; sync exit 30; dry-run sync invocation count 0; Codex local profile 자동 복사 금지와 안내; 재실행 후 filesystem diff 승인 목록 비교",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "[docs] 설정 문서 canonical source 및 generate-documents 관리",
+        "description": "프로젝트 설정의 현재 동작을 canonical 문서로 정리하고 Diataxis 기반 generate-documents 흐름으로 문서 drift를 방지한다.",
+        "status": "done",
+        "priority": "medium",
+        "dependencies": ["15", "17", "18", "19", "20", "23", "24"],
+        "details": "README는 진입점과 Quickstart만 유지하고, 구현 전 Task #24에서 확정한 영향 문서 목록만 갱신한다. 대상은 bootstrap how-to, PATH/startup/secret 책임 reference, 필요한 architecture explanation으로 제한한다. 전체 tutorial/project docs의 전면 재작성은 수행하지 않는다. `/generate-documents`는 대상 문서의 명령 실행 가능성, link, secret redaction만 검증한다.",
+        "testStrategy": "문서의 명령을 실제 실행; README에서 2단계 이내 discoverability; 내부 링크 검사; 현재 bootstrap target과 문서 대조; secret literal redaction 검사; generate-documents review",
         "subtasks": []
       }
     ],

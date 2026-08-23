@@ -47,7 +47,9 @@ fzf 없음
 | 모듈 | 소유 책임 | 의도적으로 하지 않는 일 |
 |---|---|---|
 | `options/` | 셸 옵션, completion, keybinding | alias나 secret 로드 |
-| `env.zsh` | PATH와 공통 환경변수 | 실행 명령 wrapper |
+| `env.zsh` | 공통 환경변수와 tool home | PATH 변경 |
+| `path.zsh` | PATH/path 배열과 tool bin 등록의 단일 소유자 | secret 로드와 runtime sync |
+| `integrations/` | rbenv/Bun 경로값·hook 계산 | 직접적인 PATH mutation |
 | `integrations/lazy/` | 필요 시 외부 도구 초기화 | 모든 도구를 startup에서 강제 로드 |
 | `aliases/` | 짧은 명령과 업무 함수 | plugin 초기화 |
 | `plugins/` | OMZ/custom plugin과 theme | 비밀값 설정 |
@@ -67,6 +69,12 @@ Bootstrap은 기존 파일을 삭제하지 않습니다. 대상이 이미 존재
 ```
 
 이 방식은 재설치 시 복구 경로를 남기지만, bootstrap이 machine-specific 설정을 자동 병합하지는 않습니다. 개인 설정은 저장소 파일에 직접 섞기보다 별도 local override 모듈로 분리하는 편이 안전합니다.
+
+## Startup and runtime sync boundaries
+
+Startup loads deterministic shell environment only. It does not write files, synchronize Hermes runtime secrets, or reload itself recursively. Secret files are loaded by `zsh/secrets/`; runtime synchronization is an explicit `--sync-secrets` bootstrap stage.
+
+SDKMAN is a lazy entrypoint. An uninstalled SDKMAN directory does not fail startup; calling `sdk` then returns `127` with one diagnostic line. Automatic zsh reload is disabled by default and requires `ZSH_AUTO_RELOAD=1`.
 
 ## Codex and tmux integration
 

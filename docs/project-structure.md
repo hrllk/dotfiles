@@ -25,13 +25,17 @@
 | 영역 | 동작 | 기본 대상 |
 |---|---|---|
 | 외부 plugin | 없을 때 Git clone | `~/.oh-my-zsh/custom/`, `~/.local/share/tmux/plugins/tpm` |
-| 백업 | 기존 파일·symlink를 timestamp backup으로 이동 | `~/.dotfiles-backup/` 또는 홈 디렉터리의 `.bak.*` |
+| 백업 | 기존 파일·symlink를 invocation timestamp backup으로 이동 | `BACKUP_ROOT` 또는 홈 디렉터리의 `.bak.*` |
 | zsh | 저장소 설정 연결 | `~/.zshrc` |
 | tmux | 설정과 plugin 디렉터리 연결 | `~/.tmux.conf`, `~/.gitmux.conf`, `~/.tmux` |
 | terminal | Kitty와 WezTerm 설정 연결 | `~/.config/kitty/kitty.conf`, `~/.wezterm.lua` |
 | editor | JetBrains Vim 설정 연결 | `~/.ideavimrc` |
+| AI | `--ai`에서 Claude/Hermes 연결 | `~/.claude`, `~/.hermes` |
+| Codex | local profile 생성 안내만 출력 | `~/.codex`는 자동 변경하지 않음 |
 
-경로는 `DOTFILES_DIR`, `ZSH_CUSTOM_DIR`, `BACKUP_ROOT` 환경변수로 덮어쓸 수 있습니다. [Bootstrap How-to](howto-bootstrap.md)에 실행 예와 검증 절차가 있습니다.
+경로는 `DOTFILES_DIR`, `ZSH_CUSTOM_DIR`, `BACKUP_ROOT`, `BACKUP_TIMESTAMP` 환경변수로 덮어쓸 수 있습니다. [Bootstrap How-to](howto-bootstrap.md)에 실행 예와 검증 절차가 있습니다.
+
+PATH 구성은 `zsh/path.zsh`가 단독 소유합니다. `zsh/env.zsh`는 공통 환경변수와 tool home만 관리하고, rbenv/Bun integration은 path 값을 계산해 `path.zsh`에 제공합니다.
 
 ## zsh layout
 
@@ -39,7 +43,10 @@
 zsh/.zshrc
 ├── aliases/taskmaster.zsh       빠른 task-master alias
 ├── options/completion.zsh       compinit, matcher, menu, zcompdump
-├── env.zsh                      PATH와 공통 환경변수
+├── env.zsh                      공통 환경변수와 tool home
+├── path.zsh                     PATH/path 배열과 bin 등록의 단일 소유자
+├── integrations/rbenv.zsh       rbenv shim 경로 계산
+├── integrations/bun.zsh         Bun bin 경로 계산
 ├── integrations/lazy/            nvm, Node 명령, SDKMAN lazy loader
 ├── secrets/index.zsh             도메인별 비밀값 로더
 ├── aliases/index.zsh             navigation, git, tools, work alias 조합

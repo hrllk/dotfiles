@@ -6,7 +6,7 @@ __export_secret() {
   local value
 
   if [[ ! -r "$path" ]]; then
-    echo "secret file not readable: $path" >&2
+    echo "secret file not readable" >&2
     return 1
   fi
 

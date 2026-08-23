@@ -20,8 +20,17 @@ git clone https://github.com/hrllk/dotfiles.git ~/dotfiles
 ## Step 2: Bootstrap 실행
 
 ```zsh
-bash ~/dotfiles/scripts/bootstrap.sh
+# shell/terminal setup
+bash ~/dotfiles/scripts/bootstrap.sh --shell-only
+
+# AI setup, when needed
+bash ~/dotfiles/scripts/bootstrap.sh --ai
+
+# Explicitly synchronize Hermes runtime secrets
+bash ~/dotfiles/scripts/bootstrap.sh --ai --sync-secrets
 ```
+
+`--dry-run`을 붙이면 network, backup, symlink, secret write 없이 실행 계획만 확인할 수 있습니다. Codex local profile은 bootstrap이 자동 생성하지 않습니다.
 
 Bootstrap은 기존 설정을 timestamp backup으로 보존한 뒤 다음 파일을 연결합니다.
 

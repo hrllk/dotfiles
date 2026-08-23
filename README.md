@@ -105,12 +105,19 @@ git clone https://github.com/hrllk/dotfiles.git ~/dotfiles
 bash ~/dotfiles/scripts/bootstrap.sh
 ```
 
+The bootstrap script supports explicit stages:
+- `--shell-only` (the default when no option is provided): clones shell/terminal plugins, creates backups, and links shell/terminal configuration
+- `--ai`: links Claude and Hermes configuration and prints Codex local-profile guidance without copying or linking Codex files
+- `--ai --sync-secrets`: runs the explicit Hermes runtime secret synchronization step
+- `--dry-run`: previews the selected stage without network, filesystem, launchctl, or secret writes
+- invalid flag combinations exit with code `2` before any stage runs
+
 The bootstrap script:
-- clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting`
-- clones `tmux plugin manager (TPM)`
-- backs up existing shell and terminal config files with timestamps
+- clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting` when missing
+- clones tmux plugin manager (TPM) when missing
+- backs up existing shell and terminal config files with a shared invocation timestamp
 - creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, `kitty`, and `wezterm`
-- loads `zsh/.p10k.zsh` when present, so Powerlevel10k config can live in the repo
+- keeps shell secret loading separate from Hermes runtime synchronization
 
 Targets after bootstrap:
 - `~/.zshrc` -> `~/dotfiles/zsh/.zshrc`

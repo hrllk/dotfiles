@@ -4,7 +4,8 @@ set -euo pipefail
 DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
 SOURCE_DIR="$DOTFILES_DIR/ai/.claude"
 TARGET_PATH="${CLAUDE_HOME:-$HOME/.claude}"
-BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)}"
+BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.dotfiles-backup}"
+BACKUP_TIMESTAMP="${BACKUP_TIMESTAMP:-}"
 
 DRY_RUN=0
 ASSUME_YES=0
@@ -61,9 +62,15 @@ claude_is_running() {
 
 backup_path_for() {
   local base_name="$1"
-  local stamp
-  stamp="$(date +%Y%m%d-%H%M%S)"
-  printf '%s/%s.bak.%s\n' "$BACKUP_ROOT" "$base_name" "$stamp"
+  local candidate
+  local suffix=0
+
+  candidate="$BACKUP_ROOT/${base_name}.bak.${BACKUP_TIMESTAMP}"
+  while [[ -e "$candidate" || -L "$candidate" ]]; do
+    suffix=$((suffix + 1))
+    candidate="$BACKUP_ROOT/${base_name}.bak.${BACKUP_TIMESTAMP}.${suffix}"
+  done
+  printf '%s/%s\n' "$BACKUP_ROOT" "${candidate#"$BACKUP_ROOT/"}"
 }
 
 move_to_backup() {
@@ -92,6 +99,14 @@ link_source() {
   log "linked $TARGET_PATH -> $SOURCE_DIR"
 }
 
+resolve_backup_timestamp() {
+  if [[ -z "$BACKUP_TIMESTAMP" ]]; then
+    BACKUP_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+  fi
+  [[ "$BACKUP_TIMESTAMP" =~ ^[0-9]{8}-[0-9]{6}$ ]] || die 'invalid BACKUP_TIMESTAMP; expected YYYYMMDD-HHMMSS'
+  export BACKUP_ROOT BACKUP_TIMESTAMP
+}
+
 while (( $# )); do
   case "$1" in
     --dry-run) DRY_RUN=1 ;;
@@ -101,6 +116,8 @@ while (( $# )); do
   esac
   shift
 done
+
+resolve_backup_timestamp
 
 [[ -d "$SOURCE_DIR" ]] || die "missing managed directory: $SOURCE_DIR"
 

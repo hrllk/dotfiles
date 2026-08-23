@@ -22,6 +22,8 @@ source_if_exists "$ZSH_DOTFILES_PATH/aliases/taskmaster.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/options/completion.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/options/history.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/env.zsh"
+source_if_exists "$ZSH_DOTFILES_PATH/integrations/rbenv.zsh"
+source_if_exists "$ZSH_DOTFILES_PATH/integrations/bun.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/path.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/integrations/lazy/nvm.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/integrations/lazy/node-commands.zsh"
@@ -32,38 +34,32 @@ source_if_exists "$ZSH_DOTFILES_PATH/plugins/index.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/options/keybindings.zsh"
 source_if_exists "$ZSH_DOTFILES_PATH/plugins/omz/theme.zsh"
 
-autoload -Uz add-zsh-hook
-zmodload -i zsh/stat
+if [[ "${ZSH_AUTO_RELOAD:-0}" == 1 ]]; then
+  autoload -Uz add-zsh-hook
+  zmodload -i zsh/stat
 
-typeset -g _zshrc_mtime=''
-typeset -g _p10k_mtime=''
-typeset -A _zshrc_stat
-zstat -H _zshrc_stat -L -- "$ZSH_DOTFILES_PATH/.zshrc" 2>/dev/null && _zshrc_mtime="${_zshrc_stat[mtime]}"
-typeset -A _p10k_stat
-zstat -H _p10k_stat -L -- "$ZSH_DOTFILES_PATH/.p10k.zsh" 2>/dev/null && _p10k_mtime="${_p10k_stat[mtime]}"
+  typeset -g _zshrc_mtime=''
+  typeset -g _p10k_mtime=''
+  typeset -A _zshrc_stat
+  zstat -H _zshrc_stat -L -- "$ZSH_DOTFILES_PATH/.zshrc" 2>/dev/null && _zshrc_mtime="${_zshrc_stat[mtime]}"
+  typeset -A _p10k_stat
+  zstat -H _p10k_stat -L -- "$ZSH_DOTFILES_PATH/.p10k.zsh" 2>/dev/null && _p10k_mtime="${_p10k_stat[mtime]}"
 
-reload_zshrc() {
-  local -A stat
-  local -A p10k_stat
+  reload_zshrc() {
+    local -A stat
+    local -A p10k_stat
 
-  zstat -H stat -L -- "$ZSH_DOTFILES_PATH/.zshrc" 2>/dev/null || return 0
-  zstat -H p10k_stat -L -- "$ZSH_DOTFILES_PATH/.p10k.zsh" 2>/dev/null
+    zstat -H stat -L -- "$ZSH_DOTFILES_PATH/.zshrc" 2>/dev/null || return 0
+    zstat -H p10k_stat -L -- "$ZSH_DOTFILES_PATH/.p10k.zsh" 2>/dev/null
 
-  [[ "${stat[mtime]}" == "$_zshrc_mtime" && "${p10k_stat[mtime]:-}" == "$_p10k_mtime" ]] && return 0
+    [[ "${stat[mtime]}" == "$_zshrc_mtime" && "${p10k_stat[mtime]:-}" == "$_p10k_mtime" ]] && return 0
 
-  _zshrc_mtime="${stat[mtime]}"
-  _p10k_mtime="${p10k_stat[mtime]:-}"
-  ZSH_RELOADING_RC=1 source "$ZSH_DOTFILES_PATH/.zshrc"
-  unset ZSH_RELOADING_RC
-}
+    _zshrc_mtime="${stat[mtime]}"
+    _p10k_mtime="${p10k_stat[mtime]:-}"
+    ZSH_RELOADING_RC=1 source "$ZSH_DOTFILES_PATH/.zshrc"
+    unset ZSH_RELOADING_RC
+  }
 
-add-zsh-hook -d precmd reload_zshrc 2>/dev/null
-add-zsh-hook precmd reload_zshrc
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/Users/hrk/.sdkman"
-[[ -s "/Users/hrk/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/hrk/.sdkman/bin/sdkman-init.sh"
-
-# Task Master aliases added on 8/18/2026
-alias tm='task-master'
-alias taskmaster='task-master'
+  add-zsh-hook -d precmd reload_zshrc 2>/dev/null
+  add-zsh-hook precmd reload_zshrc
+fi

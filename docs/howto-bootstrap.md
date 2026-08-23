@@ -32,11 +32,22 @@
 
 3. Bootstrap을 실행합니다.
 
+   기본 shell/terminal 단계만 실행하려면 다음을 사용합니다.
+
    ```zsh
-   bash ~/dotfiles/scripts/bootstrap.sh
+   bash ~/dotfiles/scripts/bootstrap.sh --shell-only
    ```
 
-   스크립트는 Powerlevel10k, fzf-tab, zsh-autosuggestions, zsh-syntax-highlighting, TPM을 없을 때만 clone하고, 기존 설정을 backup한 뒤 symlink를 생성합니다.
+   변경 없이 계획만 확인하려면 `--dry-run --shell-only`를 사용합니다. AI 설정은 별도 단계입니다.
+
+   ```zsh
+   bash ~/dotfiles/scripts/bootstrap.sh --ai
+   bash ~/dotfiles/scripts/bootstrap.sh --ai --sync-secrets
+   ```
+
+   `--ai` 단계는 Claude/Hermes만 연결하고 Codex local profile은 자동 복사·symlink하지 않고 생성 안내만 출력합니다. `--sync-secrets`는 `--ai`와 함께 지정해야 합니다.
+
+   스크립트는 선택된 stage의 prerequisite만 먼저 검사하고, invalid flag 조합은 어떤 파일도 변경하지 않고 exit `2`로 종료합니다. 기존 backup은 하나의 invocation timestamp를 공유합니다.
 
 4. tmux plugin을 설치합니다.
 
