@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash $HOME/.codex/tmux-notify-hook.sh",
+            "command": "bash $HOME/.tmux/scripts/ai-notify-hook.sh Codex",
             "timeout": 5
           }
         ]

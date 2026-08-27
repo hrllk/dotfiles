@@ -120,7 +120,7 @@ Start at the [documentation index](docs/index.md), or jump straight to a quadran
 - [Secret handling](docs/explanation-secret-handling.md): why tracked `.env` files carry no secrets
 
 **Design and review**
-- [Codex tmux unread design](docs/design-codex-tmux-unread.md): completion state in tmux windows
+- [AI agent tmux unread design](docs/design-codex-tmux-unread.md): shared Codex/Claude Code completion state in tmux windows
 - [Structural review (2026-08-26)](docs/review-structural-2026-08-26.md): known structural issues and change candidates
 
 ### Verification

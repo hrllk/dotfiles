@@ -13,6 +13,9 @@ else
   echo "No known test suite found."
 fi
 
-if [[ -x scripts/test-tmux-unread ]]; then
-  scripts/test-tmux-unread
+# The tmux unread indicator is shared with Claude Code, so its test lives in
+# the dotfiles repo. Skip silently when the harness runs outside that checkout.
+TMUX_UNREAD_TEST="${DOTFILES_DIR:-$HOME/dotfiles}/scripts/tests/tmux-unread-test.sh"
+if [[ -x "$TMUX_UNREAD_TEST" ]]; then
+  "$TMUX_UNREAD_TEST"
 fi

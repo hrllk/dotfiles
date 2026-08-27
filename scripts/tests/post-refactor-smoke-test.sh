@@ -17,5 +17,6 @@ run bootstrap-matrix bash "$REPO_ROOT/scripts/tests/bootstrap-matrix-test.sh"
 run bootstrap-rerun bash "$REPO_ROOT/scripts/tests/bootstrap-rerun-test.sh"
 run claude-backup-contract bash "$REPO_ROOT/scripts/tests/claude-backup-contract-test.sh"
 run sync-contract bash "$REPO_ROOT/scripts/tests/sync-contract-test.sh"
+run tmux-unread bash "$REPO_ROOT/scripts/tests/tmux-unread-test.sh"
 
 printf '\nPOST_REFACTOR_SMOKE: PASS\n'

@@ -46,8 +46,8 @@
 
 ## 기능별 문서
 
-- [Codex tmux unread 설계](design-codex-tmux-unread.md): Codex 완료 상태를 tmux window에 표시하는 설계
-- [Codex tmux unread 테스트 계획](eng-review-test-plan-codex-tmux-unread.md): 격리된 tmux 서버에서 검증하는 시나리오
+- [AI agent tmux unread 설계](design-codex-tmux-unread.md): Codex와 Claude Code의 완료 상태를 tmux window에 표시하는 공용 설계
+- [AI agent tmux unread 테스트 계획](eng-review-test-plan-codex-tmux-unread.md): 격리된 tmux 서버에서 검증하는 시나리오
 
 ## 검토와 결정 기록
 

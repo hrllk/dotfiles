@@ -1,5 +1,4 @@
 {
-  "theme": "dark",
   "hooks": {
     "Stop": [
       {
@@ -11,7 +10,19 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.tmux/scripts/ai-notify-hook.sh Claude",
+            "timeout": 5
+          }
+        ]
       }
     ]
-  }
+  },
+  "tui": "default",
+  "theme": "dark",
+  "editorMode": "vim"
 }
