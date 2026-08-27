@@ -10,9 +10,11 @@ browser:
 display:
   tool_progress: all
 command_allowlist:
-  - shell command via -c/-lc flag
+  - pipe decoded content to shell (possible command obfuscation)
   - script execution via heredoc
   - script execution via -e/-c flag
+  - shell command via -c/-lc flag
+  - execute_code
 onboarding:
   seen:
     profile_build_offered: true

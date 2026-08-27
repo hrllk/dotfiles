@@ -10,9 +10,10 @@ browser:
 display:
   tool_progress: all
 command_allowlist:
+  - script execution via -e/-c flag
   - shell command via -c/-lc flag
   - script execution via heredoc
-  - script execution via -e/-c flag
+  - recursive delete
 onboarding:
   seen:
     profile_build_offered: true

@@ -1,17 +1,9 @@
-
 .nvimlog
 .yarn*
 *.log
 .DS_Store
-.gemini/tmp/*
-.gemini/.DS_Store
-.gemini/settings.json.orig
-
-.codex/log
-.codex/log/*
-
-.codex/sessions
-.codex/sessions/*
-
 auth.json
-.DS_Store
+
+# Gemini runtime state (any location — the tree lives under archive/ai/)
+**/.gemini/tmp/
+**/.gemini/settings.json.orig

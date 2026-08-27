@@ -1458,3 +1458,92 @@ subagent는 원안이 손대지 않는 영역(에러 문자열 20건, 문서 9�
 | 4 | 관리 대상 목록이 3곳에 이중화, 이미 분기함 | CEO(Sec 8), Eng(H-5), DX(F-4.3) | **3개 phase 전부** |
 | 5 | `--check`와 `--dry-run`이 두 코드경로가 되면 갈라진다 | Eng(A-2), DX(F-2.4) | 2개 |
 | 6 | `link-claude-home` rsync 마이그레이션이 미검증 최고위험 경로 | CEO(F-9), Eng(S-1) | 2개 |
+
+---
+
+# FINAL DECISIONS
+
+## 사용자 제공 사실
+
+**저장소는 영구 public이다. private 전환 계획 없음.** 이 사실이 D2/D3/D8을 결정 가능하게 만든다.
+
+귀결: allowlist gitignore가 영구히 **유일한** 봉쇄 수단이다. "나중에 private으로 돌리면 되는"
+완화책이 존재하지 않는다. `agents/ commands/ skills/ hooks/ plugins/ keybindings.json scripts/*`가
+막히지 않는 상태와 `zsh/aliases/work.zsh`의 사내 IP 3건이 영구 공개 상태라는 뜻이다.
+둘 다 이 작업 범위 밖(사용자가 별도 처리로 결정)이지만, 시한부가 아니라는 점이 달라졌다.
+
+## D2/D3/D8 — 결정
+
+**링크는 공개하지 않고, 병합이 공개한다.** 이 구분이 답을 정한다.
+
+- **D2 codex는 `--all`에 포함.** `~/.codex`는 이 기기에서 이미 심링크이고, 링크 행위 자체는
+  아무것도 게시하지 않는다. 봉쇄는 gitignore가 한다.
+- **D3 반전을 `docs/decisions.md`에 기록.** `reference-bootstrap-cli.md:133`과
+  `explanation-secret-handling.md:195`가 반대를 말하고 있으므로 둘 다 갱신한다.
+- **D8 마이그레이션은 `--all`에서 분리.** `bootstrap claude --migrate` 명시 제스처로만 실행.
+  이유: rsync `--ignore-existing`는 저장소에 없는 파일만 복사하고, 그게 정확히 allowlist가
+  막지 않는 부류다. 영구 public이면 이 경로가 유일하게 새 내용을 영구 공개 트리로 **가져오는**
+  경로다. 추가로 (a) `--exclude`로 추적 가능 부류 차단, (b) 병합 후
+  `git status --porcelain -uall` 비어있음을 **강제 검사**, 비어있지 않으면 exit 20.
+
+## 자동결정 6건 (근거가 답을 정함)
+
+| # | 결정 | 원칙 | 근거 |
+|---|---|---|---|
+| D1 | bare 호출 = 읽기 전용 (`--list` + `--check` 요약) | P5 | 같은 키에 blast radius가 커지면 안 됨. `README.md:64` quickstart의 유일한 명령 |
+| D5 | 3단계 분할: 테스트 → 구조·CLI → 이동·문서 | P1 | 테스트가 리팩터 안전망. 순서 역전 시 회귀 미검출 |
+| D6 | **2함수 계약** — `unit_preflight` + `unit_apply`, `unit_check`는 lib 래퍼 | P4 | 두 몸통이 같은 상태를 보면 갈라짐(`backup_path_for`로 증명). 3함수 표가 0E 결론과 모순이었음 |
+| D7 | `40-codex.sh`는 `link_path` 재구현. `init-home-codex`는 수동 경로로 존치 | P1 | 플래그 파싱 0건 → `--dry-run`이 실제로 파일 생성. 취향 아닌 버그. 세 번째 백업 구현 분리 |
+| D9 | drift 종료코드 = **11** | P3 | 순수 bikeshed. 10/20/30 가족과 같은 자리. 1은 사고성 실패 예약 |
+| — | 단위를 `TARGETS` 배열 기반으로 | P5 | 안 하면 `howto-add-configuration.md:372`의 "한 줄 추가"가 두 함수 손동기화가 됨 |
+
+## 확정 규약
+
+```
+종료코드   0  동기화됨 / 성공
+           2  사용법 오류 (기존 유지, bootstrap-matrix-test.sh:31 이 assert)
+          10  preflight 미충족 (기존 유지)
+          11  drift 감지, 오류 아님          ← 신규
+          20  apply 실패 (기존 유지)
+          30  secrets sync 실패 (기존 유지)
+           1  예약 — 내부 버그. 오케스트레이터가 "internal error in unit <name>" 후 20 반환
+
+문법     bootstrap.sh [--check|--dry-run] [--all | <unit>...]
+         --all 과 <unit>... 은 상호배타
+         --list, --help 는 종결 명령
+         --check, --dry-run 은 두 선택자 모두에 적용 가능
+
+--all    shell terminal claude codex hermes      (secrets 제외, migration 제외)
+
+bash     3.2.57 대상. declare -A 금지 (조용히 인덱스 배열로 격하됨).
+         nameref 금지. mapfile/readarray 금지. globstar 금지.
+         모든 unit_* 함수는 명시적 return 0 으로 끝난다 ((( )) 마지막 문장 = rc 1).
+         local x="$(cmd)" 금지 — declare 후 assign.
+         set -e 를 안전망으로 신뢰하지 않는다 (|| 문맥에서 서브트리 전체 무력화).
+```
+
+## Decision Audit Trail (최종)
+
+| # | Phase | Decision | Class | Principle |
+|---|-------|----------|-------|-----------|
+| 1 | CEO | Mode = SELECTIVE EXPANSION | Mechanical | P6 |
+| 2 | CEO | approach B 채택 | User Challenge → 사용자 | — |
+| 3 | CEO | C1 GAP-1 수정 포함 | Mechanical | P1 |
+| 4 | CEO | C3 HOME 격리 assert 필수 | Mechanical | P1 |
+| 5 | CEO | C4 rsync 테스트 최우선 | Taste | P1 |
+| 6 | CEO | C7 secrets를 `--all`에서 제외 | Mechanical | P5 |
+| 7 | CEO | C8 fail-fast + 상태 요약 | Taste | P3 |
+| 8 | CEO | E3 폐기 (근거 반증됨) | Mechanical | P4 |
+| 9 | CEO | 개명 폐기 | Mechanical | P3 |
+| 10 | Eng | `sync-secrets` class A→B, 이동 취소 | Mechanical | P1 — 사실 정정 |
+| 11 | Eng | D6 2함수 계약 | Mechanical | P4 |
+| 12 | Eng | D7 codex 재구현 | Mechanical | P1 |
+| 13 | Eng | D9 drift = 11 | Taste | P3 |
+| 14 | Eng | T-1 격리 assert를 3변수로 확장 | Mechanical | P1 |
+| 15 | DX | D1 bare = 읽기 전용 | Taste | P5 |
+| 16 | DX | TARGETS 배열 기반 단위 | Mechanical | P5 |
+| 17 | DX | 문서 blast radius 4개 → 9개 | Mechanical | P1 — 사실 정정 |
+| 18 | DX | D5 3단계 분할 | Taste | P1 |
+| 19 | Gate | D2 codex `--all` 포함 | **사용자 사실 기반** | — |
+| 20 | Gate | D3 반전을 decisions.md에 기록 | Mechanical | P1 |
+| 21 | Gate | D8 마이그레이션 `--all`에서 분리 | **사용자 사실 기반** | — |
