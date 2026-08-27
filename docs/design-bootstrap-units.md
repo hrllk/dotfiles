@@ -1314,3 +1314,63 @@ secrets를 제외한다는 사실이 명시되지 않으면 "왜 안 됐지"를 
 - [ ] 문서 6개 갱신 (Pass 4)
 - [ ] 마이그레이션 노트 한 단락 (Pass 5)
 - [ ] `--all` 완료 시 단위별 상태 요약 (Pass 8, C8과 동일)
+
+## Eng Step 0.5: Dual Voices
+
+Codex `[codex-unavailable: disabled by config]` → `[subagent-only]`.
+
+### CLAUDE SUBAGENT (eng — independent review)
+
+18건 지적. 실측 검증 결과 확인한 주장은 아래와 같다.
+
+| 주장 | 검증 명령 | 결과 |
+|---|---|---|
+| macOS bash는 3.2.57이고 `declare -A`가 **조용히 틀린 값**을 준다 | `bash -c 'declare -A m; m[shell]=10; m[terminal]=20; echo ${m[shell]}'` | **사실.** `20` 출력 (기대 10). 에러 없이 인덱스 배열로 격하 |
+| `sync-secrets`는 class A가 아니라 **class B**다 | `gateway-restart:12-14` | **사실.** 없으면 `exit 1`. 이동 시 런타임 도구 2개가 매 호출마다 실패 |
+| `init-home-codex`는 플래그를 파싱하지 않는다 | 인자 처리 매칭 0건 | **사실.** `--dry-run --all`이 실제로 `~/.codex`를 만든다 |
+| allowlist가 막는 것과 안 막는 것이 반대다 | `git check-ignore --no-index` | **사실.** `agents/ commands/ skills/ hooks/ plugins/ keybindings.json scripts/*` **NOT ignored**. `projects/ sessions/ history.jsonl .credentials.json` ignored |
+| `claude-backup-contract-test.sh`가 실제 저장소로 rsync한다 | `:13` `DOTFILES_DIR="$REPO_ROOT"`, `:15` `--yes` (dry-run 없음) | **사실.** 픽스처가 비어 있어서 무해할 뿐 |
+| `(( ))`를 함수 마지막 문장에 두면 1을 반환한다 | `g(){ DRY=0; (( DRY )) && echo x; }` | **사실.** rc=1 |
+
+### 내 리뷰의 정정 3건
+
+1. **`sync-secrets`를 class A로 분류한 것은 틀렸다.** `ai/.hermes/scripts/gateway-restart:5,12,39`와
+   `gateway-management-profile:7,255`가 `$HERMES_HOME/scripts/sync-secrets`를 참조하고,
+   전자는 없으면 `exit 1`한다. `~/.hermes`가 디렉터리 통째 심링크라 옮기면 그 경로에서 사라진다.
+   **T13에서 `sync-secrets` 이동을 제외한다.** `link-claude-home`만 옮긴다.
+2. **"`lib.sh`가 `backup_path_for`를 한 벌로 만든다"는 거짓이다.** 구현이 셋이다.
+   `bootstrap.sh:106-117`, `link-claude-home:63-74`, 그리고 `init-home-codex:6-7,13-15`
+   (자체 `date` 타임스탬프, `$HOME/.codex.bak.*`, `.$$` 충돌 접미사). 셋 중 둘만 통합된다.
+3. **`--check` 종료코드 1은 쓸 수 없다.** bash에서 1은 실패한 `[[ ]]`, 매칭 없는 `grep`,
+   `(( ))` 마지막 문장 등 **모든 사고성 실패의 반환값**이다. drift와 버그가 구분되지 않는다.
+   내 A2 표를 폐기하고 drift는 **11**로 옮긴다. 1은 "내부 버그" 예약.
+
+### ENG DUAL VOICES — CONSENSUS TABLE
+
+```
+═══════════════════════════════════════════════════════════════
+  Dimension                     Claude  Codex  Consensus
+  ────────────────────────────  ──────  ─────  ─────────
+  1. Architecture sound?        NO      N/A    NO (단독)
+  2. Test coverage sufficient?  NO      N/A    NO (단독)
+  3. Performance risks?         OK      N/A    OK (단독)
+  4. Security threats covered?  NO      N/A    NO (단독)
+  5. Error paths handled?       NO      N/A    NO (단독)
+  6. Deployment risk manageable?PARTIAL N/A    PARTIAL (단독)
+═══════════════════════════════════════════════════════════════
+Codex 부재로 CONFIRMED 0. 두 축이 독립 일치한 항목:
+GAP-1 백업 거짓 성공 / set -e 무력화 / DOTFILES_DIR SPOF /
+HOME 격리 불충분 / rsync 마이그레이션 미검증 / --all 범위 미정의
+```
+
+### 두 축이 갈린 지점 (→ 사용자 결정)
+
+- **3함수 계약.** 내 설계는 `unit_preflight`/`unit_check`/`unit_apply`. subagent는 `check`와
+  `apply`가 같은 상태를 보는 두 몸통이라 반드시 갈라진다며 `MODE`+`CHANGES` 앰비언트 상태로
+  **2함수**로 접으라고 한다. 플랜 0E HOUR 2-3의 "check = dry-run + 종료코드"와 일치하는 쪽은
+  subagent다. 내 계약 표가 내 자신의 결론과 모순이었다.
+- **`40-codex.sh`가 `init-home-codex`를 부를 것인가.** 내 설계는 호출. subagent는 그 스크립트가
+  플래그를 안 읽어서 `--dry-run`을 깨뜨리고 세 번째 백업 구현을 끌고 온다며 `link_path` 한 줄로
+  재구현하라고 한다.
+- **`~/.claude` 마이그레이션이 `--all`에 포함되는가.** 내 설계는 암묵 포함. subagent는 C7(secrets)과
+  같은 논리로 명시적 `--migrate` 제스처로 분리하라고 한다.
