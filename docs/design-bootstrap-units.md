@@ -1374,3 +1374,87 @@ HOME 격리 불충분 / rsync 마이그레이션 미검증 / --all 범위 미정
   재구현하라고 한다.
 - **`~/.claude` 마이그레이션이 `--all`에 포함되는가.** 내 설계는 암묵 포함. subagent는 C7(secrets)과
   같은 논리로 명시적 `--migrate` 제스처로 분리하라고 한다.
+
+## DX Step 0.5: Dual Voices
+
+Codex `[codex-unavailable: disabled by config]` → `[subagent-only]`.
+
+### CLAUDE SUBAGENT (DX — independent review)
+
+DX 점수: 현재 3.6/10 → 플랜 원안 그대로 5.0/10 → findings 반영 시 8.1/10.
+**"플랜 원안 그대로는 5.0"** 이라는 게 핵심이다. 내 리뷰는 원안이 8.1에 도달한다고 봤는데,
+subagent는 원안이 손대지 않는 영역(에러 문자열 20건, 문서 9개 중 5개, 마이그레이션 노트)을
+빼면 5.0에 그친다고 본다. 이쪽이 맞다.
+
+### 내가 놓친 것 4건
+
+1. **F-4.2 — 이 리팩터가 가장 잦은 작업을 더 어렵게 만든다.**
+   `docs/howto-add-configuration.md:372`는 설정 파일 추가 방법을 "`run_shell_stage`에 `link_path`
+   한 줄 추가"로 안내한다. 3함수 계약에서는 `unit_apply`와 `unit_check` **두 함수를 손으로
+   동기화**해야 하고 불일치가 눈에 보이지 않는다. 단위를 `TARGETS` 배열 기반으로 만들지 않으면
+   **향후 6개월 가장 잦은 작업에서 순 DX 퇴행**이다.
+2. **F-1.1 — 튜토리얼이 oh-my-zsh를 전제조건에 안 적었다.** `zsh/plugins/index.zsh:1`이
+   `$HOME/.oh-my-zsh/custom`을 쓰고 `bootstrap.sh:180-183`이 거기로 clone하는데,
+   `mkdir -p`가 oh-my-zsh 없이도 트리를 만든다. README와 howto에는 있고 튜토리얼에만 없다.
+3. **F-1.2 — `local.config.toml` 수동 꼬리가 남는다.** `zsh/aliases/codex.zsh:11-15`가 없으면
+   `codex` 실행을 거부한다. `--all`이 "완료"를 찍어도 codex는 못 쓴다. 플랜에 이 파일이 없다.
+4. **F-5.1 — "흡수"가 문서화된 탈출구를 지운다.** `docs/howto-add-configuration.md:348`이
+   `~/.hermes/scripts/sync-secrets` 직접 실행을 안내하고, `reference-bootstrap-cli.md:167`이
+   `link-claude-home` 직접 실행을 안내한다. 흡수하면 두 경로가 사라진다.
+
+### 문서 blast radius 정정
+
+플랜 step 4는 문서 4개를 든다. 실제는 **9개**다. 누락: `docs/howto-bootstrap.md`(index가 두 번째로
+보내는 how-to), `docs/howto-add-configuration.md:372`, `docs/reference-hermes-gateways.md:5`,
+`ai/.hermes/README.md:198`, `docs/explanation-secret-handling.md:195`(Codex 자동배포 안 하는
+이유를 설명 — `40-codex.sh`가 이걸 반박한다), `docs/decisions.md`.
+
+### DX SCORECARD (subagent)
+
+```
+  Dimension                today   원안그대로   findings반영
+  ──────────────────────   ─────   ──────────   ───────────
+  getting-started            3         6            8
+  CLI naming                 3         5            8
+  error messages             2         3            8
+  docs findability           6         4 ↓          8
+  upgrade path               4         4            8
+  escape hatches             7         5 ↓          8
+  observability of state     1         8            9
+  first-run confidence       3         5            8
+  ──────────────────────   ─────   ──────────   ───────────
+  mean                      3.6       5.0          8.1
+```
+
+원안이 **2개 차원을 퇴행시킨다**(docs findability 6→4, escape hatches 7→5).
+
+### DX DUAL VOICES — CONSENSUS TABLE
+
+```
+═══════════════════════════════════════════════════════════════
+  Dimension                     Claude  Codex  Consensus
+  ────────────────────────────  ──────  ─────  ─────────
+  1. Getting started < 5 min?   NO      N/A    NO (단독)
+  2. CLI naming guessable?      PARTIAL N/A    PARTIAL (단독)
+  3. Error messages actionable? NO      N/A    NO (단독)
+  4. Docs findable & complete?  NO      N/A    NO (단독)
+  5. Upgrade path safe?         NO      N/A    NO (단독)
+  6. Dev env friction-free?     PARTIAL N/A    PARTIAL (단독)
+═══════════════════════════════════════════════════════════════
+```
+
+---
+
+# CROSS-PHASE THEMES
+
+독립적으로 실행된 3개 리뷰(CEO / Eng / DX)와 3개 subagent에서 **2개 이상 phase가 각각
+발견한** 항목. 교차 확인된 만큼 신호가 강하다.
+
+| # | 주제 | 발견 phase | 판정 |
+|---|---|---|---|
+| 1 | `--all` / bare 호출이 public 저장소 트리를 홈에 링크하는 blast radius | CEO(F-2), Eng(S-3), DX(F-2.1) | **3개 phase 전부** |
+| 2 | `backup_with_timestamp`가 실패한 백업에 성공 메시지 | CEO(GAP-1), Eng(E-5), DX(F-3.1) | **3개 phase 전부** |
+| 3 | drift 종료코드 1은 사고성 실패와 구분 불가 | Eng(A-3 → 11), DX(F-3.8 → 3) | 2개, **숫자가 갈림** |
+| 4 | 관리 대상 목록이 3곳에 이중화, 이미 분기함 | CEO(Sec 8), Eng(H-5), DX(F-4.3) | **3개 phase 전부** |
+| 5 | `--check`와 `--dry-run`이 두 코드경로가 되면 갈라진다 | Eng(A-2), DX(F-2.4) | 2개 |
+| 6 | `link-claude-home` rsync 마이그레이션이 미검증 최고위험 경로 | CEO(F-9), Eng(S-1) | 2개 |
