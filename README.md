@@ -26,60 +26,19 @@ The layout is optimized for:
 
 ## Structure
 ```text
-zsh/
-  .zshrc
-  env.zsh
-  path.zsh
-  options/
-    completion.zsh
-    keybindings.zsh
-  integrations/
-    lazy/
-      nvm.zsh
-      node-commands.zsh
-      sdkman.zsh
-  aliases/
-    index.zsh
-    navigation.zsh
-    git.zsh
-    taskmaster.zsh
-    tools.zsh
-    others.zsh
-    work.zsh
-  plugins/
-    index.zsh
-    custom/
-      safe-paste.zsh
-    omz/
-      autosuggestions.zsh
-      fzf-tab.zsh
-      syntax-highlighting.zsh
-      theme.zsh
-  secrets/
-    index.zsh
-    _shared.zsh
-    ai.zsh
-    dns.zsh
-    work.zsh
-util/
-  jetbrains/
-    .ideavimrc
-  kitty/
-    kitty.conf
-  assets/
-    wallpapers/
-      ...
-  wezterm/
-    wezterm.lua
-  tmux/
-    .gitmux.conf
-    .tmux.conf
-    .tmux/
-archive/
-  util/
-    iterm/
-      itermconf.itermexport
+ai/
+  .claude/       Claude settings and home-link helper
+  .codex/        Codex harness, hooks, and local setup
+  .hermes/       Hermes profiles, gateways, and sync scripts
+archive/         historical configuration only
+docs/            tutorials, how-tos, references, explanations
+scripts/         bootstrap entrypoint and regression tests
+util/            JetBrains, Kitty, tmux, WezTerm, assets
+zsh/             startup orchestration and shell modules
+.taskmaster/     task graph and planning metadata
 ```
+
+Active configuration lives under `ai/`, `util/`, and `zsh/`. Runtime state such as logs, caches, databases, sessions, and heartbeat files is not part of the documented source layout. `archive/` is historical data and is not loaded during startup.
 
 ## Quickstart
 ### Prerequisites
@@ -123,8 +82,12 @@ Targets after bootstrap:
 - `~/.zshrc` -> `~/dotfiles/zsh/.zshrc`
 - `~/.ideavimrc` -> `~/dotfiles/util/jetbrains/.ideavimrc`
 - `~/.tmux.conf` -> `~/dotfiles/util/tmux/.tmux.conf`
+- `~/.gitmux.conf` -> `~/dotfiles/util/tmux/.gitmux.conf`
+- `~/.tmux` -> `~/dotfiles/util/tmux/.tmux`
 - `~/.config/kitty/kitty.conf` -> `~/dotfiles/util/kitty/kitty.conf`
 - `~/.wezterm.lua` -> `~/dotfiles/util/wezterm/wezterm.lua`
+- the `--ai` stage can link `~/.claude` and `~/.hermes`
+- Codex is never copied or linked automatically; prepare it explicitly with `ai/.codex/init-home-codex`
 - tmux plugins are installed under `~/.local/share/tmux/plugins/` and are not tracked in this repo
 - use tmux `prefix + I` to install plugins after startup
 
@@ -137,12 +100,28 @@ Targets after bootstrap:
 
 ## Documentation
 
-- [Documentation index](docs/index.md): choose a tutorial, how-to, reference, or explanation
-- [First setup tutorial](docs/tutorial-first-setup.md): install the environment on a new Mac
-- [Bootstrap how-to](docs/howto-bootstrap.md): rerun, verify, and troubleshoot installation
-- [Project structure reference](docs/project-structure.md): understand ownership and public shell commands
-- [Configuration architecture](docs/explanation-architecture.md): understand startup order and fallbacks
+Start at the [documentation index](docs/index.md), or jump straight to a quadrant.
+
+**Tutorial**
+- [First setup](docs/tutorial-first-setup.md): install the environment on a new Mac
+
+**How-to**
+- [Bootstrap](docs/howto-bootstrap.md): rerun, verify, and troubleshoot installation
+- [Add configuration](docs/howto-add-configuration.md): add an alias, module, secret domain, or Hermes profile
+
+**Reference**
+- [Project structure](docs/project-structure.md): directory ownership and deployment paths
+- [Shell commands](docs/reference-shell-commands.md): every alias, function, lazy wrapper, and key binding
+- [Bootstrap CLI](docs/reference-bootstrap-cli.md): flags, environment variables, exit codes
+- [Hermes gateways](docs/reference-hermes-gateways.md): profiles, wrappers, launchd wiring
+
+**Explanation**
+- [Configuration architecture](docs/explanation-architecture.md): startup order and fallbacks
+- [Secret handling](docs/explanation-secret-handling.md): why tracked `.env` files carry no secrets
+
+**Design and review**
 - [Codex tmux unread design](docs/design-codex-tmux-unread.md): completion state in tmux windows
+- [Structural review (2026-08-26)](docs/review-structural-2026-08-26.md): known structural issues and change candidates
 
 ### Verification
 ```zsh

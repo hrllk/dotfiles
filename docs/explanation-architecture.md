@@ -7,19 +7,21 @@
 ```text
 ~/.zshrc
   -> ~/dotfiles/zsh/.zshrc
-       -> taskmaster alias
-       -> completion + compinit
-       -> environment
-       -> lazy loaders
-       -> secrets index
+       -> early task-master alias
+       -> completion + history options
+       -> env.zsh
+       -> rbenv/Bun integration values
+       -> path.zsh (sole PATH/path mutation owner)
+       -> lazy nvm and Node wrappers
+       -> secret loader
        -> alias index
-       -> plugin index
-       -> keybindings
+       -> lazy SDKMAN entrypoint
+       -> plugin index + keybindings
        -> Powerlevel10k theme
-       -> reload hook
+       -> optional reload hook (ZSH_AUTO_RELOAD=1 only)
 ```
 
-`~/.zshrc`는 저장소 파일을 가리키는 진입점입니다. 실제 조합 순서는 `zsh/.zshrc`에 있고, `source_if_exists`가 선택적 파일의 존재 여부를 확인합니다.
+`~/.zshrc`는 저장소 파일을 가리키는 진입점입니다. 실제 조합 순서는 `zsh/.zshrc`에 있고, `source_if_exists`가 선택적 파일의 존재 여부를 확인합니다. Startup은 파일 생성, Hermes runtime sync, network 호출, recursive reload를 수행하지 않습니다.
 
 ## Why the task-master alias loads early
 
