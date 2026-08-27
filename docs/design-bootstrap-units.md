@@ -712,3 +712,605 @@ Codex 부재로 CONFIRMED 0. 단, 두 축(내 0A 전제검증, subagent)이
 | 8 | CEO | E3 폐기 | Mechanical | P4 | 근거가 사실이 아님. 중복 기제 |
 | 9 | CEO | 개명 폐기 (F-12) | Mechanical | P3 | 비용만 있고 이득 없음 |
 | 10 | CEO | E1/E2/E4/E5/E6은 B에 포함 | Mechanical | P1 | B 원안이 이미 포함. 사용자 결정 존중 |
+
+---
+
+# ENG REVIEW (Phase 3)
+
+## Step 0: Scope Challenge
+
+**Complexity check: 발동.** 신규 7파일 + 이동 2 + 수정 3 + 테스트 2 + 문서 4 ≈ 18파일.
+8파일 기준을 넘는다. autoplan 규칙상 범위 축소는 하지 않으며(P2), 사용자가 premise gate에서
+approach B를 명시적으로 재확인했다. **as-is 진행. 재론하지 않는다.**
+
+**이미 존재하는 것:** CEO 0B 표 참조. 요약하면 `link_path`(멱등, 실측), `link-claude-home`의
+올바른 `backup_path_for`, `init-home-codex`(멱등), `bootstrap-matrix-test.sh`의 HOME 격리 +
+git stub 하네스, `post-refactor-smoke-test.sh` 러너가 모두 재사용 가능하다.
+
+**Search check.**
+- **[Layer 1]** `lib.sh` + 번호 접두 단위 파일은 `/etc/profile.d`, systemd `*.d`, dotbot이
+  쓰는 검증된 패턴이다. 새로 발명하는 게 아니다.
+- **[Layer 1]** `--check` 종료코드는 `diff`와 `git diff --exit-code`의 규약(0 = 차이 없음,
+  1 = 차이 있음, ≥2 = 오류)을 그대로 쓴다. 새 규약을 만들 이유가 없다.
+- **[Layer 2] 알려진 함정: bash `set -e`와 `||`의 상호작용.** 이게 이 설계 최대의 위험이며
+  아래 Section 1에서 다룬다.
+
+**TODOS 교차참조:** `TODOS.md` 없음. 이 저장소는 `.taskmaster/tasks/tasks.json`을 쓴다.
+
+**Distribution check:** 신규 아티팩트 없음. 배포 대상은 저장소 자체이고 배포 수단이 이 스크립트다.
+
+**테스트 프레임워크:** 감지 결과 표준 프레임워크 없음. `scripts/tests/*.sh`(bash),
+`zsh/tests/*.zsh`(zsh)를 손으로 실행한다. **CI 없음** (저장소 루트에 `.github` 없음).
+`post-refactor-smoke-test.sh`가 집계 러너지만 문서 외에는 참조하는 곳이 없다.
+
+## Section 1: Architecture Review
+
+### 의존 그래프 (approach B)
+
+```
+                       scripts/bootstrap.sh (orchestrator)
+                                │
+                    ┌───────────┴───────────┐
+                    │  parse_args           │  --all --check --list --dry-run <unit>...
+                    │  resolve_timestamp    │  export BACKUP_TIMESTAMP DRY_RUN DOTFILES_DIR
+                    └───────────┬───────────┘
+                                │ source (고정 순서)
+        ┌──────────┬────────────┼────────────┬──────────┬──────────┐
+        ▼          ▼            ▼            ▼          ▼          ▼
+   10-shell   20-terminal   30-claude    40-codex   50-hermes  60-secrets
+        │          │            │            │          │          │
+        └──────────┴────────────┴──── source ┴──────────┴──────────┘
+                                │
+                        bootstrap.d/lib.sh
+                    link_path / backup_path_for /
+                    clone_if_missing / run_command
+                                │
+                    ┌───────────┼───────────┐
+                    ▼           ▼           ▼
+          scripts/link-      ai/.codex/   scripts/
+          claude-home        init-home-   sync-secrets
+          (이동)             codex (유지) (이동)
+```
+
+### A1 (P1, confidence 9/10) — `set -e` + `||` 조합이 이 설계에서 18배로 증폭된다
+
+`bootstrap.sh:2`는 `set -euo pipefail`이지만 `bootstrap.sh:186` 같은 호출부가
+`link_path ... || return 20` 형태다. bash 규칙상 `&&`/`||` 리스트 안의 명령은 `set -e` 면제
+대상이고, 이 면제는 **호출된 함수 내부 전체로 전파된다.** CEO GAP-1이 정확히 이 메커니즘으로
+발생했다. 실측 근거:
+
+```
+bootstrap.sh:124   run_command mv "$target" "$backup_path"     ← 실패
+bootstrap.sh:125   printf 'backup: %s -> %s\n' ...             ← 그래도 실행, 함수는 0 반환
+실측 출력:         backup: .zshrc -> .zshrc.bak.20260827-112149   ← 거짓
+실제:              백업 파일 없음. ~/.zshrc 원본 그대로
+```
+
+approach B는 `unit_preflight`/`unit_check`/`unit_apply` 18개 함수를 만든다. 오케스트레이터가
+`unit_apply || record_failure` 형태로 부르면 **18개 함수 전부가 같은 함정 위에 놓인다.**
+
+**수정 (플랜에 반드시 포함):** `|| return N` 패턴을 버리고 명시적 분기로 바꾼다.
+```bash
+if ! link_path "$src" "$dst"; then
+  error "link failed: $dst"; return 20
+fi
+```
+그리고 `lib.sh`의 모든 함수는 마지막 명령이 `printf`가 아니라 상태를 결정하는 명령이어야 한다.
+`printf`로 끝나야 하면 명시적 `return 0`을 붙인다.
+
+### A2 (P1, confidence 9/10) — 종료코드 규약을 먼저 못박지 않으면 `--check`가 무의미해진다
+
+0E HOUR 1에서 지목한 지점이다. `unit_check`가 "미반영"과 "오류"를 같은 1로 반환하면
+`--check`는 신뢰할 수 없다. bash는 126(실행 불가), 127(명령 없음), 128+N(시그널)을 예약한다.
+
+**규약 (플랜에 명시):**
+
+| 코드 | 의미 | 근거 |
+|---|---|---|
+| 0 | 동기화됨 / 성공 | `diff`, `git diff --exit-code` 규약 |
+| 1 | drift 있음 (`unit_check` 전용) | 동일 |
+| 10 | preflight 미충족 | 기존 `bootstrap.sh` 규약 유지 |
+| 20 | apply 실패 | 동일 |
+| 2 | 인자 오류 | 동일 |
+
+`unit_check`만 1을 쓰고 나머지는 절대 1을 반환하지 않는다.
+
+### A3 (P2, confidence 8/10) — 단위가 단독 실행과 오케스트레이션을 동시에 만족해야 한다
+
+플랜의 "각 단위를 독립적으로 실행할 수 있다"(목표 1)와 오케스트레이터의 `--all`이 충돌한다.
+`bash 40-codex.sh`로 직접 돌리면 `lib.sh`가 로드되지 않고 `BACKUP_TIMESTAMP`도 없다.
+
+**수정:** 각 단위 파일이 (a) `lib.sh`를 idempotent guard와 함께 스스로 source하고,
+(b) 직접 실행될 때만 자기 main을 돌린다.
+```bash
+: "${_BOOTSTRAP_LIB_LOADED:=}"
+[ -n "$_BOOTSTRAP_LIB_LOADED" ] || . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
+# ... unit_preflight / unit_check / unit_apply 정의 ...
+[ "${BASH_SOURCE[0]}" = "$0" ] && unit_main "$@"
+```
+오케스트레이터는 subshell(`bash unit.sh`)이 아니라 **source**로 부른다. subshell을 쓰면
+상태를 전부 export해야 하고, 단위 간 함수명 충돌은 `unit_` 접두로 막는다. 단, source 방식은
+단위 A의 `unit_check` 정의가 단위 B의 것을 덮어쓰므로 오케스트레이터는 **한 번에 한 단위만
+source하고 즉시 호출**해야 한다. 이 제약이 플랜에 없다.
+
+### A4 (P2, confidence 8/10) — `DOTFILES_DIR` SPOF가 `40-codex.sh`에서 실질 위험이 된다
+
+`init-home-codex:4`가 `HARNESS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"`로
+**자기 위치**를 링크 대상으로 삼는다. `40-codex.sh`가 `$DOTFILES_DIR/ai/.codex/init-home-codex`를
+호출하는데 `DOTFILES_DIR`가 실제 체크아웃과 다르면 엉뚱한 트리가 `~/.codex`가 된다.
+`link_path`는 문자열 비교만 하므로 "틀린 경로를 정확히 가리키는" 상태를 정상으로 판정한다.
+
+**수정:** `unit_preflight`에서 `[ -d "$DOTFILES_DIR/ai/.codex" ] && [ -f "$DOTFILES_DIR/ai/.codex/harness.yml" ]`
+sanity check. `--check`는 심링크 문자열뿐 아니라 **대상 파일의 실재 여부**까지 확인한다.
+
+### A5 (P2, confidence 9/10) — `--all`의 포함 범위가 미정의이고 두 답 모두 회귀다
+
+`60-secrets.sh`가 단위 목록에 있고 `--all`이 목표에 있는데 관계가 없다. 현재는 코드로
+강제된다: `bootstrap.sh:79-82`가 `--sync-secrets` 단독을 거부하며 암묵 실행이 없다.
+`--all`이 secrets를 포함하면 한 명령이 무동의로 iCloud 키 파일을 읽고
+`~/.hermes/.launchd.env`를 쓴다.
+
+**결정 (C7):** `--all`에서 secrets **제외**. `--all` 설명 문구를 "설정 링크 전체"로 정정하고,
+secrets는 `bootstrap secrets` 명시 호출로만 실행한다.
+
+### A6 (P3, confidence 7/10) — 롤백 절차가 문서에 없다
+
+E4(A그룹 이동)를 revert하면 `~/.claude/scripts/`, `~/.hermes/scripts/`에서 파일이 사라진
+상태가 남는다. revert 후 `bootstrap --all` 재실행이 필수인데 어디에도 적혀 있지 않다.
+
+### 프로덕션 실패 시나리오
+
+| 통합 지점 | 현실적 실패 | 플랜이 대비하나 |
+|---|---|---|
+| `link-claude-home` rsync | 실제 `~/.claude`를 공개 저장소 트리로 복사 | **N** — C4로 편입 |
+| `init-home-codex` | `DOTFILES_DIR` 불일치로 엉뚱한 트리 링크 | **N** — A4 |
+| `--all` 중간 실패 | 단위 3에서 멈추고 4~6 미실행 | **N** — C8 |
+| `backup mv` 실패 | 거짓 성공 보고, 사용자 파일 유실 | **N** — A1/C1 |
+| 중단된 clone | 영구 방치 | **N** — G5 |
+
+**Findings: 6건** (P1 2, P2 3, P3 1)
+
+## Section 2: Code Quality Review
+
+### Q1 (P1, confidence 10/10) — `backup_path_for` 중복이 이미 갈라졌다
+
+```
+bootstrap.sh:109        candidate="$HOME/${base}.bak.${BACKUP_TIMESTAMP}"        ← 버그
+link-claude-home:68     candidate="$BACKUP_ROOT/${base_name}.bak.${...}"         ← 정상
+```
+`lib.sh`에는 **후자를 승격**한다. 전자를 옮기면 버그를 정식화한다. 구조검토 S-04.
+
+### Q2 (P1, confidence 9/10) — "마지막 명령이 printf" 안티패턴 전수 조사 필요
+
+A1의 근본 원인이다. `lib.sh`로 옮기는 모든 함수에 대해 마지막 명령이 상태를 결정하는지
+확인하고, 아니면 명시적 `return`을 붙인다. 현재 확인된 곳: `backup_with_timestamp:125`.
+
+### Q3 (P2, confidence 8/10) — `run_shell_stage`가 이름과 다른 일을 한다
+
+shell과 terminal을 둘 다 한다. `10-shell.sh` / `20-terminal.sh` 분리로 자연 해소된다.
+분리 기준: `10-shell`은 zsh 플러그인 clone + `.zshrc`, `20-terminal`은 tmux/kitty/wezterm/ideavim.
+
+### Q4 (P2, confidence 7/10) — 관리 대상 목록이 이중화되어 이미 분기했다
+
+`README.md:84-86`과 `bootstrap.sh:186-192`가 각각 목록을 들고 있고, `~/.codex`는 README에만
+있다. `--list`가 코드에서 단일 출처로 생성하고 문서는 그 출력을 인용하도록 한다.
+
+### Q5 (P3, confidence 6/10) — 18함수 표면에 대한 완화책
+
+사용자가 B를 선택했으므로 축소 논의는 종결. 다만 완화는 가능하다: 대부분 단위의
+`unit_preflight`는 `return 0` 한 줄이고 `unit_check`는 `lib.sh`의 공용
+`check_links "$@"` 헬퍼 호출 한 줄이면 된다. 단위 파일당 실질 코드가 10~20줄에 그치도록
+`lib.sh`에 공용 헬퍼를 충분히 둔다. 중간 신뢰도로 표기 — 실제 구현 시 재확인.
+
+**Findings: 5건** (P1 2, P2 2, P3 1)
+
+## Section 3: Test Review
+
+프레임워크 없음. bash 통합 테스트(`scripts/tests/*.sh`)를 손으로 실행하며 CI가 없다.
+`post-refactor-smoke-test.sh`가 집계 러너다. 신규 테스트는 이 규약을 따른다.
+
+### 커버리지 다이어그램
+
+```
+CODE PATHS                                          USER FLOWS (= 설치 시나리오)
+[+] bootstrap.d/lib.sh                              [+] 신규 기기 전체 설치
+  ├── link_path()                                     ├── [GAP] [→E2E] bootstrap --all → 10경로 링크
+  │   ├── [★★★ 실측] 없음/올바름/틀림/깨짐/일반파일    ├── [GAP] [→E2E] --all 후 ~/.codex 존재
+  │   └── [GAP]      일반 디렉터리 대상                └── [GAP]        --all 후 --check 종료코드 0
+  ├── backup_path_for()                             [+] 부분 반영 복구
+  │   ├── [GAP] CRITICAL 항상 BACKUP_ROOT 인가        ├── [GAP] 링크 1개 삭제 → 재실행 복구
+  │   └── [GAP]          같은 초 충돌 시 suffix        ├── [GAP] 링크 → 일반파일 교체 → 복구
+  ├── backup_with_timestamp()                         └── [GAP] 깨진 심링크 → 복구
+  │   └── [GAP] CRITICAL mv 실패 시 거짓 성공 없음    [+] 재실행 안전성
+  ├── clone_if_missing()                              └── [GAP] 2회 연속 실행 상태 무변화
+  │   ├── [★★  실측] .git 있으면 skip                [+] 마이그레이션 (최고 위험)
+  │   └── [GAP] CRITICAL 중단된 clone 복구             └── [GAP] CRITICAL [→E2E]
+  └── run_command()                                          실제 ~/.claude → 저장소 rsync 시
+      └── [GAP]      dry-run 시 무변경 보장                   민감파일이 트리에 노출되지 않음
+
+[+] bootstrap.d/*.sh (6단위 x 3함수)                [+] 안전장치
+  ├── unit_preflight  [GAP] 미충족 시 10               └── [GAP] CRITICAL HOME 격리 assert
+  ├── unit_check      [GAP] 동기화 0 / drift 1
+  └── unit_apply      [GAP] 실패 시 20
+  └── 40-codex        [GAP] DOTFILES_DIR 불일치 거부
+
+[+] bootstrap.sh (orchestrator)
+  ├── --all           [GAP] 고정 순서 + 중간 실패 요약
+  ├── --check         [GAP] 비변경 보장 + 종료코드
+  ├── --list          [GAP] 코드가 단일 출처
+  ├── <unit> 인자     [GAP] 단독 실행이 lib.sh 자동 로드
+  └── --shell-only/--ai/--sync-secrets  [GAP] alias 하위호환
+
+COVERAGE: 2/26 경로 테스트됨 (8%)  |  code: 2/14 (14%)  |  flows: 0/12 (0%)
+QUALITY: ★★★:1 ★★:1 ★:0  |  GAPS: 24 (5 E2E, 0 eval, 5 CRITICAL)
+```
+
+범례: ★★★ 동작+엣지+에러 | ★★ happy만 | [→E2E] 통합 테스트 필요
+
+기존 테스트 2건(★ 표시)은 이 리뷰 중 격리 샌드박스 실측으로 확인한 것이며 **저장소에 테스트
+코드로 존재하지 않는다.** 저장소 기준 실질 커버리지는 0%다.
+
+### CRITICAL 5건
+
+1. **HOME 격리 assert.** 신규 테스트는 실제 mutation을 한다. 기존 테스트는 전부 `--dry-run`이라
+   이 위험이 없었다. `TEST_ROOT` 밖이면 즉시 중단하는 assert가 없으면 개발자 홈이 망가진다.
+   테스트 파일 첫 실행문이어야 한다.
+2. **`link-claude-home` rsync 마이그레이션.** `link-claude-home:92`가
+   `rsync -a --ignore-existing "$path"/ "$SOURCE_DIR"/`로 실제 `~/.claude`(sessions, history,
+   경우에 따라 credentials)를 **공개 저장소 작업트리로 복사**한다. bootstrap이 `--yes`를
+   전달하므로 확인 프롬프트가 없다. 시스템 전체에서 결과가 가장 무거운 경로이고 테스트가 0건이다.
+3. **`backup mv` 실패 시 거짓 성공 없음.** A1/C1 회귀 테스트. 실측으로 현재 실패를 재현했으므로
+   **REGRESSION RULE 적용 — AskUserQuestion 없이 계획에 필수 포함.**
+4. **중단된 clone 복구.** 실측으로 현재 방치를 확인. 동일하게 회귀 테스트.
+5. **백업 위치 단일성.** 실측으로 `$HOME`과 `BACKUP_ROOT` 분산을 확인. 동일.
+
+### 2am 금요일 테스트
+
+신규 기기에 `bootstrap --all` 한 번 → 관리 대상 10경로 전부 링크 + `~/.codex` 포함 +
+`--check` 종료코드 0 + `post-refactor-smoke-test.sh` 통과. 이게 통과하면 안심하고 잔다.
+
+### 적대적 QA가 쓸 테스트
+
+`HOME`을 실제 홈으로 두고 테스트를 실행한다. assert가 없으면 홈이 망가진다.
+그 다음: 실제 `~/.claude` 모양(`.credentials.json`, `projects/`, `history.jsonl`)을 만든 뒤
+마이그레이션을 돌리고 `git status --porcelain ai/.claude`가 비어 있는지, 옮겨진 모든 경로가
+`git check-ignore`에 걸리는지 확인한다.
+
+### 카오스 테스트
+
+`--all` 도중 3번째 단위에서 `mv`를 실패시키고 (a) 거짓 성공 출력이 없는지 (b) 어디까지
+됐는지 요약이 남는지 (c) 종료코드가 20인지 확인.
+
+### Flakiness 위험
+
+`BACKUP_TIMESTAMP`가 초 단위라 같은 초 재실행 시 충돌 경로를 탄다. 테스트는
+`BACKUP_TIMESTAMP`를 고정 주입해 결정적으로 만든다 (`bootstrap-rerun-test.sh:16`이 이미
+쓰는 패턴). 네트워크 의존은 git stub으로 제거한다 (`bootstrap-matrix-test.sh:10-15` 패턴).
+
+### 테스트 피라미드
+
+통합 위주가 맞다. 단위 함수를 bash에서 격리 테스트하는 비용이 통합 테스트보다 높고,
+검증 대상이 "파일시스템에 무슨 일이 일어났나"라서 통합이 자연스럽다. E2E 5건은
+`--all` 시나리오이며 격리 tmux처럼 격리 `HOME`으로 충분하다.
+
+### LLM/프롬프트 변경
+
+없음. 이 플랜은 프롬프트나 eval 스위트를 건드리지 않는다.
+
+**Findings: 24 GAP (5 CRITICAL). 저장소 기준 현재 커버리지 0%.**
+
+## Section 4: Performance Review
+
+관련 축이 거의 없다. DB, 쿼리, 커넥션 풀, 캐시가 존재하지 않는다.
+
+- **N+1 / 인덱스 / 캐시:** 해당 없음.
+- **메모리:** 최대 자료구조가 단위 이름 배열 6개다. 해당 없음.
+- **느린 경로:** `clone_if_missing` 5회의 네트워크 왕복이 실행 시간을 지배한다. 이미 존재하면
+  즉시 return하므로 재실행 비용은 0에 수렴한다. approach B가 이걸 바꾸지 않는다.
+- **`--check` 지연:** 파일시스템 stat 10여 회. 체감 즉시.
+- **단위 분리 오버헤드:** source 방식이므로 subshell fork가 없다. 측정 가능한 수준이 아니다.
+- **한 가지 주의:** A3에서 "한 번에 한 단위만 source"를 택하면 `--all`은 6회 source한다.
+  파일 6개 읽기이므로 무시 가능하다.
+
+**No issues.**
+
+## Required Outputs (Eng)
+
+### NOT in scope
+
+| 항목 | 사유 |
+|---|---|
+| 플러그인 자동 업데이트 | 재현성 측면에서 현 동작(최초 clone 고정)이 의도일 수 있음. 별도 결정 필요 |
+| `~/.oh-my-zsh` 본체 설치 | bootstrap이 `custom/` 하위만 만들고 본체는 설치 안 함. 같은 성격의 별도 판단 |
+| `bootstrap.sh` → `bootstrap` 개명 | 테스트 4곳 + 문서 4곳 수정 비용만 있고 이득 없음 (F-12) |
+| E3 단위 의존 선언 | 유일 근거가 실측으로 반증됨 (F-8) |
+| S-01 공개 저장소 노출 | 사용자가 이 작업 후 별도 처리로 결정 |
+| S-02 미커밋 agent 권한 확장 | 동일 |
+| CI 구축 | `--check`의 소비자가 될 수 있으나 이 플랜 범위 밖 |
+
+### What already exists
+
+| 하위 문제 | 기존 코드 | 플랜이 재사용? |
+|---|---|---|
+| 멱등 링크 | `bootstrap.sh:128-140` | 예 — `lib.sh`로 이관, 로직 변경 없음 |
+| 올바른 백업 경로 | `link-claude-home:63-74` | **예 — 이쪽을 승격.** bootstrap.sh 버전은 폐기 |
+| codex 링크 | `ai/.codex/init-home-codex` | 예 — `40-codex.sh`가 호출만 |
+| 상태 확인 골격 | `--dry-run` (delta만 출력) | 예 — `--check`가 종료코드만 추가 |
+| HOME 격리 하네스 | `bootstrap-matrix-test.sh:8-15` | 예 — 신규 테스트가 차용 |
+| 결정적 타임스탬프 | `bootstrap-rerun-test.sh:16` | 예 — 동일 패턴 |
+| git stub | `bootstrap-matrix-test.sh:10-15` | 예 — 네트워크 제거 |
+| 테스트 러너 | `post-refactor-smoke-test.sh` | 예 — 한 줄 추가 |
+
+### Failure Modes Registry
+
+```
+  CODEPATH                    | FAILURE MODE           | RESCUED? | TEST? | USER SEES?      | LOGGED?
+  ----------------------------|------------------------|----------|-------|-----------------|--------
+  backup_with_timestamp       | mv 실패                | N        | N     | 거짓 "backup:"  | N   ← CRITICAL GAP
+  clone_if_missing            | 중단된 clone           | N        | N     | 아무것도        | N   ← CRITICAL GAP
+  link-claude-home rsync      | 민감파일이 트리로 복사 | N        | N     | 아무것도        | N   ← CRITICAL GAP
+  40-codex / init-home-codex  | DOTFILES_DIR 불일치    | N        | N     | 아무것도        | N   ← CRITICAL GAP
+  테스트 하네스               | HOME 격리 실패         | N        | N     | 홈 파괴         | N   ← CRITICAL GAP
+  backup_path_for             | $HOME 오염             | N        | N     | 완료문구가 거짓 | N   ← CRITICAL GAP
+  --all                       | 단위 3 실패 후 4~6 중단| Y(exit20)| N     | exit 20         | N
+  link_path                   | ln 실패                | Y(exit20)| N     | ln stderr       | Y
+  clone_if_missing            | git clone 실패         | Y(exit20)| N     | error 라인      | Y
+  unit_check                  | drift/오류 코드 혼동   | N        | N     | 잘못된 판정     | N
+  단위 단독 실행              | lib.sh 미로드          | N        | N     | 함수 없음 오류  | N
+  --check                     | 문자열만 비교, 대상 부재 미감지 | N | N | "동기화됨" 거짓 | N
+  ----------------------------|------------------------|----------|-------|-----------------|--------
+  총 12건, CRITICAL GAP 6건
+```
+
+**CRITICAL GAP 정의:** RESCUED=N AND TEST=N AND (USER SEES=Silent OR 거짓). 6건 모두 해당.
+
+### Diagrams produced
+
+1. 의존 그래프 (현재 → approach A) — CEO Section 1
+2. 의존 그래프 (approach B) — Eng Section 1
+3. Dream state (CURRENT → PLAN → 12-MONTH) — CEO 0C
+4. 부분 상태 전이 — CEO Section 4
+5. 테스트 커버리지 다이어그램 — Eng Section 3
+
+### Stale Diagram Audit
+
+이 플랜이 건드리는 파일에 기존 ASCII 다이어그램 없음. `docs/design-codex-tmux-unread.md:99-107`의
+상태 전이 다이어그램은 `@ai_unread`로 갱신 완료(커밋 `aa4b8ff`). 이 플랜의 영향 없음.
+
+### Implementation Tasks
+
+- [ ] **T1 (P1, human: ~1h / CC: ~10min) — tests** — `bootstrap-idempotency-test.sh`에 HOME 격리 assert를 첫 실행문으로 넣는다
+  - Surfaced by: Eng Section 3 CRITICAL 1 — 신규 테스트가 실제 mutation을 하므로 격리 실패 시 개발자 홈이 파괴된다
+  - Files: `scripts/tests/bootstrap-idempotency-test.sh`
+  - Verify: `HOME=$HOME bash scripts/tests/bootstrap-idempotency-test.sh` 가 즉시 중단되는지
+- [ ] **T2 (P1, human: ~3h / CC: ~25min) — tests** — `~/.claude` 마이그레이션이 저장소로 민감파일을 흘리지 않는지 검증
+  - Surfaced by: Eng Section 3 CRITICAL 2 — `link-claude-home:92` rsync가 `--yes`로 실행되며 테스트 0건. 저장소는 public
+  - Files: `scripts/tests/bootstrap-idempotency-test.sh`, `scripts/link-claude-home`
+  - Verify: 가짜 `~/.claude` 마이그레이션 후 `git status --porcelain ai/.claude` 가 비어 있음
+- [ ] **T3 (P1, human: ~30min / CC: ~5min) — lib** — `backup_with_timestamp`가 실패한 백업에 성공 메시지를 내지 않도록 수정
+  - Surfaced by: Eng A1/Section 2 GAP-1 — 마지막 명령이 `printf`라 항상 0 반환. 실측 재현됨. REGRESSION
+  - Files: `scripts/bootstrap.d/lib.sh`
+  - Verify: `mv` 스텁 실패 시 `backup:` 라인 없음 + 종료코드 비0
+- [ ] **T4 (P1, human: ~30min / CC: ~5min) — lib** — `backup_path_for`를 `link-claude-home` 구현으로 승격
+  - Surfaced by: Eng Q1 — 두 벌이 이미 갈라짐. bootstrap.sh 쪽이 `$HOME`에 씀. 구조검토 S-04. REGRESSION
+  - Files: `scripts/bootstrap.d/lib.sh`, `scripts/link-claude-home`
+  - Verify: 실행 후 `$HOME`에 `*.bak.*` 0개
+- [ ] **T5 (P1, human: ~1h / CC: ~10min) — orchestrator** — 종료코드 규약 확정 및 문서화
+  - Surfaced by: Eng A2 — `unit_check`가 drift와 오류를 구분하지 않으면 `--check`가 무의미
+  - Files: `scripts/bootstrap.sh`, `scripts/bootstrap.d/lib.sh`, `docs/reference-bootstrap-cli.md`
+  - Verify: 동기화 0 / drift 1 / preflight 10 / apply 20 각각 재현
+- [ ] **T6 (P1, human: ~2h / CC: ~15min) — units** — 단위가 단독 실행과 오케스트레이션을 모두 만족하도록 source 규약 확정
+  - Surfaced by: Eng A3 — 단독 실행 시 `lib.sh` 미로드. 오케스트레이터는 한 번에 한 단위만 source해야 함
+  - Files: `scripts/bootstrap.d/*.sh`, `scripts/bootstrap.sh`
+  - Verify: `bash scripts/bootstrap.d/40-codex.sh --check` 단독 동작
+- [ ] **T7 (P1, human: ~30min / CC: ~5min) — orchestrator** — `--all`에서 secrets 단위 제외를 명시
+  - Surfaced by: Eng A5 / C7 — 포함 시 한 명령이 무동의로 iCloud 키를 읽는다
+  - Files: `scripts/bootstrap.sh`, `docs/reference-bootstrap-cli.md`
+  - Verify: `--all` 실행 후 `~/.hermes/.launchd.env` 미생성
+- [ ] **T8 (P2, human: ~30min / CC: ~5min) — lib** — `clone_if_missing`에 repo 유효성 검증 추가
+  - Surfaced by: Eng Section 3 CRITICAL 4 / G5 — `.git` 존재만 확인. 중단된 clone 영구 방치. 실측 재현. REGRESSION
+  - Files: `scripts/bootstrap.d/lib.sh`
+  - Verify: `.git`만 있는 디렉터리로 재실행 시 재clone 발생
+- [ ] **T9 (P2, human: ~1h / CC: ~10min) — 40-codex** — `DOTFILES_DIR` sanity check 후 `init-home-codex` 호출
+  - Surfaced by: Eng A4 / C2 — `init-home-codex`가 자기 위치를 링크 대상으로 삼는다
+  - Files: `scripts/bootstrap.d/40-codex.sh`
+  - Verify: 잘못된 `DOTFILES_DIR`로 실행 시 링크하지 않고 exit 10
+- [ ] **T10 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--all` 중간 실패 시 단위별 상태 요약 출력
+  - Surfaced by: Eng Section 2 정책 / C8 — 조용히 멈추면 재실행 판단이 안 된다
+  - Files: `scripts/bootstrap.sh`
+  - Verify: 단위 3 강제 실패 시 1~2 성공 / 3 실패 / 4~6 건너뜀 요약 출력
+- [ ] **T11 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--check`가 심링크 문자열뿐 아니라 대상 실재까지 확인
+  - Surfaced by: Eng A4 / C9 — `link_path`는 문자열 비교만 하므로 "틀린 경로를 정확히 가리키는" 상태를 정상 판정
+  - Files: `scripts/bootstrap.d/lib.sh`
+  - Verify: 대상 파일을 지운 뒤 `--check`가 1 반환
+- [ ] **T12 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--list`가 관리 대상을 코드에서 단일 출처로 생성
+  - Surfaced by: Eng Q4 / C10 — `README.md:84-86`과 `bootstrap.sh:186-192`가 이중화, `~/.codex`에서 이미 분기
+  - Files: `scripts/bootstrap.sh`, `README.md`
+  - Verify: `--list` 출력과 README 목록 일치
+- [ ] **T13 (P2, human: ~4h / CC: ~30min) — scripts** — A그룹 헬퍼 2개를 `scripts/`로 이동
+  - Surfaced by: CEO 0A P3 / 소유권 분류 — 배포 표면 정리. B/C 그룹은 이동하지 않음
+  - Files: `ai/.claude/scripts/link-claude-home` → `scripts/`, `ai/.hermes/scripts/sync-secrets` → `scripts/`
+  - Verify: `post-refactor-smoke-test.sh` 통과 + `claude-backup-contract-test.sh` 통과
+- [ ] **T14 (P3, human: ~1h / CC: ~10min) — docs** — 결정 3건을 `docs/decisions.md`에 기록
+  - Surfaced by: C5, C12, Eng A6 — G2가 문서화된 결정의 반전이라는 점 / bash 유지 근거(chezmoi 심링크 비호환) / E4 롤백 절차
+  - Files: `docs/decisions.md`, `docs/reference-bootstrap-cli.md`
+  - Verify: 세 항목이 문서에 존재
+
+---
+
+# DX REVIEW (Phase 3.5)
+
+Mode: DX POLISH. 제품 유형: CLI (개발자용 설치 도구). 페르소나: 저장소 소유자 본인 —
+(a) 새 기기를 세팅하는 오늘의 나, (b) 6개월 뒤 "이거 반영됐나?"를 묻는 나.
+
+## 0A. Developer Persona
+
+이 CLI의 사용자는 한 명이고 1년에 한두 번 쓴다. 그래서 일반 CLI와 우선순위가 다르다.
+
+- **기억이 남지 않는다.** 1년 만에 쓰는 도구는 "매번 처음 쓰는 도구"다. `--help`와
+  에러 메시지가 유일한 기억 보조 장치다.
+- **실패 비용이 비대칭이다.** 잘못 돌리면 홈 디렉터리 설정이 백업으로 밀려난다.
+  그래서 "무슨 일이 일어날 것인가"를 미리 보여주는 능력(`--dry-run`, `--check`)이
+  일반 CLI보다 훨씬 값을 한다.
+- **문서를 읽으러 가지 않는다.** 자기 저장소이므로 문서보다 `--help`와 소스를 먼저 본다.
+
+## 0F. Developer Journey Trace + TTHW
+
+`docs/tutorial-first-setup.md` 기준 실측:
+
+```
+  단계                          명령 수   누적    마찰
+  ─────────────────────────────  ──────   ────   ────────────────────────────
+  Step 1 저장소 + 도구 설치         2       2    brew 설치 대기
+  Step 2 bootstrap 실행             3       5    ★ 3회 호출 (--shell-only, --ai, --ai --sync-secrets)
+  Step 3 결과 확인                  1       6    수동 ls 로 눈 검사
+  Step 4 tmux 준비                  2       8
+  Step 5 Codex profile              5      13    ★ init-home-codex 수동 + cp + chmod + 검증
+  ─────────────────────────────  ──────   ────
+  합계                             13      13    수동 게이트 5개
+```
+
+**TTHW 현재: 10~20분 (네트워크 clone 포함) → Red Flag tier (>10분, 50~70% 이탈).**
+사용자가 1명이라 "이탈"이 아니라 "누락"으로 나타난다. 실제로 이미 누락이 발생했다:
+`~/.codex` 링크가 튜토리얼 Step 5에 있는데 bootstrap은 만들지 않는다.
+
+**플랜 적용 후 목표: 3~5분, 명령 3개.**
+```
+  git clone ... ~/dotfiles
+  bash ~/dotfiles/scripts/bootstrap.sh --all
+  bash ~/dotfiles/scripts/bootstrap.sh --check    # 눈 검사 대체
+```
+`--all`이 Step 2의 3회 호출과 Step 5의 `init-home-codex`를 흡수하고, `--check`가 Step 3의
+수동 `ls`를 대체한다. Codex `local.config.toml`은 secrets 성격이라 수동으로 남는다(A5/C7 결정과 일관).
+**Competitive tier (2~5분) 진입.**
+
+## 0G. First-Time Developer Roleplay
+
+> 새 맥북. 저장소를 clone했다. `bootstrap.sh --help`를 친다.
+> "no args = same as --shell-only"라고 한다. 그럼 `--all`은 뭐지? 아직 없다.
+> `--shell-only`를 돌린다. 끝났다. "bootstrap completed."
+> …근데 Claude는? `--ai`를 또 돌려야 한다는 걸 나는 튜토리얼을 열어봐서 알았다.
+> `--help`만 봤으면 절반만 깔고 끝냈을 것이다.
+> `--ai`를 돌린다. 마지막 줄에 "Codex local profile guidance: create ... explicitly;
+> no automatic copy or link was performed." 뭘 하라는 거지? `local.config.toml`을 만들라는 건
+> 알겠는데, `~/.codex` 자체가 없다는 얘기는 어디에도 없다.
+
+이 롤플레이가 현재 DX의 핵심 실패를 정확히 보여준다: **`--help`가 전체 설치 경로를 알려주지
+않고, 안내문이 진짜 누락(`~/.codex` 링크)을 말하지 않는다.**
+
+## Pass 1: Getting Started — 4/10 → 목표 8/10
+
+- 3회 호출이 필요한데 `--help`는 그 사실을 말하지 않는다. `no args = --shell-only`라
+  **가장 자연스러운 호출이 가장 적게 한다.**
+- `--all` 도입 후 `no args`의 의미가 결정되지 않았다. → Pass 2 DX1.
+- 10점의 모습: `git clone && bootstrap --all` 두 줄로 끝. `--check`가 결과를 스스로 보고.
+
+## Pass 2: CLI Ergonomics — 5/10 → 목표 8/10
+
+### DX1 (P1) — `--all` 도입 후 `no args`의 의미가 미결정이고, 어느 쪽이든 함정이 있다
+
+현재 `bootstrap.sh:19` `no args → same as --shell-only`.
+
+| 선택 | 문제 |
+|---|---|
+| `no args` = `--shell-only` 유지 | "한 명령으로 전체" 목표와 정면 충돌. 가장 자연스러운 호출이 절반만 깐다 |
+| `no args` = `--all` 로 변경 | 튜토리얼·README·근육기억에 대한 파괴적 변경. 무심코 치면 AI 설정까지 링크 |
+| `no args` = `--help` 출력 | 파괴적이지만 안전. 사용자가 명시적으로 고르게 강제 |
+
+**권고: `no args` = `--help` + `--check` 요약.** 1년 만에 쓰는 도구에서 인자 없는 호출은
+"뭘 할 수 있지"를 묻는 것이다. 현재 상태 요약까지 붙이면 그 질문에 즉답이 된다.
+파괴적 변경이지만 사용자가 1명이고 튜토리얼 한 줄 수정으로 끝난다.
+
+### DX2 (P2) — 기존 플래그와 신규 표면의 관계가 문서화되어야 한다
+
+`--shell-only` / `--ai` / `--sync-secrets`를 단위 조합 alias로 유지한다는 게 플랜의 결정이다.
+`--help`에 "deprecated alias, use `bootstrap shell terminal` instead" 식으로 대응 관계를
+명시해야 근육기억이 부드럽게 이동한다.
+
+### DX3 (P2) — 단위 이름이 추측 가능해야 한다
+
+`10-shell.sh` 파일명과 사용자가 치는 `bootstrap shell`이 다르다. `--list`가 이 매핑을
+출력하고, 오타 시 "unknown unit 'shel'. Did you mean 'shell'? Run --list." 를 낸다.
+
+## Pass 3: Error Messages — 3/10 → 목표 8/10
+
+현재 에러 25건 전수 조사. **problem + cause + fix 3요소를 갖춘 것은 0건이다.**
+
+| 현재 | 문제 | 권고 |
+|---|---|---|
+| `invalid arguments` (4곳) | 어느 인자가 왜 틀렸는지 없음. 실제로는 "같은 플래그 중복" 케이스 | `bootstrap: --dry-run specified twice` |
+| `invalid combination: --ai cannot be combined with --shell-only` | 좋음. cause 있음. fix 없음 | `... Run them separately, or use --all.` |
+| `missing prerequisite: git` | problem만 | `bootstrap: git not found. Install with: brew install git` |
+| `file-link failure: powerlevel10k` | **이름이 거짓말.** clone 실패인데 link라고 함. cause·fix 없음 | `bootstrap: failed to clone powerlevel10k into ~/.oh-my-zsh/custom/themes. Check network, then re-run — existing units are skipped.` |
+| `sync failure` | 최악. 3요소 전부 없음 | `bootstrap: Hermes secret sync failed. Check that key files exist under $DOTFILES_KEY_DIR. See docs/explanation-secret-handling.md` |
+| `missing sync-secrets` | 무엇이 없는지 경로가 없음 | 경로를 포함 |
+
+**추가 (신규 표면):** `--check`가 drift를 보고할 때 "무엇이 어긋났는지 + 고치는 명령"을
+같이 내야 한다. `~/.zshrc: not linked → run: bootstrap shell`
+
+## Pass 4: Documentation — 5/10 → 목표 8/10
+
+이 변경으로 stale해지는 문서 6개: `docs/reference-bootstrap-cli.md`(CLI 표 전체),
+`docs/tutorial-first-setup.md`(Step 2·3·5), `README.md:70-91`, `docs/index.md`,
+`docs/project-structure.md:36`, `docs/howto-add-configuration.md:237`.
+
+**"이 저장소가 뭘 관리하고 지금 반영돼 있나"에 답하는 단일 장소가 없다.** 현재는
+`README.md:84-86`과 `bootstrap.sh:186-192`에 목록이 이중화되어 있고 이미 갈라졌다(`~/.codex`).
+`--list`가 코드 단일 출처가 되고 문서가 그 출력을 인용하면 이 분기가 구조적으로 사라진다.
+
+## Pass 5: Upgrade Path — 6/10 → 목표 8/10
+
+근육기억 이동 대상 3개: `--shell-only`, `--ai`, `~/dotfiles/ai/.codex/init-home-codex`.
+alias 유지로 앞 둘은 무해하다. 세 번째는 `--all`이 흡수하지만 수동 실행 경로도 살아 있어야
+한다(그 파일은 harness root에 남기기로 결정). **마이그레이션 노트 한 단락**이
+`docs/reference-bootstrap-cli.md`에 필요하다.
+
+## Pass 6: Escape Hatches — 8/10
+
+전부 수동으로 가능하다. `ln -s` 직접, `init-home-codex` 직접, `--dry-run`으로 미리보기.
+단위 분리는 오히려 탈출구를 늘린다(`bootstrap claude`만 돌리기). 감점 요인은 `--all`이
+secrets를 제외한다는 사실이 명시되지 않으면 "왜 안 됐지"를 유발한다는 점뿐이다(C7이 해결).
+
+## Pass 7: Observability of State — 2/10 → 목표 9/10
+
+현재 상태 조회 수단이 **없다.** 수동 `ls -ld`가 전부이고 튜토리얼 Step 3이 그걸 시킨다.
+`--check`가 이 차원을 단독으로 2→9로 올린다. 이 리뷰 전체에서 가장 큰 DX 이득이다.
+
+## Pass 8: First-Run Confidence — 4/10 → 목표 8/10
+
+완료 메시지가 `bootstrap completed. backups: <BACKUP_ROOT> timestamp: <TS>` 한 줄인데,
+**BACKUP_ROOT가 실제 백업 위치가 아니다**(G4). 첫 실행 후 "제대로 된 건가"를 확인할 방법이
+눈 검사뿐이다. `--all` 종료 시 단위별 상태 요약(C8) + `--check` 자동 실행이 이 차원을 올린다.
+
+## DX SCORECARD
+
+```
+  ┌──────────────────────────────┬─────────┬────────┬──────────────────────────┐
+  │ Dimension                    │ Current │ Target │ Driver                   │
+  ├──────────────────────────────┼─────────┼────────┼──────────────────────────┤
+  │ 1. Getting started           │  4/10   │  8/10  │ --all                    │
+  │ 2. CLI naming/ergonomics     │  5/10   │  8/10  │ DX1 no-args 결정 + --list│
+  │ 3. Error messages            │  3/10   │  8/10  │ 25건 전수 재작성         │
+  │ 4. Docs findability          │  5/10   │  8/10  │ --list 단일 출처         │
+  │ 5. Upgrade path              │  6/10   │  8/10  │ alias 유지 + 마이그레이션 노트│
+  │ 6. Escape hatches            │  8/10   │  8/10  │ 이미 양호                │
+  │ 7. Observability of state    │  2/10   │  9/10  │ --check ★최대 이득       │
+  │ 8. First-run confidence      │  4/10   │  8/10  │ 상태 요약 + G4 수정      │
+  ├──────────────────────────────┼─────────┼────────┼──────────────────────────┤
+  │ OVERALL                      │ 4.6/10  │ 8.1/10 │                          │
+  └──────────────────────────────┴─────────┴────────┴──────────────────────────┘
+
+  TTHW: 10~20분 (Red Flag) → 3~5분 (Competitive)
+  명령 수: 13 → 3
+```
+
+## DX Implementation Checklist
+
+- [ ] `no args` 동작 결정 및 `--help` 갱신 (DX1)
+- [ ] `--help`에 기존 플래그 ↔ 단위 대응 표 추가 (DX2)
+- [ ] `--list` + 오타 시 근접 제안 (DX3)
+- [ ] 에러 메시지 25건을 problem + cause + fix로 재작성 (Pass 3)
+- [ ] `--check` drift 출력에 고치는 명령 포함 (Pass 3)
+- [ ] 문서 6개 갱신 (Pass 4)
+- [ ] 마이그레이션 노트 한 단락 (Pass 5)
+- [ ] `--all` 완료 시 단위별 상태 요약 (Pass 8, C8과 동일)
