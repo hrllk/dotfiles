@@ -2,7 +2,6 @@
   "hooks": {
     "Stop": [
       {
-        "_gstack_source": "gstack-timeline-stop",
         "hooks": [
           {
             "type": "command",
