@@ -1,56 +1,46 @@
+# Ignore Codex runtime state by default. Only the entries below are tracked.
+#
+# The upstream harness-for-codex template assets (LICENSE, CHANGELOG, docs/,
+# tasks/, .github/, .devcontainer/, harness.yml, justfile, scripts/*) are
+# deliberately NOT tracked. They are a project scaffold; nothing executes them
+# from a tool home directory. Clone the harness into a project when you need it.
 *
+
 !.gitignore
+!AGENTS.md
+!CLAUDE.md
 !config.toml
 !local.config.toml.example
 !codex-profile-check
+!init-home-codex
+!hooks.json
 
-node_modules/
-dist/
-build/
-coverage/
-.coverage
-.pytest_cache/
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-.env
-.env.*
-!.env.example
-CLAUDE.local.md
-target/
-tmp/
-*.log
+!hooks/
+!hooks/**/
+!hooks/**/*.mjs
+!hooks/**/*.js
+!hooks/**/*.sh
+!hooks/**/*.py
 
-# Codex runtime state and machine-local data
-auth.json
-oauth*.json
-installation_id
-history.jsonl
-models_cache.json
-version.json
-*.sqlite
-*.sqlite-journal
-*.sqlite-wal
-*.sqlite-shm
-logs_*.sqlite*
-goals_*.sqlite*
-memories_*.sqlite*
-state_*.sqlite*
-cache/
-.tmp/
-sessions/
-shell_snapshots/
-skills/.system
+!skills/
+!skills/**/
+!skills/**/.gitignore
+!skills/**/*.md
+!skills/**/*.json
+!skills/**/*.yaml
+!skills/**/*.yml
+!skills/**/*.sh
+!skills/**/*.mjs
+!skills/**/*.js
+!skills/**/*.py
+
+# Externally installed skills stay untracked; their upstream tool owns them.
+skills/.system/
 skills/gstack
 skills/gstack-*
-rules/
-logs/
-crash_reports/
-.personality_migration
-.sandbox_migration
-thread-writer-locks/
-*.bak
-*.merge-backup-*
-AGENTS.md.bak
-CLAUDE.md.bak
+
+# Never commit credentials or machine-local overrides.
+auth.json
+oauth*.json
+local.config.toml
+.credentials.json
