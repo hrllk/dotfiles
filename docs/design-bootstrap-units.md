@@ -1079,62 +1079,118 @@ QUALITY: ★★★:1 ★★:1 ★:0  |  GAPS: 24 (5 E2E, 0 eval, 5 CRITICAL)
 
 ### Implementation Tasks
 
-- [ ] **T1 (P1, human: ~1h / CC: ~10min) — tests** — `bootstrap-idempotency-test.sh`에 HOME 격리 assert를 첫 실행문으로 넣는다
-  - Surfaced by: Eng Section 3 CRITICAL 1 — 신규 테스트가 실제 mutation을 하므로 격리 실패 시 개발자 홈이 파괴된다
+> **Reconciled 2026-09-01.** 이 목록은 원래 T1~T14였고 Phase 3 이전에 작성되었습니다.
+> 아래 `Decision Audit Trail (최종)`의 행 10 / 11 / 14 / 17이 그 목록을 바꿨는데 목록에는
+> 반영되지 않아, 문서가 자기 결정과 모순된 상태였습니다. 가장 큰 것은 구 T13이었습니다.
+> 헬퍼 2개를 `scripts/`로 옮기라고 지시했지만 행 10이 `sync-secrets`를 class B로 정정해
+> 이동을 취소했습니다. 구 목록대로 실행하면 틀린 일을 합니다. 아래는 eng review가 확정한
+> 24개 목록이며 구 번호와의 대응을 각 항목에 적었습니다. `--all`에서 secrets를 제외하는
+> 구 T7은 독립 항목이 아니라 `확정 규약`의 `--all` 정의로 흡수되었습니다.
+
+**Phase 1 — 테스트 (리팩터 안전망, D5에 따라 먼저)**
+
+- [ ] **T1 (P1, human: ~1h / CC: ~10min) — tests** — 격리 assert 3변수(HOME/BACKUP_ROOT/DOTFILES_DIR) + trap은 assert 이후
+  - Surfaced by: Eng T-1 — HOME만으론 불충분. 백업은 BACKUP_ROOT로, rsync는 DOTFILES_DIR로 탈출. 구 T1을 audit trail 행 14가 3변수로 확장
   - Files: `scripts/tests/bootstrap-idempotency-test.sh`
-  - Verify: `HOME=$HOME bash scripts/tests/bootstrap-idempotency-test.sh` 가 즉시 중단되는지
-- [ ] **T2 (P1, human: ~3h / CC: ~25min) — tests** — `~/.claude` 마이그레이션이 저장소로 민감파일을 흘리지 않는지 검증
-  - Surfaced by: Eng Section 3 CRITICAL 2 — `link-claude-home:92` rsync가 `--yes`로 실행되며 테스트 0건. 저장소는 public
-  - Files: `scripts/tests/bootstrap-idempotency-test.sh`, `scripts/link-claude-home`
+  - Verify: 세 변수 각각을 실제 홈 경로로 두고 실행 시 즉시 중단
+- [ ] **T2 (P1, human: ~3h / CC: ~25min) — tests** — rsync 마이그레이션이 저장소로 추적가능 파일을 흘리지 않는지 검증
+  - Surfaced by: Eng S-1 — agents/commands/skills/hooks/plugins는 allowlist가 안 막음(실측). 구 T2
+  - Files: `scripts/tests/bootstrap-idempotency-test.sh`
   - Verify: 가짜 `~/.claude` 마이그레이션 후 `git status --porcelain ai/.claude` 가 비어 있음
-- [ ] **T3 (P1, human: ~30min / CC: ~5min) — lib** — `backup_with_timestamp`가 실패한 백업에 성공 메시지를 내지 않도록 수정
-  - Surfaced by: Eng A1/Section 2 GAP-1 — 마지막 명령이 `printf`라 항상 0 반환. 실측 재현됨. REGRESSION
-  - Files: `scripts/bootstrap.d/lib.sh`
+- [ ] **T3 (P1, human: ~30min / CC: ~5min) — tests** — claude-backup-contract-test가 실제 저장소를 가리키는 것 수정
+  - Surfaced by: Eng T-1 — `:13` DOTFILES_DIR=REPO_ROOT + `:15` `--yes`. 픽스처가 비어서 무해할 뿐. 구 목록에 없던 신규
+  - Files: `scripts/tests/claude-backup-contract-test.sh`
+  - Verify: 테스트가 임시 DOTFILES_DIR을 쓰고, 저장소 트리를 건드리지 않음
+- [ ] **T4 (P1, human: ~2h / CC: ~20min) — tests** — 14개 assertion 작성 (디렉터리 백업/백업 위치 단일성/`--check` 비변경 포함)
+  - Surfaced by: Eng T-2 — 원안 6개는 디렉터리 링크와 백업 위치를 비껴감. 구 목록에 없던 신규
+  - Files: `scripts/tests/bootstrap-idempotency-test.sh`, `scripts/tests/post-refactor-smoke-test.sh`
+  - Verify: 14개 전부 통과하고, `--check` 실행 전후 트리가 동일
+
+**Phase 2 — 구조와 CLI**
+
+- [ ] **T5 (P1, human: ~30min / CC: ~5min) — lib** — backup 실패 시 거짓 성공 메시지 제거 + 절대경로 출력
+  - Surfaced by: CEO GAP-1 / Eng E-5 / DX F-3.1 — 3개 phase 전부 발견. 마지막 명령이 `printf`라 항상 0 반환. 실측 재현. REGRESSION. 구 T3
+  - Files: `scripts/bootstrap.sh`
   - Verify: `mv` 스텁 실패 시 `backup:` 라인 없음 + 종료코드 비0
-- [ ] **T4 (P1, human: ~30min / CC: ~5min) — lib** — `backup_path_for`를 `link-claude-home` 구현으로 승격
-  - Surfaced by: Eng Q1 — 두 벌이 이미 갈라짐. bootstrap.sh 쪽이 `$HOME`에 씀. 구조검토 S-04. REGRESSION
-  - Files: `scripts/bootstrap.d/lib.sh`, `scripts/link-claude-home`
+- [ ] **T6 (P1, human: ~30min / CC: ~5min) — lib** — `backup_path_for`를 `link-claude-home` 구현으로 승격
+  - Surfaced by: Eng Q1 / S-04 — 구현이 셋, 둘만 통합됨. REGRESSION. 구 T4
+  - Files: `scripts/bootstrap.sh`
   - Verify: 실행 후 `$HOME`에 `*.bak.*` 0개
-- [ ] **T5 (P1, human: ~1h / CC: ~10min) — orchestrator** — 종료코드 규약 확정 및 문서화
-  - Surfaced by: Eng A2 — `unit_check`가 drift와 오류를 구분하지 않으면 `--check`가 무의미
-  - Files: `scripts/bootstrap.sh`, `scripts/bootstrap.d/lib.sh`, `docs/reference-bootstrap-cli.md`
-  - Verify: 동기화 0 / drift 1 / preflight 10 / apply 20 각각 재현
-- [ ] **T6 (P1, human: ~2h / CC: ~15min) — units** — 단위가 단독 실행과 오케스트레이션을 모두 만족하도록 source 규약 확정
-  - Surfaced by: Eng A3 — 단독 실행 시 `lib.sh` 미로드. 오케스트레이터는 한 번에 한 단위만 source해야 함
-  - Files: `scripts/bootstrap.d/*.sh`, `scripts/bootstrap.sh`
-  - Verify: `bash scripts/bootstrap.d/40-codex.sh --check` 단독 동작
-- [ ] **T7 (P1, human: ~30min / CC: ~5min) — orchestrator** — `--all`에서 secrets 단위 제외를 명시
-  - Surfaced by: Eng A5 / C7 — 포함 시 한 명령이 무동의로 iCloud 키를 읽는다
-  - Files: `scripts/bootstrap.sh`, `docs/reference-bootstrap-cli.md`
-  - Verify: `--all` 실행 후 `~/.hermes/.launchd.env` 미생성
-- [ ] **T8 (P2, human: ~30min / CC: ~5min) — lib** — `clone_if_missing`에 repo 유효성 검증 추가
-  - Surfaced by: Eng Section 3 CRITICAL 4 / G5 — `.git` 존재만 확인. 중단된 clone 영구 방치. 실측 재현. REGRESSION
-  - Files: `scripts/bootstrap.d/lib.sh`
+- [ ] **T7 (P2, human: ~30min / CC: ~5min) — lib** — `clone_if_missing`에 `rev-parse --verify HEAD` 검증
+  - Surfaced by: Eng — `.git` 존재만 확인. 중단된 clone 영구 방치. 실측 재현. REGRESSION. 구 T8
+  - Files: `scripts/bootstrap.sh`
   - Verify: `.git`만 있는 디렉터리로 재실행 시 재clone 발생
-- [ ] **T9 (P2, human: ~1h / CC: ~10min) — 40-codex** — `DOTFILES_DIR` sanity check 후 `init-home-codex` 호출
-  - Surfaced by: Eng A4 / C2 — `init-home-codex`가 자기 위치를 링크 대상으로 삼는다
+- [ ] **T8 (P1, human: ~2h / CC: ~15min) — lib** — `lib.sh` 추출 + bash 3.2 규약 주석 (`declare -A` 금지, `return 0` 강제, `local` 분리)
+  - Surfaced by: Eng H-1..H-4 — `declare -A`가 조용히 틀린 값(실측). `set -e`는 `||` 문맥에서 무력. 구 목록에 없던 신규
+  - Files: `scripts/bootstrap.d/lib.sh`
+  - Verify: `bash --version` 3.2 환경에서 전 단위 `--check` 통과
+- [ ] **T9 (P1, human: ~1h / CC: ~10min) — lib** — MODE+CHANGES 앰비언트 상태로 `unit_check`를 lib 래퍼화 (2함수 계약)
+  - Surfaced by: Eng A-2 / DX F-2.4 / 자동결정 D6 — 두 몸통은 반드시 갈라짐(`backup_path_for`로 증명). 구 목록에 없던 신규
+  - Files: `scripts/bootstrap.d/lib.sh`
+  - Verify: 단위가 `unit_preflight` + `unit_apply` 두 함수만 정의하고 `--check`가 동작
+- [ ] **T10 (P1, human: ~2h / CC: ~15min) — units** — 6단위를 `TARGETS` 배열 기반으로 작성 (단위당 10~25줄)
+  - Surfaced by: DX F-4.2 — 아니면 `howto-add-configuration.md:372`의 "한 줄 추가"가 두 함수 손동기화가 됨. 구 T6의 일부
+  - Files: `scripts/bootstrap.d/`
+  - Verify: 링크 대상 1개 추가가 `TARGETS` 한 줄 변경으로 끝남
+- [ ] **T11 (P1, human: ~1h / CC: ~10min) — orchestrator** — 종료코드 규약(drift=11, 1은 예약) + 문법 확정, `usage()`에 명시
+  - Surfaced by: Eng A-3 / DX F-3.8 / 자동결정 D9 — 1은 모든 사고성 실패의 반환값. 구 T5(값이 미정이었음)
+  - Files: `scripts/bootstrap.sh`, `docs/reference-bootstrap-cli.md`
+  - Verify: 동기화 0 / drift 11 / preflight 10 / apply 20 각각 재현
+- [ ] **T12 (P1, human: ~1h / CC: ~10min) — orchestrator** — 단위 단독 실행 + 오케스트레이션 source 규약 (`BASH_SOURCE` guard, unset 루프)
+  - Surfaced by: Eng A-1 / A-5 — 함수 네임스페이스가 하나라 `unit_apply`가 충돌. 구 T6
+  - Files: `scripts/bootstrap.d/`, `scripts/bootstrap.sh`
+  - Verify: `bash scripts/bootstrap.d/40-codex.sh --check` 단독 동작
+- [ ] **T13 (P1, human: ~1h / CC: ~10min) — orchestrator** — bare 호출을 읽기 전용(`--list` + `--check`)으로 변경
+  - Surfaced by: DX F-2.1 / 자동결정 D1 — `README.md:64` quickstart의 유일한 명령. blast radius 확대 차단. 구 목록에 없던 신규
+  - Files: `scripts/bootstrap.sh`, `README.md`
+  - Verify: 인자 없는 실행이 파일을 만들지 않음
+- [ ] **T14 (P1, human: ~2h / CC: ~15min) — 30-claude** — 마이그레이션을 `--migrate`로 분리 + `rsync --exclude` + 병합 후 `git status` 강제검사
+  - Surfaced by: Eng S-1 / Gate D8 — 영구 public 트리로 새 내용을 가져오는 유일 경로. 구 목록에 없던 신규
+  - Files: `scripts/bootstrap.d/30-claude.sh`, `scripts/link-claude-home`
+  - Verify: `--all`이 마이그레이션을 실행하지 않고, `--migrate` 후 `git status`가 비어 있음
+- [ ] **T15 (P1, human: ~1h / CC: ~10min) — 40-codex** — `init-home-codex` 호출 대신 `link_path` 재구현 + `DOTFILES_DIR` sanity check
+  - Surfaced by: Eng E-2 / Gate D7 — 플래그 파싱 0건, `--dry-run`이 실제 생성. 구 T9
   - Files: `scripts/bootstrap.d/40-codex.sh`
   - Verify: 잘못된 `DOTFILES_DIR`로 실행 시 링크하지 않고 exit 10
-- [ ] **T10 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--all` 중간 실패 시 단위별 상태 요약 출력
-  - Surfaced by: Eng Section 2 정책 / C8 — 조용히 멈추면 재실행 판단이 안 된다
+- [ ] **T16 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--all` 실패 시 단위별 상태 + resume 명령 + 백업 절대경로 출력
+  - Surfaced by: Eng E-5 / DX F-3.7 — 재실행 판단에 필요. 구 T10
   - Files: `scripts/bootstrap.sh`
   - Verify: 단위 3 강제 실패 시 1~2 성공 / 3 실패 / 4~6 건너뜀 요약 출력
-- [ ] **T11 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--check`가 심링크 문자열뿐 아니라 대상 실재까지 확인
-  - Surfaced by: Eng A4 / C9 — `link_path`는 문자열 비교만 하므로 "틀린 경로를 정확히 가리키는" 상태를 정상 판정
+- [ ] **T17 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--check`가 심링크 문자열이 아니라 대상 실재까지 확인
+  - Surfaced by: Eng A-6 / DX F-3.3 — `DOTFILES_DIR` 오타 시 전부 green 보고. 구 T11
   - Files: `scripts/bootstrap.d/lib.sh`
-  - Verify: 대상 파일을 지운 뒤 `--check`가 1 반환
-- [ ] **T12 (P2, human: ~1h / CC: ~10min) — orchestrator** — `--list`가 관리 대상을 코드에서 단일 출처로 생성
-  - Surfaced by: Eng Q4 / C10 — `README.md:84-86`과 `bootstrap.sh:186-192`가 이중화, `~/.codex`에서 이미 분기
+  - Verify: 대상 파일을 지운 뒤 `--check`가 11 반환
+- [ ] **T18 (P2, human: ~2h / CC: ~15min) — orchestrator** — `--list`/`--check` 출력 형식 확정 (`UNITS` 배열 단일 출처, `IN --ALL` 컬럼)
+  - Surfaced by: DX F-4.4/F-4.5 / Eng H-5 — 목록 3곳 이중화, 이미 분기. 구 T12
   - Files: `scripts/bootstrap.sh`, `README.md`
   - Verify: `--list` 출력과 README 목록 일치
-- [ ] **T13 (P2, human: ~4h / CC: ~30min) — scripts** — A그룹 헬퍼 2개를 `scripts/`로 이동
-  - Surfaced by: CEO 0A P3 / 소유권 분류 — 배포 표면 정리. B/C 그룹은 이동하지 않음
-  - Files: `ai/.claude/scripts/link-claude-home` → `scripts/`, `ai/.hermes/scripts/sync-secrets` → `scripts/`
+- [ ] **T19 (P2, human: ~30min / CC: ~5min) — orchestrator** — `60-secrets` preflight가 `~/.hermes` 심링크 여부 확인 + 단위 순서 고정
+  - Surfaced by: Eng E-3 — 순서 역전 시 평문 봇 토큰이 백업 디렉터리에 영구 잔류. 구 목록에 없던 신규
+  - Files: `scripts/bootstrap.d/60-secrets.sh`, `scripts/bootstrap.sh`
+  - Verify: `~/.hermes`가 심링크가 아닐 때 secrets 단위가 exit 10
+- [ ] **T20 (P2, human: ~3h / CC: ~25min) — orchestrator** — 에러 메시지 20건을 problem + cause + fix로 재작성
+  - Surfaced by: DX Pass 3 — 3요소를 갖춘 것이 0건. `zsh/aliases/codex.zsh:12-14` 패턴 차용. 구 목록에 없던 신규
+  - Files: `scripts/bootstrap.sh`, `scripts/bootstrap.d/lib.sh`
+  - Verify: 20건 각각이 세 요소를 모두 포함
+
+**Phase 3 — 이동과 문서**
+
+- [ ] **T21 (P2, human: ~2h / CC: ~15min) — scripts** — `link-claude-home`만 `scripts/`로 이동 + `ai/.claude/.gitignore:28-29` 삭제
+  - Surfaced by: Eng S-2 / audit trail 행 10 — `sync-secrets`는 class B라 이동 **취소**. allowlist 구멍은 같이 닫음. 구 T13이 2개를 옮기라고 했던 것을 1개로 정정
+  - Files: `scripts/link-claude-home`, `ai/.claude/.gitignore`
   - Verify: `post-refactor-smoke-test.sh` 통과 + `claude-backup-contract-test.sh` 통과
-- [ ] **T14 (P3, human: ~1h / CC: ~10min) — docs** — 결정 3건을 `docs/decisions.md`에 기록
-  - Surfaced by: C5, C12, Eng A6 — G2가 문서화된 결정의 반전이라는 점 / bash 유지 근거(chezmoi 심링크 비호환) / E4 롤백 절차
-  - Files: `docs/decisions.md`, `docs/reference-bootstrap-cli.md`
+- [ ] **T22 (P2, human: ~3h / CC: ~25min) — docs** — 문서 9개 갱신 (원안 4개 + `howto-bootstrap`, `howto-add-configuration`, `reference-hermes-gateways`, `ai/.hermes/README`, `explanation-secret-handling`)
+  - Surfaced by: DX F-4.1 / audit trail 행 17 — 원안이 blast radius를 4개로 과소평가. 구 목록에 없던 신규
+  - Files: `docs/`
+  - Verify: 9개 파일이 새 CLI 표면을 반영
+- [ ] **T23 (P2, human: ~1h / CC: ~10min) — docs** — 마이그레이션 표 + `decisions.md` 3건 (G2 반전 / bash 유지 근거 / 롤백 절차)
+  - Surfaced by: DX F-5.3 / Gate D3 / C12 — 구 T14
+  - Files: `docs/reference-bootstrap-cli.md`, `docs/decisions.md`
   - Verify: 세 항목이 문서에 존재
+- [ ] **T24 (P3, human: ~30min / CC: ~5min) — docs** — 튜토리얼 전제조건에 oh-my-zsh와 codex 추가 + `local.config.toml` 꼬리 처리
+  - Surfaced by: DX F-1.1/F-1.2 — 튜토리얼만 oh-my-zsh를 빠뜨림. codex는 `local.config.toml` 없이 실행 거부. 구 목록에 없던 신규
+  - Files: `docs/tutorial-first-setup.md`, `scripts/bootstrap.d/40-codex.sh`
+  - Verify: 새 Mac 시나리오에서 튜토리얼만 따라가도 codex가 실행됨
 
 ---
 
@@ -1306,14 +1362,22 @@ secrets를 제외한다는 사실이 명시되지 않으면 "왜 안 됐지"를 
 
 ## DX Implementation Checklist
 
-- [ ] `no args` 동작 결정 및 `--help` 갱신 (DX1)
-- [ ] `--help`에 기존 플래그 ↔ 단위 대응 표 추가 (DX2)
-- [ ] `--list` + 오타 시 근접 제안 (DX3)
-- [ ] 에러 메시지 25건을 problem + cause + fix로 재작성 (Pass 3)
-- [ ] `--check` drift 출력에 고치는 명령 포함 (Pass 3)
-- [ ] 문서 6개 갱신 (Pass 4)
-- [ ] 마이그레이션 노트 한 단락 (Pass 5)
-- [ ] `--all` 완료 시 단위별 상태 요약 (Pass 8, C8과 동일)
+> **Superseded 2026-09-01.** DX pass가 자체 집계한 목록이라 숫자 두 개가 최종본과
+> 다릅니다. 에러 메시지는 25건이 아니라 20건(Eng 전수조사 결과), 문서는 6개가 아니라
+> 9개(audit trail 행 17)입니다. 실행 목록은
+> [Implementation Tasks](#implementation-tasks)의 T1~T24가 단일 출처입니다. 아래는
+> DX finding과 T번호의 대응이며 체크박스는 추적용이 아닙니다.
+
+| DX 항목 | 확정된 곳 |
+|---|---|
+| `no args` 동작 결정 및 `--help` 갱신 (DX1) | 자동결정 D1(읽기 전용)으로 확정 → **T13** |
+| `--help`에 기존 플래그 ↔ 단위 대응 표 추가 (DX2) | **T11**(usage 명시) + **T23**(마이그레이션 표) |
+| `--list` + 오타 시 근접 제안 (DX3) | **T18**. 근접 제안은 채택되지 않음 |
+| 에러 메시지 재작성 (Pass 3) | **T20**. 25건이 아니라 **20건** |
+| `--check` drift 출력에 고치는 명령 포함 (Pass 3) | **T20** |
+| 문서 갱신 (Pass 4) | **T22**. 6개가 아니라 **9개** |
+| 마이그레이션 노트 한 단락 (Pass 5) | **T23** |
+| `--all` 완료 시 단위별 상태 요약 (Pass 8, C8과 동일) | **T16** |
 
 ## Eng Step 0.5: Dual Voices
 
