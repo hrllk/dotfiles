@@ -35,5 +35,6 @@
   },
   "tui": "default",
   "theme": "dark",
-  "editorMode": "vim"
+  "editorMode": "vim",
+  "autoScrollEnabled": true
 }
