@@ -19,6 +19,18 @@
           }
         ]
       }
+    ],
+    "Notification": [
+      {
+        "matcher": "permission_prompt",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.tmux/scripts/ai-notify-hook.sh Claude waiting",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "tui": "default",
