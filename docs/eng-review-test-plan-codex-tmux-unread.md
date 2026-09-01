@@ -16,6 +16,11 @@ Repo: hrllk/dotfiles
 - Client focus-in clears the current window state.
 - Reloading configuration does not duplicate named hook entries.
 - Codex and Claude Code write the same `@ai_unread` flag, and either agent's read event clears the other's mark.
+- A `waiting` call on an inactive window sets `@ai_waiting` and leaves `@ai_unread` untouched.
+- A `waiting` call on the active window sets neither flag.
+- A `done` call clears `@ai_waiting`, because the turn ending means whatever blocked it was answered.
+- Selecting or focusing a window clears both flags, not just `@ai_unread`.
+- Reloading configuration does not duplicate hook slot `[98]` any more than `[99]`.
 
 ## Edge Cases
 
@@ -26,6 +31,8 @@ Repo: hrllk/dotfiles
 - The same window receives multiple completion callbacks.
 - The hook runs twice after configuration reload.
 - The hook is invoked without an agent label.
+- The hook is invoked without a state argument, which must behave as `done` so Codex keeps working.
+- The hook is invoked with an unrecognised state argument.
 - The hook exits non-zero. Claude Code reads exit code 2 on `Stop` as "keep going", so every path must return 0.
 
 ## Critical Paths
@@ -39,3 +46,11 @@ Repo: hrllk/dotfiles
 Implemented as `scripts/tests/tmux-unread-test.sh`, wired into
 `scripts/tests/post-refactor-smoke-test.sh` and, when the dotfiles checkout is
 present, into the Codex harness `ai/.codex/scripts/test`.
+
+## Coverage gap (2026-09-01)
+
+`scripts/tests/tmux-unread-test.sh` predates the `waiting` state. Its `fire()`
+helper passes a single argument, so none of the scenarios above that mention
+`@ai_waiting` currently execute. The suite passes without exercising them, which
+means a regression in the `waiting` branches ships green. Tracked as T5 in
+[design-codex-tmux-unread.md](design-codex-tmux-unread.md#implementation-tasks).
