@@ -54,8 +54,13 @@ config.adjust_window_size_when_changing_font_size = false
 config.background = {
   {
     source = {
-      File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
-      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-leyla21m-30744872.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-agnieszka-taggart-3157904-39281575.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-thales13-39007224.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-thales13-39069329.jpg",
+      --
+      -- File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-nejc-soklic-7862643-6521543.jpg",
+      File = home .. "/dotfiles/util/assets/wallpapers/pexels-arts-1214011.jpg",
 
     },
     hsb = {
