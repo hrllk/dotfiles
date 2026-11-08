@@ -154,7 +154,7 @@ config.background = {
     -- 0.85 reduces the wallpaper to texture rather than imagery, which is what
     -- lets the orange chrome read as the brightest thing on screen. Lower it
     -- back toward 0.30 to bring the photo forward again.
-    opacity = 0.85,
+    opacity = 0.55,
     -- opacity = 0,
     width = "100%",
     height = "100%",
