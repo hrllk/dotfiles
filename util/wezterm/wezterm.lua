@@ -2,18 +2,39 @@ local wezterm = require "wezterm"
 local home = os.getenv("HOME") or "/Users/hrk"
 
 local config = wezterm.config_builder()
-local kitty_active_border = "#2DD4BF"
-local kitty_inactive_border = "#3b4261"
+-- Sonokai "andromeda" palette, copied verbatim from the colorscheme nvim runs
+-- (sonokai/autoload/sonokai.vim). Keeping the literals identical is the point:
+-- editor, multiplexer and terminal chrome all read from the same six values, so
+-- the only colour that varies across a split is the code itself.
+local sonokai = {
+  black = "#181A1C",
+  fg = "#E1E3E4",
+  grey = "#7E8294",
+  grey_dim = "#5A5E7A",
+  bg3 = "#393E53",
+  red = "#FB617E",
+  orange = "#F89860",
+  yellow = "#EDC763",
+  green = "#9ED06C",
+  blue = "#6DCAE8",
+  purple = "#BB97EE",
+}
+
+-- Orange is the single chrome accent. The dim variant is a hand-darkened
+-- orange rather than a palette entry: sonokai's own bg_yellow (#4E432F) goes
+-- muddy once the 85% black background layer sits under it.
+local active_border = sonokai.orange
+local inactive_border = "#6B4226"
 
 local active_window_frame = {
   border_left_width = "0.25cell",
   border_right_width = "0.25cell",
   border_top_height = "0.125cell",
   border_bottom_height = "0.125cell",
-  border_left_color = kitty_active_border,
-  border_right_color = kitty_active_border,
-  border_top_color = kitty_active_border,
-  border_bottom_color = kitty_active_border,
+  border_left_color = active_border,
+  border_right_color = active_border,
+  border_top_color = active_border,
+  border_bottom_color = active_border,
 }
 
 local inactive_window_frame = {
@@ -21,10 +42,10 @@ local inactive_window_frame = {
   border_right_width = "0.25cell",
   border_top_height = "0.125cell",
   border_bottom_height = "0.125cell",
-  border_left_color = kitty_inactive_border,
-  border_right_color = kitty_inactive_border,
-  border_top_color = kitty_inactive_border,
-  border_bottom_color = kitty_inactive_border,
+  border_left_color = inactive_border,
+  border_right_color = inactive_border,
+  border_top_color = inactive_border,
+  border_bottom_color = inactive_border,
 }
 
 local function apply_window_frame(window)
@@ -48,7 +69,50 @@ config.font = wezterm.font_with_fallback({
   "Apple Color Emoji",
 })
 config.font_size = 12
-config.color_scheme = "Tokyo Night"
+-- Defined inline rather than picked from wezterm's bundled schemes so the ANSI
+-- table matches sonokai exactly. Note slot 6: sonokai maps cyan to orange, and
+-- following it keeps `ls`/`git` output in the same two-colour world as the
+-- chrome. Swap in sonokai.blue there to get a conventional cyan back.
+config.color_schemes = {
+  ["Sonokai Andromeda"] = {
+    foreground = sonokai.fg,
+    background = "#000000",
+    cursor_bg = sonokai.orange,
+    cursor_fg = "#000000",
+    cursor_border = sonokai.orange,
+    selection_bg = sonokai.bg3,
+    selection_fg = sonokai.fg,
+    ansi = {
+      sonokai.black,
+      sonokai.red,
+      sonokai.green,
+      sonokai.yellow,
+      sonokai.blue,
+      sonokai.purple,
+      sonokai.orange,
+      sonokai.fg,
+    },
+    brights = {
+      sonokai.grey,
+      sonokai.red,
+      sonokai.green,
+      sonokai.yellow,
+      sonokai.blue,
+      sonokai.purple,
+      sonokai.orange,
+      sonokai.fg,
+    },
+    tab_bar = {
+      background = "#000000",
+      active_tab = { bg_color = "#000000", fg_color = sonokai.orange, intensity = "Bold" },
+      inactive_tab = { bg_color = "#000000", fg_color = sonokai.grey },
+      inactive_tab_hover = { bg_color = "#000000", fg_color = sonokai.fg },
+      new_tab = { bg_color = "#000000", fg_color = sonokai.grey_dim },
+      new_tab_hover = { bg_color = "#000000", fg_color = sonokai.fg },
+    },
+  },
+}
+config.color_scheme = "Sonokai Andromeda"
 config.line_height = 0.9
 config.adjust_window_size_when_changing_font_size = false
 config.background = {
@@ -87,7 +151,10 @@ config.background = {
     source = {
       Color = "black",
     },
-    opacity = 0.30,
+    -- 0.85 reduces the wallpaper to texture rather than imagery, which is what
+    -- lets the orange chrome read as the brightest thing on screen. Lower it
+    -- back toward 0.30 to bring the photo forward again.
+    opacity = 0.85,
     -- opacity = 0,
     width = "100%",
     height = "100%",
