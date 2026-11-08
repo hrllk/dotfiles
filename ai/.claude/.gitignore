@@ -43,10 +43,16 @@
 !plugins/config.json
 
 # Externally installed skills stay untracked; their upstream tool owns them.
-skills/.system/
-skills/gstack
-skills/gstack-*
-skills/_gstack-command/
+# gstack installs its suite here as symlinks into /Users/hrk/gstack-open -- 101
+# of them at last count -- so tracking the tree would commit absolute paths that
+# resolve on no other machine, and break on this one the moment that checkout
+# moves. Everything currently under skills/ belongs to gstack.
+#
+# This ignores the directory, so git does not descend into it. To track a
+# hand-written skill later, re-allow the directory before the file:
+#   !skills/my-skill/
+#   !skills/my-skill/**
+skills/
 
 # Never commit credentials or machine-local overrides.
 .credentials.json

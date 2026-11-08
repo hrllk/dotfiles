@@ -9,7 +9,6 @@
 !.gitignore
 !AGENTS.md
 !CLAUDE.md
-!config.toml
 !local.config.toml.example
 !codex-profile-check
 !init-home-codex
@@ -33,11 +32,20 @@
 !skills/**/*.mjs
 !skills/**/*.js
 !skills/**/*.py
+!skills/**/*.html
 
 # Externally installed skills stay untracked; their upstream tool owns them.
 skills/.system/
 skills/gstack
 skills/gstack-*
+
+# config.toml is written by the ChatGPT desktop app, not by hand: it rewrites
+# MCP server registrations, the plugin marketplace, [desktop] preferences and a
+# pinned build number on every launch. Tracking it meant a dirty tree after each
+# run and a diff that said nothing about how this machine is set up on purpose.
+# A fresh machine gets Codex's own defaults; set model and approvals there by
+# hand, or keep them in local.config.toml.
+config.toml
 
 # Never commit credentials or machine-local overrides.
 auth.json
