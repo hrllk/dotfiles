@@ -9,8 +9,11 @@ set -u
 #
 # usage: ai-notify-hook.sh <AgentLabel> [done|waiting]
 #
-#   done     the turn ended            -> @ai_unread  (amber)
-#   waiting  the agent blocks on you    -> @ai_waiting (wine badge)
+#   done     the turn ended           -> @ai_unread  (window turns orange)
+#   waiting  the agent blocks on you   -> @ai_waiting (orange, and bold)
+#
+# Orange in the status line means this and only this; .tmux.conf holds the
+# full assignment and the reasoning behind it.
 #
 # "waiting" covers permission prompts and the AskUserQuestion dialog alike:
 # Claude Code routes every requiresUserInteraction tool through the same ask
