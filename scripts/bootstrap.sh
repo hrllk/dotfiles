@@ -6,6 +6,21 @@ ZSH_CUSTOM_DIR="${ZSH_CUSTOM_DIR:-$HOME/.oh-my-zsh/custom}"
 BACKUP_ROOT="${BACKUP_ROOT:-$HOME/.dotfiles-backup}"
 TMUX_TPM_DIR="$HOME/.local/share/tmux/plugins/tpm"
 
+# k9s picks its own config directory, and linking anywhere else silently does
+# nothing. Mirror its order exactly: K9S_CONFIG_DIR wins, then XDG_CONFIG_HOME,
+# then the per-OS default -- Application Support on macOS (where Go's
+# UserConfigDir points) and ~/.config elsewhere. Verified against the strings
+# in k9s 0.51.0, which reads all three.
+if [[ -n "${K9S_CONFIG_DIR:-}" ]]; then
+  K9S_DIR="$K9S_CONFIG_DIR"
+elif [[ -n "${XDG_CONFIG_HOME:-}" ]]; then
+  K9S_DIR="$XDG_CONFIG_HOME/k9s"
+elif [[ "$(uname -s)" == "Darwin" ]]; then
+  K9S_DIR="$HOME/Library/Application Support/k9s"
+else
+  K9S_DIR="$HOME/.config/k9s"
+fi
+
 DRY_RUN=0
 SHELL_ONLY=0
 AI=0
@@ -156,6 +171,7 @@ clone_if_missing() {
 
 preflight_shell() {
   [[ -d "$DOTFILES_DIR/zsh" ]] || { error 'missing shell source directory'; return 10; }
+  [[ -d "$DOTFILES_DIR/util/k9s/skins" ]] || { error 'missing k9s source directory'; return 10; }
   command -v git >/dev/null 2>&1 || { error 'missing prerequisite: git'; return 10; }
   command -v ln >/dev/null 2>&1 || { error 'missing prerequisite: ln'; return 10; }
   command -v mv >/dev/null 2>&1 || { error 'missing prerequisite: mv'; return 10; }
@@ -190,6 +206,12 @@ run_shell_stage() {
   link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux" || return 20
   link_path "$DOTFILES_DIR/util/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf" || return 20
   link_path "$DOTFILES_DIR/util/wezterm/wezterm.lua" "$HOME/.wezterm.lua" || return 20
+
+  # clusters/ and k9s.log stay out of the repo: they are per-cluster view state
+  # and a log, written by k9s rather than chosen by anyone.
+  link_path "$DOTFILES_DIR/util/k9s/config.yaml" "$K9S_DIR/config.yaml" || return 20
+  link_path "$DOTFILES_DIR/util/k9s/aliases.yaml" "$K9S_DIR/aliases.yaml" || return 20
+  link_path "$DOTFILES_DIR/util/k9s/skins" "$K9S_DIR/skins" || return 20
 }
 
 run_ai_stage() {
