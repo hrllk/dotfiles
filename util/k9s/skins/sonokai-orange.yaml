@@ -1,0 +1,135 @@
+# Sonokai "andromeda" for k9s, sharing the literals in util/wezterm/wezterm.lua
+# and util/tmux/.tmux.conf so a k9s pane sits inside the same terminal without
+# announcing itself as a different application.
+#
+#   #F89860 orange   the accent, and the focus/selection colour
+#   #6B4226          dim orange, the unfocused counterpart
+#   #E1E3E4 fg       #7E8294 grey      #181A1C near-black
+#   #FB617E red      #EDC763 yellow    #9ED06C green   #6DCAE8 blue  #BB97EE purple
+#
+# Every background is `default`, which k9s maps to the terminal's own
+# background rather than painting a colour. That is what keeps the wezterm
+# wallpaper visible through k9s, the same way nvim runs transparent. The cost
+# is that any surface needing to sit *above* the content -- the cursor row,
+# crumbs, buttons -- has to earn its contrast from a foreground swap instead of
+# a panel, which is why those few places invert to #181A1C on orange.
+k9s:
+  body:
+    fgColor: "#E1E3E4"
+    bgColor: default
+    logoColor: "#F89860"
+    logoColorMsg: "#E1E3E4"
+    logoColorInfo: "#9ED06C"
+    logoColorWarn: "#EDC763"
+    logoColorError: "#FB617E"
+  prompt:
+    fgColor: "#E1E3E4"
+    bgColor: default
+    suggestColor: "#7E8294"
+    border:
+      command: "#F89860"
+      default: "#6B4226"
+  help:
+    fgColor: "#E1E3E4"
+    bgColor: default
+    sectionColor: "#F89860"
+    keyColor: "#F89860"
+    numKeyColor: "#EDC763"
+  frame:
+    title:
+      fgColor: "#F89860"
+      bgColor: default
+      highlightColor: "#FFFFFF"
+      counterColor: "#7E8294"
+      filterColor: "#EDC763"
+    border:
+      # Deliberately the same pair as tmux pane-border-style and
+      # pane-active-border-style: a k9s frame and a tmux pane border meeting at
+      # the same seam should not disagree about which one has focus.
+      fgColor: "#6B4226"
+      focusColor: "#F89860"
+    menu:
+      fgColor: "#E1E3E4"
+      keyColor: "#F89860"
+      numKeyColor: "#EDC763"
+    crumbs:
+      fgColor: "#181A1C"
+      bgColor: "#F89860"
+      activeColor: "#FFFFFF"
+    status:
+      # Resource lifecycle keeps its own hues -- this is the one place where
+      # colour carries data rather than chrome, so flattening it to orange
+      # would destroy information.
+      newColor: "#6DCAE8"
+      modifyColor: "#EDC763"
+      addColor: "#9ED06C"
+      pendingColor: "#F89860"
+      errorColor: "#FB617E"
+      highlightColor: "#F89860"
+      killColor: "#BB97EE"
+      completedColor: "#7E8294"
+  info:
+    sectionColor: "#7E8294"
+    fgColor: "#F89860"
+  views:
+    table:
+      fgColor: "#E1E3E4"
+      bgColor: default
+      cursorFgColor: "#181A1C"
+      cursorBgColor: "#F89860"
+      markColor: "#EDC763"
+      header:
+        fgColor: "#7E8294"
+        bgColor: default
+        sorterColor: "#F89860"
+        selectedSortColumnColor: "#FFFFFF"
+    xray:
+      fgColor: "#E1E3E4"
+      bgColor: default
+      cursorColor: "#F89860"
+      cursorTextColor: "#181A1C"
+      graphicColor: "#6B4226"
+    charts:
+      bgColor: default
+      dialBgColor: default
+      chartBgColor: default
+      focusFgColor: "#FFFFFF"
+      focusBgColor: "#6B4226"
+      defaultDialColors:
+        - "#F89860"
+        - "#FB617E"
+      defaultChartColors:
+        - "#F89860"
+        - "#FB617E"
+      resourceColors:
+        cpu:
+          - "#F89860"
+          - "#6B4226"
+        mem:
+          - "#EDC763"
+          - "#6B4226"
+    yaml:
+      keyColor: "#F89860"
+      valueColor: "#E1E3E4"
+      colonColor: "#7E8294"
+    picker:
+      mainColor: "#E1E3E4"
+      focusColor: "#F89860"
+      shortcutColor: "#EDC763"
+    logs:
+      fgColor: "#E1E3E4"
+      bgColor: default
+      indicator:
+        fgColor: "#F89860"
+        bgColor: default
+        toggleOnColor: "#9ED06C"
+        toggleOffColor: "#7E8294"
+  dialog:
+    fgColor: "#E1E3E4"
+    bgColor: default
+    buttonFgColor: "#181A1C"
+    buttonBgColor: "#6B4226"
+    buttonFocusFgColor: "#181A1C"
+    buttonFocusBgColor: "#F89860"
+    labelFgColor: "#F89860"
+    fieldFgColor: "#E1E3E4"
