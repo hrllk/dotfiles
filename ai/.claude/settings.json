@@ -36,5 +36,38 @@
   "tui": "default",
   "theme": "dark",
   "editorMode": "vim",
-  "autoScrollEnabled": true
+  "autoScrollEnabled": true,
+  "autoMode": {
+    "soft_deny": [
+      "$defaults",
+      "Bash(kubectl delete:*) scoped to namespace resale — frequent kubectl use (25×) in this project without delete precedent; destructive subcommands should stay gated",
+      "Bash(kubectl apply:*) against namespaces other than resale/context-catalog/context-order"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: one IaaS provider (fixed egress IP for the vendor API proxy) and a managed PostgreSQL service",
+      "**Repository visibility**: not queryable here — assume private per shipped default",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: .env (local, gitignored, derived from .env.example)",
+      "**Default / protected branches**: main (default branch; protection status not queryable here)",
+      "**CI/CD deploy targets**: local k3d cluster via deploy/k3d/; namespace `resale`",
+      "**Network posture**: vendor API calls route through a fixed-IP proxy because the vendor allowlists a single address; direct egress is rejected",
+      "**Source control**: a single private repo and its origin remote only",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: an external vendor API, managed PostgreSQL, and a chat webhook for operator alerts",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: .env (API keys, datasource credentials, webhook URL) — not for any audience beyond this session; share only with named+specifics-cleared parties",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace/host carrying `prod`/`production` as a whole word or segment (none observed in this repo's k8s usage, which is scoped to `resale`, `context-catalog`, `context-order`)",
+      "**Protected deployment namespaces / environments**: resale, context-catalog, context-order (k8s namespaces seen in this project's usage) plus the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (Spring-based automation tool; task management via task-master)",
+      "**Trusted repo**: /Users/hrk/task/sources/personal/resale (git worktree origin) and its origin remote — visibility not confirmed, treat as private by default; confidential material (non-secret) OK here, secrets/sensitive data never cleared by visibility alone",
+      "**Org-specific CLIs**: task-master / tm (backlog tool, claude-code provider, no API key needed except --research)",
+      "**routine under /Users/hrk/task/sources/personal/resale/ prefix**: kubectl against namespace resale (and context-catalog, context-order) is routine for this project"
+    ]
+  }
 }
