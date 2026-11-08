@@ -58,20 +58,37 @@ config.background = {
       -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-thales13-39007224.jpg",
       -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-thales13-39069329.jpg",
       --
+
+    -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-lucasandrade-11755269.jpg",
+    -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-nadunvishwanath-33820512.jpg",
+    -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-hvitkerist-38999718.jpg",
+    -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-vladimirsrajber-39022915.jpg",
+    -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-rperucho-39052377.jpg",
+    
+    
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-hvitkerist-38999721.jpg",
       -- File = home .. "/dotfiles/util/assets/wallpapers/jeremy-bishop-G9i_plbfDgk-unsplash.jpg",
       -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-nejc-soklic-7862643-6521543.jpg",
-      File = home .. "/dotfiles/util/assets/wallpapers/pexels-arts-1214011.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-arts-1214011.jpg",
+      --
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-marek-piwnicki-3907296-8387393.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-marek-piwnicki-3907296-9606971.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-marek-piwnicki-3907296-11032454.jpg",
+      -- File = home .. "/dotfiles/util/assets/wallpapers/pexels-thales13-38875180.jpg",
+      File = home .. "/dotfiles/util/assets/wallpapers/pexels-tima-miroshnichenko-7033937.jpg",
+
 
     },
     hsb = {
-      brightness = 0.75,
+      brightness = 0.95,
     },
   },
   {
     source = {
       Color = "black",
     },
-    opacity = 0.40,
+    opacity = 0.30,
+    -- opacity = 0,
     width = "100%",
     height = "100%",
   },
