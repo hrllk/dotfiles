@@ -1,135 +1,151 @@
-# Sonokai "andromeda" for k9s, sharing the literals in util/wezterm/wezterm.lua
+# Sonokai "andromeda" for k9s, tracking the literals in util/wezterm/wezterm.lua
 # and util/tmux/.tmux.conf so a k9s pane sits inside the same terminal without
 # announcing itself as a different application.
 #
-#   #F89860 orange   the accent, and the focus/selection colour
-#   #6B4226          dim orange, the unfocused counterpart
-#   #E1E3E4 fg       #7E8294 grey      #181A1C near-black
-#   #FB617E red      #EDC763 yellow    #9ED06C green   #6DCAE8 blue  #BB97EE purple
+# The values are NOT those literals, though, and that is deliberate. k9s renders
+# through tcell, which picks truecolor from terminfo rather than COLORTERM, so
+# under TERM=tmux-256color it quantises to the 256-colour palette. Its
+# quantisation is also wrong for colours that fall between palette entries:
+# measured on k9s 0.51.0, sonokai's own #F89860 came out as #8787FF, a violet,
+# and #6DCAE8 as a muddy #87AFAF. Colours that sit exactly on a palette entry
+# are passed through untouched.
 #
-# Every background is `default`, which k9s maps to the terminal's own
-# background rather than painting a colour. That is what keeps the wezterm
-# wallpaper visible through k9s, the same way nvim runs transparent. The cost
-# is that any surface needing to sit *above* the content -- the cursor row,
-# crumbs, buttons -- has to earn its contrast from a foreground swap instead of
-# a panel, which is why those few places invert to #181A1C on orange.
+# So each colour below is the palette entry its sonokai counterpart quantises
+# to. The rendered result is identical to what a correct quantiser would have
+# produced, and nothing is left for the broken one to mangle:
+#
+#   #FF875F 209  orange      <- #F89860      #875F00  94  dim orange <- #6B4226
+#   #E4E4E4 254  fg          <- #E1E3E4      #878787 102  grey       <- #7E8294
+#   #1C1C1C 234  near-black  <- #181A1C      #FF5F87 204  red        <- #FB617E
+#   #FFD75F 221  yellow      <- #EDC763      #AFD75F 149  green      <- #9ED06C
+#   #5FD7FF  81  blue        <- #6DCAE8      #AF87D7 140  purple     <- #BB97EE
+#
+# Re-check with a probe, not by eye, if these are ever edited: set body.logoColor
+# alone and read the SGR the ASCII logo is painted with.
+#
+# Every background is `default`, which k9s maps to the terminal's own background
+# rather than painting a colour. That is what keeps the wezterm wallpaper visible
+# through k9s, the same way nvim runs transparent. The cost is that any surface
+# needing to sit *above* the content -- the cursor row, crumbs, buttons -- has to
+# earn its contrast from a foreground swap instead of a panel, which is why those
+# few places invert to #1C1C1C on orange.
 k9s:
   body:
-    fgColor: "#E1E3E4"
+    fgColor: "#E4E4E4"
     bgColor: default
-    logoColor: "#F89860"
-    logoColorMsg: "#E1E3E4"
-    logoColorInfo: "#9ED06C"
-    logoColorWarn: "#EDC763"
-    logoColorError: "#FB617E"
+    logoColor: "#FF875F"
+    logoColorMsg: "#E4E4E4"
+    logoColorInfo: "#AFD75F"
+    logoColorWarn: "#FFD75F"
+    logoColorError: "#FF5F87"
   prompt:
-    fgColor: "#E1E3E4"
+    fgColor: "#E4E4E4"
     bgColor: default
-    suggestColor: "#7E8294"
+    suggestColor: "#878787"
     border:
-      command: "#F89860"
-      default: "#6B4226"
+      command: "#FF875F"
+      default: "#875F00"
   help:
-    fgColor: "#E1E3E4"
+    fgColor: "#E4E4E4"
     bgColor: default
-    sectionColor: "#F89860"
-    keyColor: "#F89860"
-    numKeyColor: "#EDC763"
+    sectionColor: "#FF875F"
+    keyColor: "#FF875F"
+    numKeyColor: "#FFD75F"
   frame:
     title:
-      fgColor: "#F89860"
+      fgColor: "#FF875F"
       bgColor: default
       highlightColor: "#FFFFFF"
-      counterColor: "#7E8294"
-      filterColor: "#EDC763"
+      counterColor: "#878787"
+      filterColor: "#FFD75F"
     border:
       # Deliberately the same pair as tmux pane-border-style and
       # pane-active-border-style: a k9s frame and a tmux pane border meeting at
       # the same seam should not disagree about which one has focus.
-      fgColor: "#6B4226"
-      focusColor: "#F89860"
+      fgColor: "#875F00"
+      focusColor: "#FF875F"
     menu:
-      fgColor: "#E1E3E4"
-      keyColor: "#F89860"
-      numKeyColor: "#EDC763"
+      fgColor: "#E4E4E4"
+      keyColor: "#FF875F"
+      numKeyColor: "#FFD75F"
     crumbs:
-      fgColor: "#181A1C"
-      bgColor: "#F89860"
+      fgColor: "#1C1C1C"
+      bgColor: "#FF875F"
       activeColor: "#FFFFFF"
     status:
       # Resource lifecycle keeps its own hues -- this is the one place where
       # colour carries data rather than chrome, so flattening it to orange
       # would destroy information.
-      newColor: "#6DCAE8"
-      modifyColor: "#EDC763"
-      addColor: "#9ED06C"
-      pendingColor: "#F89860"
-      errorColor: "#FB617E"
-      highlightColor: "#F89860"
-      killColor: "#BB97EE"
-      completedColor: "#7E8294"
+      newColor: "#5FD7FF"
+      modifyColor: "#FFD75F"
+      addColor: "#AFD75F"
+      pendingColor: "#FF875F"
+      errorColor: "#FF5F87"
+      highlightColor: "#FF875F"
+      killColor: "#AF87D7"
+      completedColor: "#878787"
   info:
-    sectionColor: "#7E8294"
-    fgColor: "#F89860"
+    sectionColor: "#878787"
+    fgColor: "#FF875F"
   views:
     table:
-      fgColor: "#E1E3E4"
+      fgColor: "#E4E4E4"
       bgColor: default
-      cursorFgColor: "#181A1C"
-      cursorBgColor: "#F89860"
-      markColor: "#EDC763"
+      cursorFgColor: "#1C1C1C"
+      cursorBgColor: "#FF875F"
+      markColor: "#FFD75F"
       header:
-        fgColor: "#7E8294"
+        fgColor: "#878787"
         bgColor: default
-        sorterColor: "#F89860"
+        sorterColor: "#FF875F"
         selectedSortColumnColor: "#FFFFFF"
     xray:
-      fgColor: "#E1E3E4"
+      fgColor: "#E4E4E4"
       bgColor: default
-      cursorColor: "#F89860"
-      cursorTextColor: "#181A1C"
-      graphicColor: "#6B4226"
+      cursorColor: "#FF875F"
+      cursorTextColor: "#1C1C1C"
+      graphicColor: "#875F00"
     charts:
       bgColor: default
       dialBgColor: default
       chartBgColor: default
       focusFgColor: "#FFFFFF"
-      focusBgColor: "#6B4226"
+      focusBgColor: "#875F00"
       defaultDialColors:
-        - "#F89860"
-        - "#FB617E"
+        - "#FF875F"
+        - "#FF5F87"
       defaultChartColors:
-        - "#F89860"
-        - "#FB617E"
+        - "#FF875F"
+        - "#FF5F87"
       resourceColors:
         cpu:
-          - "#F89860"
-          - "#6B4226"
+          - "#FF875F"
+          - "#875F00"
         mem:
-          - "#EDC763"
-          - "#6B4226"
+          - "#FFD75F"
+          - "#875F00"
     yaml:
-      keyColor: "#F89860"
-      valueColor: "#E1E3E4"
-      colonColor: "#7E8294"
+      keyColor: "#FF875F"
+      valueColor: "#E4E4E4"
+      colonColor: "#878787"
     picker:
-      mainColor: "#E1E3E4"
-      focusColor: "#F89860"
-      shortcutColor: "#EDC763"
+      mainColor: "#E4E4E4"
+      focusColor: "#FF875F"
+      shortcutColor: "#FFD75F"
     logs:
-      fgColor: "#E1E3E4"
+      fgColor: "#E4E4E4"
       bgColor: default
       indicator:
-        fgColor: "#F89860"
+        fgColor: "#FF875F"
         bgColor: default
-        toggleOnColor: "#9ED06C"
-        toggleOffColor: "#7E8294"
+        toggleOnColor: "#AFD75F"
+        toggleOffColor: "#878787"
   dialog:
-    fgColor: "#E1E3E4"
+    fgColor: "#E4E4E4"
     bgColor: default
-    buttonFgColor: "#181A1C"
-    buttonBgColor: "#6B4226"
-    buttonFocusFgColor: "#181A1C"
-    buttonFocusBgColor: "#F89860"
-    labelFgColor: "#F89860"
-    fieldFgColor: "#E1E3E4"
+    buttonFgColor: "#1C1C1C"
+    buttonBgColor: "#875F00"
+    buttonFocusFgColor: "#1C1C1C"
+    buttonFocusBgColor: "#FF875F"
+    labelFgColor: "#FF875F"
+    fieldFgColor: "#E4E4E4"
