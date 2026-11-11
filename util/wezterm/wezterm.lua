@@ -20,51 +20,26 @@ local sonokai = {
   purple = "#BB97EE",
 }
 
--- Orange is the single chrome accent. The dim variant is a hand-darkened
--- orange rather than a palette entry: sonokai's own bg_yellow (#4E432F) goes
--- muddy once the 85% black background layer sits under it.
-local active_border = sonokai.orange
-local inactive_border = "#6B4226"
-
-local active_window_frame = {
+-- Orange is the single chrome accent, and the frame now wears it unconditionally.
+--
+-- This used to recolour on focus, through a window-focus-changed handler that
+-- called set_config_overrides. WezTerm has no API for the window frame short of
+-- a config override, and an override re-evaluates this file and reconfigures the
+-- window on the GUI thread -- so every Cmd+` switched the window instantly and
+-- then swallowed keystrokes for a beat while two windows rebuilt themselves.
+-- Which window has focus is now shown by the tmux status line instead (see the
+-- client-focus hooks in util/tmux/.tmux.conf); redrawing a status line costs
+-- nothing next to reconfiguring a 6720x3780 window.
+local window_frame = {
   border_left_width = "0.25cell",
   border_right_width = "0.25cell",
   border_top_height = "0.125cell",
   border_bottom_height = "0.125cell",
-  border_left_color = active_border,
-  border_right_color = active_border,
-  border_top_color = active_border,
-  border_bottom_color = active_border,
+  border_left_color = sonokai.orange,
+  border_right_color = sonokai.orange,
+  border_top_color = sonokai.orange,
+  border_bottom_color = sonokai.orange,
 }
-
-local inactive_window_frame = {
-  border_left_width = "0.25cell",
-  border_right_width = "0.25cell",
-  border_top_height = "0.125cell",
-  border_bottom_height = "0.125cell",
-  border_left_color = inactive_border,
-  border_right_color = inactive_border,
-  border_top_color = inactive_border,
-  border_bottom_color = inactive_border,
-}
-
-local function apply_window_frame(window)
-  local frame = window:is_focused() and active_window_frame or inactive_window_frame
-  window:set_config_overrides({
-    window_frame = frame,
-  })
-end
-
--- Only focus changes drive the frame. There was a second handler on
--- window-config-reloaded, and it fed back on itself: set_config_overrides below
--- triggers a reload, the reload handler called it again, and one Cmd+Shift+R
--- turned into five full evaluations of this file (counted, not guessed).
--- config.window_frame already supplies the active frame at startup, so the only
--- thing given up is that after a manual reload an unfocused window wears the
--- active border until it next gains or loses focus.
-wezterm.on("window-focus-changed", function(window, pane)
-  apply_window_frame(window)
-end)
 
 config.font = wezterm.font_with_fallback({
   { family = "JetBrains Mono", weight = "Medium" },
@@ -186,7 +161,7 @@ config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
 config.tab_bar_at_bottom = true
 config.window_decorations = "RESIZE"
-config.window_frame = active_window_frame
+config.window_frame = window_frame
 
 config.audible_bell = "Disabled"
 config.warn_about_missing_glyphs = false
@@ -194,6 +169,21 @@ config.enable_scroll_bar = false
 config.window_close_confirmation = "NeverPrompt"
 
 config.keys = {
+  -- Cmd+` cannot be bound here: macOS claims it as a system shortcut ("move
+  -- focus to the next window") and the key never reaches wezterm at all --
+  -- verified by binding a callback to it and watching it never fire, while the
+  -- same callback on Cmd+Shift+Y fired every time. Opt+` is the same physical
+  -- key on a path wezterm can actually see, so the switch stays in-process.
+  {
+    key = "`",
+    mods = "ALT",
+    action = wezterm.action.ActivateWindowRelative(1),
+  },
+  {
+    key = "`",
+    mods = "ALT|SHIFT",
+    action = wezterm.action.ActivateWindowRelative(-1),
+  },
   {
     key = "Enter",
     mods = "ALT",
