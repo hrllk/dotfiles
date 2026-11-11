@@ -55,11 +55,14 @@ local function apply_window_frame(window)
   })
 end
 
+-- Only focus changes drive the frame. There was a second handler on
+-- window-config-reloaded, and it fed back on itself: set_config_overrides below
+-- triggers a reload, the reload handler called it again, and one Cmd+Shift+R
+-- turned into five full evaluations of this file (counted, not guessed).
+-- config.window_frame already supplies the active frame at startup, so the only
+-- thing given up is that after a manual reload an unfocused window wears the
+-- active border until it next gains or loses focus.
 wezterm.on("window-focus-changed", function(window, pane)
-  apply_window_frame(window)
-end)
-
-wezterm.on("window-config-reloaded", function(window)
   apply_window_frame(window)
 end)
 
@@ -69,6 +72,15 @@ config.font = wezterm.font_with_fallback({
   "Apple Color Emoji",
 })
 config.font_size = 12
+
+-- Stated rather than left to the default, which varies by build, and this build
+-- reports no version at all. WebGpu goes through Metal here; the power
+-- preference matters on machines with a discrete GPU and is harmless on this
+-- one. max_fps is raised past the default 60 for the 120Hz internal panel --
+-- the 60Hz external display simply will not use the headroom.
+config.front_end = "WebGpu"
+config.webgpu_power_preference = "HighPerformance"
+config.max_fps = 120
 -- Defined inline rather than picked from wezterm's bundled schemes so the ANSI
 -- table matches sonokai exactly. Note slot 6: sonokai maps cyan to orange, and
 -- following it keeps `ls`/`git` output in the same two-colour world as the
