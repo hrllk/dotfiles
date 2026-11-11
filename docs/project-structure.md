@@ -125,7 +125,6 @@ zsh/
 
 ```text
 util/
-├── jetbrains/.ideavimrc            JetBrains Vim 설정
 ├── wezterm/wezterm.lua             WezTerm 설정
 ├── k9s/                            k9s 설정·alias·skin
 ├── tmux/

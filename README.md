@@ -75,12 +75,11 @@ The bootstrap script:
 - clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting` when missing
 - clones tmux plugin manager (TPM) when missing
 - backs up existing shell and terminal config files with a shared invocation timestamp
-- creates symlinks for `zsh`, `ideavim`, `tmux`, `wezterm`, and `k9s`
+- creates symlinks for `zsh`, `tmux`, `wezterm`, and `k9s`
 - keeps shell secret loading separate from Hermes runtime synchronization
 
 Targets after bootstrap:
 - `~/.zshrc` -> `~/dotfiles/zsh/.zshrc`
-- `~/.ideavimrc` -> `~/dotfiles/util/jetbrains/.ideavimrc`
 - `~/.tmux.conf` -> `~/dotfiles/util/tmux/.tmux.conf`
 - `~/.tmux` -> `~/dotfiles/util/tmux/.tmux`
 - `~/.wezterm.lua` -> `~/dotfiles/util/wezterm/wezterm.lua`

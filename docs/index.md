@@ -43,6 +43,7 @@
 |---|---|
 | [설정 아키텍처](explanation-architecture.md) | startup 순서, 모듈 책임, optional dependency 처리 |
 | [Secret handling](explanation-secret-handling.md) | key 파일과 환경변수 사이의 간접 계층, allowlist gitignore를 쓰는 이유 |
+| [터미널 테마](explanation-terminal-theme.md) | wezterm·tmux·k9s가 공유하는 팔레트, 상태바 오렌지의 단일 의미, k9s 색 제약 |
 
 ## 기능별 문서
 

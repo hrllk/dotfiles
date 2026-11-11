@@ -87,7 +87,6 @@ TPM과 zsh plugin을 clone합니다. `<target>/.git`이 이미 있으면 건너�
 | Link | Source |
 |---|---|
 | `~/.zshrc` | `zsh/.zshrc` |
-| `~/.ideavimrc` | `util/jetbrains/.ideavimrc` |
 | `~/.tmux.conf` | `util/tmux/.tmux.conf` |
 | `~/.tmux` | `util/tmux/.tmux` |
 | `~/.wezterm.lua` | `util/wezterm/wezterm.lua` |

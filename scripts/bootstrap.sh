@@ -200,7 +200,6 @@ run_shell_stage() {
   clone_if_missing https://github.com/tmux-plugins/tpm "$TMUX_TPM_DIR" || { error 'file-link failure: tpm'; return 20; }
 
   link_path "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc" || return 20
-  link_path "$DOTFILES_DIR/util/jetbrains/.ideavimrc" "$HOME/.ideavimrc" || return 20
   link_path "$DOTFILES_DIR/util/tmux/.tmux.conf" "$HOME/.tmux.conf" || return 20
   link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux" || return 20
   link_path "$DOTFILES_DIR/util/wezterm/wezterm.lua" "$HOME/.wezterm.lua" || return 20

@@ -64,7 +64,7 @@
 다음 명령으로 주요 symlink와 셸 기능을 확인합니다.
 
 ```zsh
-ls -l ~/.zshrc ~/.tmux.conf ~/.gitmux.conf ~/.wezterm.lua ~/.ideavimrc
+ls -l ~/.zshrc ~/.tmux.conf ~/.tmux ~/.wezterm.lua
 type tm task-master fzf
 bindkey -M viins '^I'
 time zsh -i -c exit

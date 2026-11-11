@@ -82,9 +82,17 @@ SDKMAN is a lazy entrypoint. An uninstalled SDKMAN directory does not fail start
 
 Codex와 Claude Code는 동일한 hook script `util/tmux/.tmux/scripts/ai-notify-hook.sh`를 각자의 `Stop` 이벤트에 등록합니다. Codex는 `ai/.codex/hooks.json`으로, Claude Code는 `ai/.claude/settings.json`의 `hooks.Stop`으로 연결하며, 두 경로 모두 `~/.codex`와 `~/.claude` 심링크를 통해 저장소 파일을 그대로 사용합니다.
 
-hook은 tmux 밖에서는 즉시 종료하고, tmux 안에서는 agent가 실행된 window의 `@ai_unread` user option을 갱신합니다. tmux format은 이 값을 읽어 window 상태를 표시하고, window 선택 또는 client focus 이벤트가 해당 값을 지웁니다. 상태 변수를 agent별로 나누지 않은 이유는 필요한 정보가 "이 window에 확인하지 않은 완료가 있다"이지 어느 agent가 끝냈는지가 아니기 때문입니다. window 이름과 내용이 이미 후자를 알려줍니다.
+hook은 tmux 밖에서는 즉시 종료하고, tmux 안에서는 agent가 실행된 window에 두 user option 중 하나를 세웁니다. `@ai_waiting`은 agent가 답을 기다릴 때, `@ai_unread`는 턴이 끝났는데 아직 보지 않았을 때입니다. 상태 변수를 agent별로 나누지 않은 이유는 필요한 정보가 "이 window가 나를 원한다"이지 어느 agent인지가 아니기 때문입니다. window 이름과 내용이 이미 후자를 알려줍니다.
 
-상태와 표시를 분리한 이유는 기존 `window-status-style`을 덮어쓰지 않고 읽음 상태만 추가하기 위해서입니다.
+상태를 지우는 훅은 **도착 경로마다 하나씩, 세 개**입니다. `after-select-window` 하나로는 부족합니다. 그것은 `switch-client`에서 발화하지 않고, `session-window-changed`는 이미 목표 window에 있는 세션으로 건너뛸 때 발화하지 않습니다. 셋을 합쳐야 모든 도착 경로가 덮입니다.
+
+| 훅 | 덮는 경로 |
+|---|---|
+| `session-window-changed` | 세션의 current window가 이동 |
+| `client-session-changed` | 클라이언트가 다른 세션으로 이동 |
+| `client-focus-in` | 이동 없이 터미널이 포커스를 되찾음 |
+
+상태와 표시를 분리한 이유는 기존 `window-status-style`을 덮어쓰지 않고 상태만 추가하기 위해서입니다. 색 배정과 그 규칙은 [터미널 테마](explanation-terminal-theme.md)에 있습니다.
 
 hook이 status line 메시지와 desktop notification을 보내는 것은 window가 비활성일 때뿐입니다. Claude Code는 assistant turn마다 `Stop`을 발화하므로, 활성 window까지 알리면 사용자가 보고 있는 화면을 계속 덮어씁니다. 자세한 상태 전이는 [tmux unread 설계](design-codex-tmux-unread.md)를 참조합니다.
 
