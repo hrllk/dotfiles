@@ -1,34 +1,15 @@
-# Sonokai "andromeda" for k9s, tracking the literals in util/wezterm/wezterm.lua
-# and util/tmux/.tmux.conf so a k9s pane sits inside the same terminal without
-# announcing itself as a different application.
+# Sonokai "andromeda" for k9s, matching util/wezterm/wezterm.lua and
+# util/tmux/.tmux.conf.
 #
-# The values are NOT those literals, though, and that is deliberate. k9s renders
-# through tcell, which picks truecolor from terminfo rather than COLORTERM, so
-# under TERM=tmux-256color it quantises to the 256-colour palette. Its
-# quantisation is also wrong for colours that fall between palette entries:
-# measured on k9s 0.51.0, sonokai's own #F89860 came out as #8787FF, a violet,
-# and #6DCAE8 as a muddy #87AFAF. Colours that sit exactly on a palette entry
-# are passed through untouched.
+# The values are the xterm-256 entries the sonokai literals quantise to, not the
+# literals themselves. k9s renders through tcell, which under TERM=tmux-256color
+# quantises -- and gets it wrong for colours between palette entries (#F89860
+# came out violet). Colours already on a palette entry pass through untouched.
+# If you edit these, verify with a probe: set body.logoColor alone and read the
+# SGR the ASCII logo is painted with.
 #
-# So each colour below is the palette entry its sonokai counterpart quantises
-# to. The rendered result is identical to what a correct quantiser would have
-# produced, and nothing is left for the broken one to mangle:
-#
-#   #FF875F 209  orange      <- #F89860      #875F00  94  dim orange <- #6B4226
-#   #E4E4E4 254  fg          <- #E1E3E4      #878787 102  grey       <- #7E8294
-#   #1C1C1C 234  near-black  <- #181A1C      #FF5F87 204  red        <- #FB617E
-#   #FFD75F 221  yellow      <- #EDC763      #AFD75F 149  green      <- #9ED06C
-#   #5FD7FF  81  blue        <- #6DCAE8      #AF87D7 140  purple     <- #BB97EE
-#
-# Re-check with a probe, not by eye, if these are ever edited: set body.logoColor
-# alone and read the SGR the ASCII logo is painted with.
-#
-# Every background is `default`, which k9s maps to the terminal's own background
-# rather than painting a colour. That is what keeps the wezterm wallpaper visible
-# through k9s, the same way nvim runs transparent. The cost is that any surface
-# needing to sit *above* the content -- the cursor row, crumbs, buttons -- has to
-# earn its contrast from a foreground swap instead of a panel, which is why those
-# few places invert to #1C1C1C on orange.
+# Backgrounds are `default` so the terminal background shows through; surfaces
+# that must sit above content invert to #1C1C1C on orange instead.
 k9s:
   body:
     fgColor: "#E4E4E4"
@@ -59,9 +40,7 @@ k9s:
       counterColor: "#878787"
       filterColor: "#FFD75F"
     border:
-      # Deliberately the same pair as tmux pane-border-style and
-      # pane-active-border-style: a k9s frame and a tmux pane border meeting at
-      # the same seam should not disagree about which one has focus.
+      # Same pair as tmux pane-border-style / pane-active-border-style.
       fgColor: "#875F00"
       focusColor: "#FF875F"
     menu:
@@ -73,9 +52,7 @@ k9s:
       bgColor: "#FF875F"
       activeColor: "#FFFFFF"
     status:
-      # Resource lifecycle keeps its own hues -- this is the one place where
-      # colour carries data rather than chrome, so flattening it to orange
-      # would destroy information.
+      # Lifecycle colours carry data, not chrome -- left polychrome on purpose.
       newColor: "#5FD7FF"
       modifyColor: "#FFD75F"
       addColor: "#AFD75F"

@@ -2,10 +2,8 @@ local wezterm = require "wezterm"
 local home = os.getenv("HOME") or "/Users/hrk"
 
 local config = wezterm.config_builder()
--- Sonokai "andromeda" palette, copied verbatim from the colorscheme nvim runs
--- (sonokai/autoload/sonokai.vim). Keeping the literals identical is the point:
--- editor, multiplexer and terminal chrome all read from the same six values, so
--- the only colour that varies across a split is the code itself.
+-- Sonokai "andromeda", verbatim from sonokai/autoload/sonokai.vim.
+-- The same literals appear in util/tmux/.tmux.conf.
 local sonokai = {
   black = "#181A1C",
   fg = "#E1E3E4",
@@ -20,16 +18,9 @@ local sonokai = {
   purple = "#BB97EE",
 }
 
--- Orange is the single chrome accent, and the frame now wears it unconditionally.
---
--- This used to recolour on focus, through a window-focus-changed handler that
--- called set_config_overrides. WezTerm has no API for the window frame short of
--- a config override, and an override re-evaluates this file and reconfigures the
--- window on the GUI thread -- so every Cmd+` switched the window instantly and
--- then swallowed keystrokes for a beat while two windows rebuilt themselves.
--- Which window has focus is now shown by the tmux status line instead (see the
--- client-focus hooks in util/tmux/.tmux.conf); redrawing a status line costs
--- nothing next to reconfiguring a 6720x3780 window.
+-- Static on purpose. Recolouring this per focus needs set_config_overrides,
+-- which rebuilds the window on the GUI thread and stalls input after every
+-- switch; the focus cue lives in tmux instead.
 local window_frame = {
   border_left_width = "0.25cell",
   border_right_width = "0.25cell",
@@ -48,18 +39,12 @@ config.font = wezterm.font_with_fallback({
 })
 config.font_size = 12
 
--- Stated rather than left to the default, which varies by build, and this build
--- reports no version at all. WebGpu goes through Metal here; the power
--- preference matters on machines with a discrete GPU and is harmless on this
--- one. max_fps is raised past the default 60 for the 120Hz internal panel --
--- the 60Hz external display simply will not use the headroom.
+-- max_fps is past the default 60 for the 120Hz internal panel.
 config.front_end = "WebGpu"
 config.webgpu_power_preference = "HighPerformance"
 config.max_fps = 120
--- Defined inline rather than picked from wezterm's bundled schemes so the ANSI
--- table matches sonokai exactly. Note slot 6: sonokai maps cyan to orange, and
--- following it keeps `ls`/`git` output in the same two-colour world as the
--- chrome. Swap in sonokai.blue there to get a conventional cyan back.
+-- Inline so the ANSI table matches sonokai exactly. Slot 6 is orange, not cyan
+-- -- sonokai's own mapping; use sonokai.blue there for a conventional cyan.
 config.color_schemes = {
   ["Sonokai Andromeda"] = {
     foreground = sonokai.fg,
@@ -138,9 +123,7 @@ config.background = {
     source = {
       Color = "black",
     },
-    -- 0.85 reduces the wallpaper to texture rather than imagery, which is what
-    -- lets the orange chrome read as the brightest thing on screen. Lower it
-    -- back toward 0.30 to bring the photo forward again.
+    -- Lower this to bring the photo forward.
     opacity = 0.55,
     -- opacity = 0,
     width = "100%",
@@ -169,11 +152,8 @@ config.enable_scroll_bar = false
 config.window_close_confirmation = "NeverPrompt"
 
 config.keys = {
-  -- Cmd+` cannot be bound here: macOS claims it as a system shortcut ("move
-  -- focus to the next window") and the key never reaches wezterm at all --
-  -- verified by binding a callback to it and watching it never fire, while the
-  -- same callback on Cmd+Shift+Y fired every time. Opt+` is the same physical
-  -- key on a path wezterm can actually see, so the switch stays in-process.
+  -- Not Cmd+`: macOS claims that as a system shortcut and the key never
+  -- reaches wezterm.
   {
     key = "`",
     mods = "ALT",
