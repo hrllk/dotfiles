@@ -202,7 +202,6 @@ run_shell_stage() {
   link_path "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc" || return 20
   link_path "$DOTFILES_DIR/util/jetbrains/.ideavimrc" "$HOME/.ideavimrc" || return 20
   link_path "$DOTFILES_DIR/util/tmux/.tmux.conf" "$HOME/.tmux.conf" || return 20
-  link_path "$DOTFILES_DIR/util/tmux/.gitmux.conf" "$HOME/.gitmux.conf" || return 20
   link_path "$DOTFILES_DIR/util/tmux/.tmux" "$HOME/.tmux" || return 20
   link_path "$DOTFILES_DIR/util/wezterm/wezterm.lua" "$HOME/.wezterm.lua" || return 20
 

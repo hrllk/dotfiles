@@ -75,17 +75,16 @@ The bootstrap script:
 - clones `powerlevel10k`, `fzf-tab`, `zsh-autosuggestions`, and `zsh-syntax-highlighting` when missing
 - clones tmux plugin manager (TPM) when missing
 - backs up existing shell and terminal config files with a shared invocation timestamp
-- creates symlinks for `zsh`, `ideavim`, `tmux`, `gitmux`, `kitty`, and `wezterm`
+- creates symlinks for `zsh`, `ideavim`, `tmux`, `wezterm`, and `k9s`
 - keeps shell secret loading separate from Hermes runtime synchronization
 
 Targets after bootstrap:
 - `~/.zshrc` -> `~/dotfiles/zsh/.zshrc`
 - `~/.ideavimrc` -> `~/dotfiles/util/jetbrains/.ideavimrc`
 - `~/.tmux.conf` -> `~/dotfiles/util/tmux/.tmux.conf`
-- `~/.gitmux.conf` -> `~/dotfiles/util/tmux/.gitmux.conf`
 - `~/.tmux` -> `~/dotfiles/util/tmux/.tmux`
-- `~/.config/kitty/kitty.conf` -> `~/dotfiles/util/kitty/kitty.conf`
 - `~/.wezterm.lua` -> `~/dotfiles/util/wezterm/wezterm.lua`
+- k9s config, aliases and skins -> `~/dotfiles/util/k9s/` (path resolved per k9s's own rules)
 - the `--ai` stage can link `~/.claude` and `~/.hermes`
 - Codex is never copied or linked automatically; prepare it explicitly with `ai/.codex/init-home-codex`
 - tmux plugins are installed under `~/.local/share/tmux/plugins/` and are not tracked in this repo

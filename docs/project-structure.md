@@ -126,11 +126,10 @@ zsh/
 ```text
 util/
 ├── jetbrains/.ideavimrc            JetBrains Vim 설정
-├── kitty/kitty.conf                Kitty 설정
 ├── wezterm/wezterm.lua             WezTerm 설정
+├── k9s/                            k9s 설정·alias·skin
 ├── tmux/
 │   ├── .tmux.conf                  tmux 기본 설정
-│   ├── .gitmux.conf                Git 상태 표시 설정
 │   └── .tmux/scripts/              상태바 보조 script
 └── assets/wallpapers/              terminal이 참조하는 정적 이미지
 ```

@@ -89,10 +89,9 @@ TPM과 zsh plugin을 clone합니다. `<target>/.git`이 이미 있으면 건너�
 | `~/.zshrc` | `zsh/.zshrc` |
 | `~/.ideavimrc` | `util/jetbrains/.ideavimrc` |
 | `~/.tmux.conf` | `util/tmux/.tmux.conf` |
-| `~/.gitmux.conf` | `util/tmux/.gitmux.conf` |
 | `~/.tmux` | `util/tmux/.tmux` |
-| `~/.config/kitty/kitty.conf` | `util/kitty/kitty.conf` |
 | `~/.wezterm.lua` | `util/wezterm/wezterm.lua` |
+| k9s config dir | `util/k9s/` (config.yaml, aliases.yaml, skins/) |
 
 `link_path`의 판단 순서:
 
