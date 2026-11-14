@@ -30,7 +30,7 @@ scripts/hooks
 - `harness.yml`: Machine-readable harness metadata and command registry.
 - `.devcontainer/`: Optional reproducible development container.
 - `.pre-commit-config.yaml`: Optional local hook definitions.
-- `docs/`: Not used in this repo.
+- `docs/`: Numbered Baeldung-style articles, one topic each.
 - `scripts/`: Stable automation entrypoints.
 - `tasks/`: Task briefs and working notes.
 
@@ -42,7 +42,7 @@ scripts/hooks
 - Use `rg` for searching when available.
 - Use the standard scripts instead of one-off local commands when they cover the task.
 - Add or update tests when behavior changes.
-- Put rationale in the commit message. Do not create a `docs/` tree.
+- Put rationale in the commit message, or in the matching `docs/` article. Keep articles in Baeldung form: numbered sections, Overview first, Conclusion last, short paragraphs, a code block per section.
 - Add nested `AGENTS.md` files in subdirectories only when that area needs different instructions.
 - Keep root-level agent instructions short and durable. Move long procedures into docs or scripts.
 

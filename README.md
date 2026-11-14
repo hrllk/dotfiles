@@ -33,6 +33,14 @@ archive/  no longer loaded
 Secret values live outside the repo under `$DOTFILES_KEY_DIR`. Tracked files
 hold `${VAR}` references only.
 
+## Docs
+
+1. [Installing the Dotfiles](docs/01-installing-the-dotfiles.md)
+2. [The Zsh Startup Sequence](docs/02-zsh-startup-sequence.md)
+3. [Loading Secrets Without Committing Them](docs/03-loading-secrets.md)
+4. [AI Agent Notifications in tmux](docs/04-ai-agent-notifications-in-tmux.md)
+5. [The Terminal Color Palette](docs/05-the-terminal-color-palette.md)
+
 ## Verify
 
 ```zsh
